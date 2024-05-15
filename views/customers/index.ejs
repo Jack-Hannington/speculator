@@ -1,0 +1,49 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+  <section>
+    <div class="row">
+      <div class="header-row col-lg-8 col-12">
+        <h1>Customers</h1>
+        <p>Manage customers and memberships here.</p>
+      </div>
+      <div class="col-lg-4 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
+        <a href="/customers/create" class="btn btn-primary">+ New customer</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="row">
+        <div class="col-12">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Membership</th>
+                        <th colspan="2">Edit</th>
+                    </thead>
+                    <tbody>
+
+                        <% customers.forEach(customer => { %>
+                        <tr>
+                            <td><%=customer.name%></td>
+                            <td><%=customer.email%></td>
+                            <td><%=customer.role%></td>
+                            <td><%= customer.memberships ? customer.memberships.name : 'No Membership' %></td>
+                            <td colspan="2"><a href="/customers/edit/<%=customer.id%>" class="me-3">Edit</a>
+                             <a href="/customers/bookings/<%=customer.id%>">Bookings</a></td>
+                          </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+  </section>
+  
+
+
+  <%- include('../partials/footer') %>

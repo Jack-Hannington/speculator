@@ -1,0 +1,477 @@
+
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<style>
+
+.btn, button {
+    border: var(--base-border);
+    color: var(--base-color);
+    border-radius: var(--base-border-radius);
+    padding: 10px 14px;
+    font-size: var(--smaller-font);
+    background: white;
+    font-weight: 500;
+    transition: 0.4s;
+    box-shadow: var(--base-box-shadow);
+}
+
+.booking-component {
+    max-width: 960px;
+    border:var(--base-border);
+    border-radius: var(--base-border-radius);
+    box-shadow: var(--base-box-shadow);
+}    
+#calendar, #day-labels {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 days in a week */
+    gap: 4px;
+}
+
+
+.day-labels > div {
+    text-align: center;
+    font-weight: 500;
+    padding: 8px 0;
+    text-transform: uppercase;
+    font-size:12px; /* Adjust padding to your liking */
+}
+
+.calendar-day {
+    text-align: center;
+    background-color: #fff; /* Light grey background */
+    border: 1px solid #ddd; /* Grey border */
+    border-radius: var(--base-border-radius);
+    cursor: pointer;
+    padding-top: 100%; /* Padding-top as 100% of the element's current width */
+    position: relative; /* Needed for absolute positioning inside */
+    box-sizing: border-box; /* Includes padding and border in the element's width and height */
+    transition: 0.4s;
+}
+
+.offset-day {
+    border:none;
+    /* background-color: white; */
+}
+
+.calendar-day:hover, button:hover {
+    border:1px solid var(--orange-600);
+}
+
+.calendar-day > span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%; /* Full width */
+    height: auto; /* Auto height based on content */
+    padding: 4px 0; /* Padding for the content */
+}
+
+.calendar-grid {
+    margin-top: 5px;
+}
+.past-day, .expired {
+    color: #ccc;  
+    background-color: #f9f9f9;
+    pointer-events: none;  
+}
+
+
+.time-slot {
+      cursor: pointer;
+      padding: var(--base-padding);
+      border: var(--base-border);
+      margin-bottom: 5px;
+      border-radius: var(--base-border-radius);
+      text-align: center;
+      font-size: var(--font-14);
+}
+.selected-day {
+    background-color: var(--orange-600);
+    color:white;
+}
+
+.time-slot.selected {
+    color: var(--orange-600);
+    background-color: var(--orange-50);
+    border-color: var(--orange-600);
+}
+
+</style>
+
+<div class="container-xxl">
+    
+      <div class="booking-component container animate__animated animate__slideInRight mt-5">
+        <div class="row px-2 py-3">
+            <div class="booking-component-details col-md-3 d-flex flex-column">
+                <img src="https://via.placeholder.com/50" style="width:40px;height:40px;border-radius:50%">
+                <h5 class="booking-component-name fw-bolder mt-3">Book <%= serviceDetails.name %></h5>
+                <p><%= serviceDetails.description %></p>
+                <p><i class="bi bi-tag-fill me-2"></i> £<%= serviceDetails.price %>.00</p>
+                <p><i class="bi bi-clock-fill me-2"></i>1 hour</p>
+                <p><i class="bi bi-person-fill me-2"></i>4 riders per arena</p>
+            </div>
+            <div class="booking-component-calendar col-md-6 mt-4 mt-sm-0">
+                    <!-- Month Navigation -->
+                    <div class="d-flex justify-content-between mb-3 calendar-header align-items-center">
+                      <button id="prev-month" class=""> <- Prev</button>
+                      <p class="mb-0 fw-semibold" id="month-year">April 2024</p>
+                      <button id="next-month" class="">Next -></button>
+                    </div>
+                    <div id="day-labels" class="day-labels">
+                    
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                        <div>Sun</div>
+                    </div>
+                
+                    <!-- Calendar Grid -->
+                    <div id="calendar" class="calendar-grid"></div>
+            </div>
+            <div class="booking-component-time-selection col-md-3 mt-4 mt-sm-0 text-lg-center">
+                <p class="fw-semibold" id="month-year">Available slots</p>
+                <div id="time-slots" class="">
+                </div>
+            </div>
+        </div>
+        <div id="add-ons-container" class="border-top py-4">
+            <% addOns.forEach(addOn => { %>
+                <div class="add-on row" data-add-on-id="<%= addOn.id %>">
+                    <div class="col-6 d-flex align-items-center">   
+                        <p class="fw-semibold mb-0"><%= addOn.name %> - £<%= addOn.price %></p>
+                    </div>
+                    <div class="quantity-controls col-6 d-flex justify-content-end align-items-center">
+                        <button onclick="changeAddOnQuantity('<%= addOn.id %>', '<%= addOn.name %>','<%= addOn.price %>', -1)">-</button>
+                        <input class="btn" style="width:40px" type="text" id="quantity-<%= addOn.id %>" value="0" min="0" max="<%= addOn.max_quantity %>" readonly>
+                        <button onclick="changeAddOnQuantity('<%= addOn.id %>', '<%= addOn.name %>', '<%= addOn.price %>',  1)">+</button>
+                    </div>  
+                    <div class="col">
+                        <p><%= addOn.description %></p>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+        <div>
+            <h4>Booking summary</h4>
+            <div id="booking-summary"></div>
+            <button id="paymentPageBtn" class="hidden">Your details -></button>
+        </div>
+        <script src="https://js.stripe.com/v3/"></script>
+
+        <button id="checkout-button">Checkout</button>
+        
+      </div> 
+  
+</div>
+
+
+<script>
+let serviceData = <%- JSON.stringify(serviceDetails) %>;
+let timeSlotsData = <%- JSON.stringify(timeSlots) %>;
+let existingBookings =<%- JSON.stringify(existingBookings) %>;
+let userId =<%- JSON.stringify(user.id) %>;
+
+
+console.log(serviceData, timeSlotsData, existingBookings, userId)
+
+function parseSessionDuration(durationStr) {
+    const [hours, minutes, seconds] = durationStr.split(':').map(Number);
+    return hours * 60 + minutes; // Ignore seconds
+}
+
+const sessionDurationMinutes = parseSessionDuration(serviceData.session_duration);
+
+const today = new Date();
+const day = today.getDate(); 
+let currentMonth = today.getMonth(); 
+let currentYear = today.getFullYear(); 
+let currentSelectedDayElement = null; 
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('prev-month').addEventListener('click', () => changeMonth(-1));
+    document.getElementById('next-month').addEventListener('click', () => changeMonth(1));
+    generateCalendar(currentMonth, currentYear);
+});
+
+function generateCalendar(month, year) {
+    const calendarContainer = document.getElementById('calendar');
+    calendarContainer.innerHTML = ''; // Clear existing calendar
+
+    // Get the first day of the month
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Adjust the first day of the week to match your calendar layout (0: Sun, 1: Mon, ..., 6: Sat)
+    // Assuming your week starts on Monday, and getDay() returns 0 for Sunday
+    const dayOffset = firstDay === 0 ? 6 : firstDay - 1; // Convert Sunday to index 6, otherwise shift by -1
+
+    // Add empty cells if the first day is not Monday
+    for (let i = 0; i < dayOffset; i++) {
+        const emptyDayElement = document.createElement('div');
+        emptyDayElement.classList.add('calendar-day');
+        emptyDayElement.classList.add('offset-day');
+        calendarContainer.appendChild(emptyDayElement);
+    }
+
+    document.getElementById('month-year').textContent = `${new Date(year, month).toLocaleString('en-gb', { month: 'long' })} ${year}`;
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateOfCurrentDay = new Date(year, month, day, 12); // Set to noon to avoid timezone affecting the day
+        const isPast = dateOfCurrentDay < today; // Check if the day is in the past
+        const dayElement = document.createElement('div');
+        dayElement.classList.add('calendar-day');
+        if (isPast) {
+            dayElement.classList.add('past-day');
+            dayElement.classList.add('expired');
+        }
+
+        const dayNumber = document.createElement('span');
+        dayNumber.textContent = day;
+        dayElement.appendChild(dayNumber);
+
+        dayElement.addEventListener('click', function() {
+            if (!isPast) {
+                if (currentSelectedDayElement) {
+                    currentSelectedDayElement.classList.remove('selected-day');
+                }
+                dayElement.classList.add('selected-day');
+                currentSelectedDayElement = dayElement;
+                const selectedDateStr = dateOfCurrentDay.toISOString().split('T')[0];
+                console.log(day, timeSlotsData, existingBookings, selectedDateStr)
+                displayTimeSlots(day, timeSlotsData, existingBookings, selectedDateStr);
+            }
+        });
+        calendarContainer.appendChild(dayElement);
+    }
+}
+
+function changeMonth(change) {
+    currentMonth += change;
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    } else if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+    generateCalendar(currentMonth, currentYear);
+}
+
+function displayTimeSlots(selectedDay, timeSlots, bookings, selectedDateString) {
+    const timeSlotsContainer = document.getElementById('time-slots');
+    timeSlotsContainer.innerHTML = ''; // Clear existing time slots
+    bookingDetails.date = selectedDateString; 
+    const selectedDate = new Date(`${selectedDateString}T12:00:00`); // Set to noon to avoid timezone issues
+    const now = new Date();
+    const selectedDayOfWeek = selectedDate.toLocaleString('en-gb', { weekday: 'long' });
+
+    // Filter slots by the selected day of the week and ensure they are not closed
+    const daySlots = timeSlots.filter(slot => slot.day_of_week === selectedDayOfWeek && !slot.is_closed);
+
+    daySlots.forEach(slot => {
+        // Skip slots with null opening or closing times
+        if (!slot.opening_time || !slot.closing_time) {
+            return;
+        }
+
+        // Parse start and end times from the slot data
+        const [startHour, startMinute] = slot.opening_time.split(':').map(Number);
+        const [endHour, endMinute] = slot.closing_time.split(':').map(Number);
+
+        // Calculate the start and end times as minutes
+        const startTimeMinutes = startHour * 60 + startMinute;
+        const endTimeMinutes = endHour * 60 + endMinute;
+
+        // Create time slots in the specified session duration intervals  TODO get the duration from the EJS
+        for (let time = startTimeMinutes; time + sessionDurationMinutes <= endTimeMinutes; time += sessionDurationMinutes) {
+            const slotStartHour = Math.floor(time / 60);
+            const slotStartMinute = time % 60;
+            const slotEndTime = time + sessionDurationMinutes;
+            const slotEndHour = Math.floor(slotEndTime / 60);
+            const slotEndMinute = slotEndTime % 60;
+
+            // Create readable start and end time strings
+            const slotStartTimeStr = `${String(slotStartHour).padStart(2, '0')}:${String(slotStartMinute).padStart(2, '0')}`;
+            const slotEndTimeStr = `${String(slotEndHour).padStart(2, '0')}:${String(slotEndMinute).padStart(2, '0')}`;
+
+            // Generate a Date object to compare with the current time
+            const slotDateTime = new Date(`${selectedDateString}T${slotStartTimeStr}:00`);
+
+            if (slotDateTime <= now) continue; // Skip past time slots
+
+            // Check if the current slot is booked
+            const isBooked = bookings.some(booking => booking.booking_date === selectedDateString &&
+                slotStartTimeStr >= booking.start_time && slotStartTimeStr < booking.end_time);
+
+            // If not booked, create a clickable time slot
+            if (!isBooked) {
+                const timeSlot = document.createElement('div');
+                timeSlot.classList.add('time-slot');
+                timeSlot.textContent = `${slotStartTimeStr} - ${slotEndTimeStr}`;
+                timeSlot.onclick = function () {
+                    this.classList.toggle('selected');
+                    toggleTimeSlotSelection(`${slotStartTimeStr} - ${slotEndTimeStr}`, this.classList.contains('selected'));
+                };
+                timeSlotsContainer.appendChild(timeSlot);
+            }
+        }
+    });
+
+    // Display a message if no time slots are available
+    if (timeSlotsContainer.children.length === 0) {
+        const noSlotsMsg = document.createElement('div');
+        noSlotsMsg.textContent = "No available time slots.";
+        timeSlotsContainer.appendChild(noSlotsMsg);
+    }
+}
+
+
+function toggleTimeSlotSelection(hour, isSelected) {
+    const index = bookingDetails.timeSlots.indexOf(hour);
+    if (index > -1 && !isSelected) {
+        bookingDetails.timeSlots.splice(index, 1); // Remove unselected time slot
+        if (bookingDetails.timeSlots.length === 0) {
+            enableDays(); // Re-enable all days if no slots are selected
+            document.querySelector('#paymentPageBtn').classList.add('hidden');
+            document.querySelector('#checkout-button').classList.add('hidden');
+        }
+    } else if (index === -1 && isSelected) {
+        if (bookingDetails.timeSlots.length === 0) {
+            disableDays(); // Disable all other days when the first slot is selected
+            document.querySelector('#paymentPageBtn').classList.remove('hidden');
+            document.querySelector('#checkout-button').classList.remove('hidden');
+        }
+        bookingDetails.timeSlots.push(hour); // Add selected time slot
+    }
+
+    recalculateTotalPrices(); // Recalculate total prices whenever time slots change
+    updateBookingSummary(); // Update the display or other UI elements if necessary
+}
+
+function disableDays() {
+    const days = document.querySelectorAll('.calendar-day');
+    days.forEach(day => {
+        if (day !== currentSelectedDayElement) {
+            day.classList.add("past-day");
+            document.querySelector('#next-month').disabled = true;
+            document.querySelector('#next-month').classList.add("past-day");
+            document.querySelector('#prev-month').disabled = true;
+            document.querySelector('#prev-month').classList.add("past-day");
+        }
+    });
+}
+
+function enableDays() {
+    const days = document.querySelectorAll('.calendar-day.past-day');
+    days.forEach(day => {
+        day.classList.remove("past-day");
+        document.querySelector('#next-month').disabled = false;
+        document.querySelector('#next-month').classList.remove("past-day");
+        document.querySelector('#prev-month').disabled = false;
+        document.querySelector('#prev-month').classList.remove("past-day");        
+    });
+}
+
+
+
+function changeAddOnQuantity(addOnId, addOnName, addOnUnitPrice, change) {
+    const quantityInput = document.getElementById(`quantity-${addOnId}`);
+    let currentQuantity = parseInt(quantityInput.value);
+    const maxQuantity = parseInt(quantityInput.max);
+
+    if (currentQuantity + change >= 0 && currentQuantity + change <= maxQuantity) {
+        currentQuantity += change;
+        quantityInput.value = currentQuantity;
+
+        const addOnIndex = bookingDetails.addOns.findIndex(addOn => addOn.id === addOnId);
+        if (addOnIndex > -1) {
+            bookingDetails.addOns[addOnIndex].quantity = currentQuantity;
+        } else {
+            bookingDetails.addOns.push({
+                id: addOnId,
+                name: addOnName,
+                price: parseFloat(addOnUnitPrice),
+                quantity: currentQuantity
+            });
+        }
+    }
+
+    recalculateTotalPrices(); // Recalculate total prices when quantity changes
+    updateBookingSummary(); 
+}
+
+function updateBookingSummary() {
+    const summaryElement = document.getElementById('booking-summary');
+    summaryElement.innerHTML = `<strong>Date:</strong> ${bookingDetails.date}<br><strong>Time Slots:</strong> ${bookingDetails.timeSlots.join(', ')}`;
+
+    const serviceInfo = document.createElement('p');
+    serviceInfo.innerHTML = `<strong>Service:</strong> ${bookingDetails.service.name}<br><strong>Service Cost:</strong> £${bookingDetails.service.totalPrice.toFixed(2)}`;
+    summaryElement.appendChild(serviceInfo);
+
+    bookingDetails.addOns.forEach(addOn => {
+        const addOnInfo = document.createElement('p');
+        addOnInfo.innerHTML = `<strong>${addOn.name}</strong>: Quantity ${addOn.quantity}, Unit Price £${addOn.price.toFixed(2)}, Total Price £${addOn.totalPrice.toFixed(2)}`;
+        summaryElement.appendChild(addOnInfo);
+    });
+
+    const totalCostElement = document.createElement('p');
+    totalCostElement.innerHTML = `<strong>Total Cost:</strong> £${bookingDetails.totalCost.toFixed(2)}`;
+    summaryElement.appendChild(totalCostElement);
+}
+
+function recalculateTotalPrices() {
+    const numberOfSlots = bookingDetails.timeSlots.length;
+    bookingDetails.service.totalPrice = bookingDetails.service.price * numberOfSlots;
+
+    bookingDetails.totalCost = bookingDetails.service.totalPrice; // Start with service cost
+
+    bookingDetails.addOns.forEach(addOn => {
+        addOn.totalPrice = addOn.price * addOn.quantity * numberOfSlots; // Recalculate add-on total price
+        bookingDetails.totalCost += addOn.totalPrice; // Add to total cost
+    });
+}
+
+let bookingDetails = {
+    date: '',
+    timeSlots: [],
+    addOns: [],
+    service: {},
+    user_id: userId
+};
+
+bookingDetails.service = {
+    id: serviceData.id,
+    name: serviceData.name,
+    price: serviceData.price
+};
+
+let stripe = Stripe('pk_test_51NQakVAnfvRY3Kb0JGMUDL00mO8hpTHF2UDt6UHk0ScFKT6DX12xT4jqcQE1GvDBBxvOs1X1oFcIitHJkrM7QCpU00CYkH5cYn');
+document.getElementById('checkout-button').addEventListener('click', function () {
+        fetch('/bookings/create-checkout-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                bookingDetails: bookingDetails
+            })
+        })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (session) {
+            return stripe.redirectToCheckout({ sessionId: session.sessionId });
+        })
+        .catch(function (error) {
+            console.error('Error:', error);
+        });
+    });
+
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,54 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<h1>Edit customer</h1>
+<form action="/customers/edit/<%= user.id %>" method="post">
+  <!-- Hidden input for customer ID -->
+  <input type="hidden" name="id" value="<%= user.id %>">
+
+  <!-- customer Name -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="name">Name:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="text" class="form-control" id="name" name="name" value="<%= user.name %>" required>
+    </div>
+  </div>
+
+  <!-- customer Email -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="email">Email:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="email" class="form-control" id="email" name="email" value="<%= user.email %>" required>
+    </div>
+  </div>
+
+  <!-- customer Role -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="role">Role:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="text" class="form-control" id="role" name="role" value="<%= user.role %>" required>
+    </div>
+  </div>
+
+  <!-- customer Status -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="status">Status:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <select class="form-control" id="status" name="status">
+        <option value="active" <%= user.status === 'active' ? 'selected' : '' %>>Active</option>
+        <option value="inactive" <%= user.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <button type="submit" class="btn btn-success">Update customer</button>
+</form>

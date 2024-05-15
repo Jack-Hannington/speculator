@@ -1,0 +1,118 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<h1>Edit Booking</h1>
+<form action="/bookings/edit-booking/<%= booking.id %>" method="POST">
+    <!-- User Selector -->
+    <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+            <label class="form-label" for="userId">User:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+            <select id="userId" name="userId" class="form-control" required>
+                <% users.forEach(user => { %>
+                    <option value="<%= user.id %>" <%= user.id === booking.user_id ? 'selected' : '' %>><%= user.name %> (<%= user.email %>)</option>
+                <% }); %>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Service Selector -->
+    <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+            <label class="form-label" for="serviceId">Service:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+            <select id="serviceId" name="serviceId" class="form-control" required onchange="updateAddOns()">
+                <% services.forEach(function(service) { %>
+                    <option value="<%= service.id %>" <%= service.id === booking.service_id.id ? 'selected' : '' %>><%= service.name %> - $<%= service.price %></option>
+                <% }); %>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Start Time -->
+    <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+            <label class="form-label" for="start_time">Start Time:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+            <input type="time" class="form-control" id="start_time" name="start_time" value="<%= booking.start_time %>" required>
+        </div>
+    </div>
+
+    <!-- End Time -->
+    <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+            <label class="form-label" for="end_time">End Time:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+            <input type="time" class="form-control" id="end_time" name="end_time" value="<%= booking.end_time %>" required>
+        </div>
+    </div>
+
+    <!-- Booking Date -->
+    <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+            <label class="form-label" for="booking_date">Date Booked:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+            <input type="date" class="form-control" id="booking_date" name="booking_date" value="<%= booking.booking_date %>">
+        </div>
+    </div>
+
+    <!-- Existing Add-Ons -->
+    <h3 class="col-12">Existing Add-Ons:</h3>
+    <div id="existingAddOns" class="col-12">
+        <ul>
+            <% booking.booking_add_ons.forEach(function(addOn, index) { %>
+                <% if (addOn.service_add_ons) { %>
+                    <li>
+                        <input type="hidden" name="existingAddOns[<%= index %>][keep]" value="0">
+                        <input type="checkbox" id="existingAddOn<%= index %>" name="existingAddOns[<%= index %>][keep]" value="1" checked>
+                        <label for="existingAddOn<%= index %>"><%= addOn.service_add_ons.name %> - £<%= addOn.price %></label>
+                        (Quantity: <input type="number" name="existingAddOns[<%= index %>][quantity]" value="<%= addOn.quantity %>" min="0" style="width: 50px;">)
+                        <input type="hidden" name="existingAddOns[<%= index %>][add_on_id]" value="<%= addOn.add_on_id %>">
+                        <input type="hidden" name="existingAddOns[<%= index %>][price]" value="<%= addOn.price %>">
+                    </li>
+                <% } %>
+            <% }); %>
+            
+        </ul>
+    </div>
+    
+    <div id="addOnsContainer" class="col-12">
+        <!-- Dynamic add-ons container -->
+    </div>
+    
+    <input type="hidden" name="tenantId" value="<%= booking.tenant_id %>">
+    <div class="form-row row mb-3">
+        <div class="col-12">
+            <button type="submit" class="btn btn-success">Update Booking</button>
+        </div>
+    </div>
+</form>
+
+    <script>
+          function updateAddOns() {
+            const serviceId = document.getElementById('serviceId').value;
+            fetch(`/services/${serviceId}/add-ons`)
+                .then(response => response.json())
+                .then(addOns => {
+                    const container = document.getElementById('addOnsContainer');
+                    container.innerHTML = '<h3>New Add-Ons:</h3>'; // Clear existing add-ons and label for clarity
+                    addOns.forEach((addOn, index) => {
+                        const div = document.createElement('div');
+                        div.innerHTML = `
+                            <input type="checkbox" id="newAddOn${index}" name="newAddOns[${index}][add_on_id]" value="${addOn.id}">
+                            <label for="newAddOn${index}">${addOn.name} - $${addOn.price}</label>
+                            <input type="hidden" name="newAddOns[${index}][price]" value="${addOn.price}">
+                            <input type="number" name="newAddOns[${index}][quantity]" min="1" value="1" style="width: 50px;">
+                        `;
+                        container.appendChild(div);
+                    });
+                })
+                .catch(error => console.error('Error fetching add-ons:', error));
+        }
+
+    </script>

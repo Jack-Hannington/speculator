@@ -1,0 +1,58 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+  <section>
+    <div class="row">
+      <div class="header-row col-lg-8 col-12">
+        <h1>Services</h1>
+        <p>Services are what customers can buy. You can set time availability, prices, limits and more.</p>
+      </div>
+      <div class="col-lg-4 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
+        <a href="/services/add-service" class="btn btn-primary">+ Add service</a>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="col-12 table-container">
+      <table>
+        <thead>
+          <tr>
+            <th colspan="2">Name</th>
+            <th>Capacity</th>
+            <th>Price</th>
+            <th>Add-ons</th>
+            <th>Status</th>            
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% services.forEach(service => { %>
+            <tr style="cursor: pointer;" onclick="window.location.href='/services/edit-service/<%= service.id %>'">
+              <td colspan="2"><%= service.name %></td>
+              <td><%= service.max_capacity %></td>
+              <td><%= Number(service.price).toFixed(2) %></td>
+              <td><%= service.service_add_ons.length %></td>
+              <td>
+                <span class="<%= service.enabled ? 'token green' : 'token red' %>">
+                  <%= service.enabled ? 'Enabled' : 'Disabled' %>
+                </span>
+              </td>
+          
+              <td>
+                  <!-- Prevent the click event from reaching the parent row -->
+                  <iconify-icon 
+                      icon="solar:pen-linear" 
+                      style="cursor: pointer;" 
+                      onclick="event.stopPropagation(); window.location.href='/services/edit-service/<%= service.id %>'"
+                  ></iconify-icon>
+              </td>
+          </tr>
+          
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<%- include('../partials/footer') %>

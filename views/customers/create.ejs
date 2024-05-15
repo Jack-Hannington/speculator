@@ -1,0 +1,76 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<h1>Create New Customer</h1>
+<form action="/customers/create" method="post">
+  <!-- Customer Name -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="name">Name:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+  </div>
+
+  <!-- Customer Email -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="email">Email:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+  </div>
+
+  <!-- Customer Role -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="role">Role:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="text" class="form-control" id="role" name="role" required>
+    </div>
+  </div>
+
+  <!-- Membership Role -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="membership_id">Membership:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <select class="form-control" id="membership_id" name="membership_id">
+        <option value="">Select Membership</option>
+        <% memberships.forEach(function(membership) { %>
+          <option value="<%= membership.id %>"><%= membership.name %></option>
+        <% }); %>
+      </select>
+    </div>
+  </div>
+
+  <!-- Password Input -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="password">Password:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+  </div>
+
+  <!-- Customer Status -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="status">Account Status:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <select class="form-control" id="status" name="status">
+        <option value="active">Active</option>
+        <option value="inactive">Disabled</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <button type="submit" class="btn btn-success">Create Customer</button>
+</form>

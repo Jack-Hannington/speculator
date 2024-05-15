@@ -1,0 +1,88 @@
+#!/usr/bin/env node
+
+/**
+ * This line tells your operating system to use Node to execute this file.
+ * It's a "shebang" line that allows this script to be run as an executable without explicitly invoking `node`.
+ */
+
+/**
+ * Module dependencies.
+ */
+const app = require('../app'); // Import the main Express app. Adjust the path as necessary based on your project structure.
+const http = require('http'); // Import Node's built-in HTTP module to create an HTTP server.
+
+/**
+ * Normalize the port value to ensure it's a valid number or named pipe.
+ * This function takes a value from the environment variable `PORT`, or defaults to 3000 if not set.
+ * It returns a numerical port if valid, or the original value if it's a named pipe.
+ * If the value is invalid, it returns `false`.
+ */
+function normalizePort(val) {
+  const port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // If port is not a number, it could be a named pipe, so return it directly.
+    return val;
+  }
+
+  if (port >= 0) {
+    // Ensure the port number is non-negative, then return it.
+    return port;
+  }
+
+  return false;
+}
+
+const port = normalizePort(process.env.PORT || '3000'); // Set the port from the environment or default to 3000.
+app.set('port', port); // Store the port in the Express application settings.
+
+/**
+ * Create an HTTP server instance with the Express app as the request handler.
+ * This server will respond to HTTP requests using the middleware and routes defined in your Express app.
+ */
+const server = http.createServer(app);
+
+/**
+ * Start listening for incoming connections on the specified port.
+ * Also, set up event listeners for 'error' and 'listening' events to handle possible server events.
+ */
+server.listen(port); // Begin listening on the specified port.
+server.on('error', onError); // Register an error event listener to handle potential startup errors.
+server.on('listening', onListening); // Register a listener to log when the server has started and is listening for requests.
+
+/**
+ * Error event handler.
+ * This function handles specific error scenarios when the server fails to start, such as port already in use or insufficient privileges.
+ */
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    // If the error is not related to listening on a port, throw it.
+    throw error;
+  }
+
+  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port; // Describe the type of server binding (port or pipe).
+
+  // Handle specific listen errors with user-friendly messages.
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges'); // Insufficient permissions.
+      process.exit(1); // Exit with failure.
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use'); // Port is already in use.
+      process.exit(1); // Exit with failure.
+      break;
+    default:
+      throw error; // Unhandled errors are thrown.
+  }
+}
+
+/**
+ * Listening event handler.
+ * This function logs the server address and port to the console, indicating that the server has started successfully.
+ */
+function onListening() {
+  const addr = server.address(); // Get the server's address information.
+  const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port; // Format the address information for logging.
+  console.log('Listening on ' + bind); // Log the listening interface to the console.
+}

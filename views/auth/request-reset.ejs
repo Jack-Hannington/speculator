@@ -1,0 +1,26 @@
+<%- include('../partials/header') %>
+<body>
+    <section id="login-layout" class="container">
+        <div class="row">
+          <div class="col-12 text-center mb-4">
+            <p class="fs-4"> Flexiibook<span class="brand-orange">.</span></p>
+            <h2>Request password reset</h2>
+          </div>
+          <div class="col-12">
+            <form action="/request-reset" method="post">
+              <div class="col-12 mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+              </div>
+              <div class="col-12 mb-3 d-flex justify-content-end">
+                <a href="/login" class="font-14">Back to login</a>
+              </div>
+              <div class="col-12 mb-4">
+                <button class="btn-primary w-100" type="submit">Send reset link</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+</body>
+</html>

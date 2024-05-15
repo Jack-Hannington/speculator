@@ -1,0 +1,49 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<!-- Individual user bookings -->
+
+<h1>User Bookings</h1>
+<div class="table-container">
+<table>
+  <thead>
+    <tr>
+      <th>Booking ID</th>
+      <th>Service ID</th>
+      <th>Booked Service</th>
+      <th>Start Time</th>
+      <th>End Time</th>
+      <th>Status</th>
+      <th>Total Price</th>
+      <th>Booking Date</th>
+      <th>Add-Ons</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% bookings.forEach(booking => { %>
+      <tr>
+        <td><%= booking.id %></td>
+        <td><%= booking.service_id %></td>
+        <td><%= booking.booked_service %></td>
+        <td><%= booking.start_time %></td>
+        <td><%= booking.end_time %></td>
+        <td><%= booking.status %></td>
+        <td>£<%= booking.total_price.toFixed(2) %></td>
+        <td><%= booking.booking_date ? new Date(booking.booking_date).toLocaleDateString('en-GB') : 'N/A' %></td>
+        <td>
+          <% if (booking.booking_add_ons && booking.booking_add_ons.length > 0) { %>
+            <ul>
+              <% booking.booking_add_ons.forEach(addOn => { %>
+                <li><%= addOn.add_on_id %> - Quantity: <%= addOn.quantity %>, Price: £<%= addOn.price ? addOn.price.toFixed(2) : 'N/A' %></li>
+              <% }); %>
+            </ul>
+          <% } else { %>
+            No add-ons
+          <% } %>
+        </td>
+      </tr>
+    <% }); %>
+  </tbody>
+</table>
+</div>
+<%- include('../partials/footer') %>

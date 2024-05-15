@@ -1,0 +1,22 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+
+<section>
+    <div class="row header-row">
+        <div class="col-12 col-lg-8">
+            <iconify-icon icon="solar:verified-check-bold" style="font-size:36px;" class="brand-orange"></iconify-icon>
+            <h1>Booking confirmed</h1>
+            <p>Thanks for booking <%= user.name%>!</p>
+            <p>Booking ID</p>
+            <p>Booked for: on </p>
+        </div>
+        <div class="col-lg-4 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
+            <a href="/bookings/select-service" class="btn btn-primary">+ New booking</a>
+          </div>
+    </div>
+</section>
+
+
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,73 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<h1>Edit <%= customer.name %></h1>
+<form action="/customers/edit/<%= customer.id %>" method="post">
+  <!-- Hidden input for customer ID -->
+  <input type="hidden" name="id" value="<%= customer.id %>">
+
+  <!-- customer Name -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="name">Name:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="text" class="form-control" id="name" name="name" value="<%= customer.name %>" required>
+    </div>
+  </div>
+
+  <!-- customer Email -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="email">Email:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="email" class="form-control" id="email" name="email" value="<%= customer.email %>" required>
+    </div>
+  </div>
+
+  <!-- customer Role -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="role">Role:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="text" class="form-control" id="role" name="role" value="<%= customer.role %>" required>
+    </div>
+  </div>
+
+    <!-- Membership Role -->
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="role">Membership:</label>
+        <p class="supporting-text font-14">Change membership level to grant different access</p>
+      </div>
+      <div class="col-lg-9 col-12">
+        <select class="form-control" id="membership_id" name="membership_id">
+          <% memberships.forEach(function(membership) { %>
+            <option></option>
+            <option value="<%= membership.id %>" <%= customer.membership_id === membership.id ? 'selected' : '' %>>
+              <%= membership.name %>
+            </option>
+          <% }); %>
+        </select>
+      </div>
+    </div>
+
+  <!-- customer Status -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="status">Account status:</label>
+      <p class="supporting-text font-14">Disabling an account will revoke their access.</p>
+    </div>
+    <div class="col-lg-9 col-12">
+      <select class="form-control" id="status" name="status">
+        <option value="active" <%= customer.status === 'active' ? 'selected' : '' %>>Active</option>
+        <option value="inactive" <%= customer.status === 'inactive' ? 'selected' : '' %>>Disabled</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <button type="submit" class="btn btn-success">Update customer</button>
+</form>

@@ -1,0 +1,70 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+
+<div class="container">
+    <h1>Create add-on for </h1>
+    <form action="/services/add-add-on" method="post">
+      <!-- Hidden input for Service ID -->
+      <input type="hidden" name="serviceId" value="<%= serviceId %>">
+  
+      <!-- Add-on Name -->
+      <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+          <label class="form-label" for="name">Name:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+          <input type="text" class="form-control" id="name" name="name" placeholder="Add-on Name" required>
+        </div>
+      </div>
+  
+      <!-- Add-on Description -->
+      <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+          <label class="form-label" for="description">Description:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+          <input type="text" class="form-control" id="description" name="description" placeholder="Description">
+        </div>
+      </div>
+  
+      <!-- Add-on Price -->
+      <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+          <label class="form-label" for="price">Price:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+          <input type="number" class="form-control" id="price" name="price" placeholder="Price" step="0.01" required>
+        </div>
+      </div>
+  
+      <!-- Add-on Max Quantity -->
+      <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+          <label class="form-label" for="maxQuantity">Max Quantity:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+          <input type="number" class="form-control" id="maxQuantity" name="maxQuantity" placeholder="Max Quantity">
+        </div>
+      </div>
+  
+      <!-- Active Checkbox -->
+      <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+          <label class="form-check-label" for="active">Active:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+          <div class="form-check form-switch">
+            <input type="checkbox" class="form-check-input" id="active" name="active" checked>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Submit Button -->
+      <button type="submit" class="btn btn-success">Add New Add-On</button>
+    </form>
+  
+    <!-- Back to Service Link -->
+    <a href="/services/edit-service/<%= serviceId %>" class="btn btn-secondary mt-3">Back to Service</a>
+  </div>
+  

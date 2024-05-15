@@ -1,0 +1,140 @@
+<%- include('./partials/header') %>
+<%- include('./partials/nav') %>
+
+
+<% if (user.role === 'admin') { %>
+<h1>Dashboard</h1>
+<section>
+  <div class="row summary-blocks header-row gap-lg-0 gap-3">
+    <div class="col">
+      <div class="card summary-card px-3 py-3">
+        <p class="fw-semibold mb-1">Bookings this week</p>
+        <div class="d-flex align-items-start flex-column">
+          <h3 class="mb-1 fw-bold">120</h3><span style="color:green;font-size:14px;">
+            <iconify-icon class="m-0" inline icon="solar:arrow-up-bold-duotone"></iconify-icon>20% vs last month
+          </span>
+        </div>
+      </div>
+
+    </div>
+    <div class="col ">
+      <div class="card summary-card px-3 py-3">
+        <p class="fw-semibold mb-1">Bookings this week</p>
+        <div class="d-flex align-items-start flex-column">
+          <h3 class="mb-1 fw-bold">120</h3><span style="color:green;font-size:14px;">
+            <iconify-icon class="m-0" inline icon="solar:arrow-up-bold-duotone"></iconify-icon>20% vs last month
+          </span>
+        </div>
+      </div>
+
+    </div>
+    <div class="col">
+      <div class="card summary-card px-3 py-3">
+        <p class="fw-semibold mb-1">Bookings this week</p>
+        <div class="d-flex align-items-start flex-column">
+          <h3 class="mb-1 fw-bold">120</h3><span style="color:green;font-size:14px;">
+            <iconify-icon class="m-0" inline icon="solar:arrow-up-bold-duotone"></iconify-icon>20% vs last month
+          </span>
+        </div>
+      </div>
+
+    </div>
+    <div class="col">
+      <div class="card summary-card px-3 py-3">
+        <p class="fw-semibold mb-1">Bookings this week</p>
+        <div class="d-flex align-items-start flex-column">
+          <h3 class="mb-1 fw-bold">120</h3><span style="color:green;font-size:14px;">
+            <iconify-icon class="m-0" inline icon="solar:arrow-up-bold-duotone"></iconify-icon>20% vs last month
+          </span>
+        </div>
+      </div>
+
+    </div>
+    <p class="support-text mt-2 font-14">Supporting grey text</p>
+  </div>
+</section>
+<% } else if (user.role === 'customer') {%>
+    <h2 class="mb-3 mt-3">Your Bookings</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Booked Service</th>
+            <th>ID</th>
+            <th>Booked for</th>
+            <th>Status</th>
+            <th>Time</th>
+            <th>Total Price</th>
+            <th>Add-Ons</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% bookings.forEach(booking => { %>
+            <tr>
+              <td><%= booking.booked_service %></td>
+              <td>#<%= booking.id %></td>
+              <td><%= new Date(booking.booking_date).toLocaleDateString('en-GB') %></td>
+              <td><%= booking.status %></td>
+              <td><%= booking.start_time %> - <%= booking.end_time %></td>
+              <td>£<%= booking.total_price.toFixed(2) %></td>
+              <td>
+                <% if (booking.add_ons.length > 0) { %>
+                  <% booking.add_ons.forEach(addOn => { %>
+                    <%= addOn.name %> (Quantity: <%= addOn.quantity %>): £<%= addOn.price.toFixed(2) %><br>
+                  <% }) %>
+                <% } else { %>
+                  No add-ons.
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <div class="container">
+    <% bookings.forEach(booking => { %>
+      <div class="row card flex-row mt-2 font-14 pt-2 pb-2">
+        <div class="col-lg-2 col-md-4 col-sm-6 col-12">
+          <label class="mb-2 support-text font-14">Booked Service</label>
+          <p><%= booking.booked_service %></p>
+        </div>
+        <div class="col-lg-1 col-md-2 col-sm-6 col-12">
+          <label class="mb-2 support-text font-14">ID</label>
+          <p><%= booking.id %></p>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-6 col-12">
+          <label class="mb-2 support-text font-14">Booking Date</label>
+          <p><%= new Date(booking.booking_date).toLocaleDateString('en-GB') %></p>
+        </div>
+        <div class="col-lg-1 col-md-2 col-sm-6 col-12">
+          <label class="mb-2 support-text font-14">Status</label>
+          <p><%= booking.status %></p>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-6 col-12">
+          <label class="mb-2 support-text font-14">Time</label>
+          <p><%= booking.start_time %> - <%= booking.end_time %></p>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 col-12">
+          <label class="mb-2 support-text font-14">Total Price</label>
+          <p>£<%= booking.total_price.toFixed(2) %></p>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 col-12">
+          <label class="mb-2 support-text font-14">Add-Ons</label>
+          <% if (booking.add_ons.length > 0) { %>
+            <% booking.add_ons.forEach(addOn => { %>
+              <p><%= addOn.name %> (Qty: <%= addOn.quantity %>): £<%= addOn.price.toFixed(2) %></p>
+            <% }) %>
+          <% } else { %>
+            <p>No add-ons.</p>
+          <% } %>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+    
+    
+    
+<% } %>
+
+
+<%- include('./partials/footer') %>
