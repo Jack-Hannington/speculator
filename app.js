@@ -175,7 +175,7 @@ app.post('/login', (req, res, next) => {
   
 
 app.post('/register', async (req, res) => {
-  const { name, email, password, tenant_id, role } = req.body;
+  const { name, email, password } = req.body;
   console.log(req.body)
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -183,7 +183,7 @@ app.post('/register', async (req, res) => {
     const { data, error } = await supabase
       .from('users')
       .insert([
-        { name: name, email: email, password: hashedPassword, tenant_id: tenant_id, role: role}
+        { name: name, email: email, password: hashedPassword}
       ]);
 
     if (error) {
@@ -363,44 +363,9 @@ app.get('/', async (req, res) => {
       const tenantId = req.user.tenant_id;
       const userId = req.user.id;
 
-      // Fetch the user's bookings
-      const { data: bookings, error: bookingsError } = await supabase
-        .from('bookings')
-        .select('id, service_id, start_time, end_time, status, total_price, booking_date, tenant_id, booked_service')
-        .eq('user_id', userId)
-        .eq('tenant_id', tenantId)
-        .order('booking_date', {ascending: true})
-
-      if (bookingsError) {
-        console.error('Error fetching bookings:', bookingsError);
-        return res.status(500).send('Error fetching bookings.');
-      }
-
-      // Fetch booking add-ons and join them with the `service_add_ons` table to get add-on names
-      const { data: bookingAddOns, error: addOnsError } = await supabase
-        .from('booking_add_ons')
-        .select('booking_id, quantity, price, service_add_ons(name)')
-        .in('booking_id', bookings.map(booking => booking.id));
-
-      if (addOnsError) {
-        console.error('Error fetching booking add-ons:', addOnsError);
-        return res.status(500).send('Error fetching booking add-ons.');
-      }
-
-      // Attach add-ons to the corresponding booking
-      bookings.forEach(booking => {
-        booking.add_ons = bookingAddOns
-          .filter(addOn => addOn.booking_id === booking.id)
-          .map(addOn => ({
-            name: addOn.service_add_ons.name,
-            quantity: addOn.quantity,
-            price: addOn.price,
-          }));
-      });
-
       // Render the home page with the bookings and tenant ID
       // const messages = req.flash('success'); // Retrieve the flash message
-      res.render('home', { tenant_id: tenantId, bookings });
+      res.render('home');
 
     } catch (err) {
       console.error('Error during data fetching:', err);

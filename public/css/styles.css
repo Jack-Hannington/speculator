@@ -10,10 +10,9 @@
     --grey: #475467;
     --light-grey: #D0D5DD;
     --base-line-height: 1.4rem;
-    /* --page-width: 1280px; */
     --default-background-color: #FCFCFD;
     --orange-50: #fff7ed;
-    --brand-color: #FF654E;
+    --brand-color: #02BAC2;
     --orange-100: #ffedd5;
     --orange-200: #fed7aa;
     --orange-300: #fdba74;
@@ -24,6 +23,17 @@
     --orange-800: #9a3412;
     --orange-900: #7c2d12;
     --skyblue-50: #f0f9ff;
+      --cyan-50: #ebfffc;
+      --cyan-100: #cdfffb;
+      --cyan-200: #a2fffb;
+      --cyan-300: #62fef8;
+      --cyan-400: #1bf5f1;
+      --cyan-500: #00dbda;
+      --cyan-600: #02bac2;
+      --cyan-700: #098c95;
+      --cyan-800: #127078;
+      --cyan-900: #135c66;
+      --cyan-950: #063e46;  
     --skyblue-100: #e0f2fe;
     --skyblue-200: #bae6fd;
     --skyblue-400: #38bdf8;
@@ -34,7 +44,7 @@
     --red-400: #f87171;
     --red-700: #b91c1c;
     --red-900: #7f1d1d;
-    --base-border-radius: 6px;
+    --base-border-radius: 8px;
     --base-padding: 6px 8px;
     --base-border: 1px solid #D0D5DD;
     --base-font-size: 16px;
@@ -100,8 +110,8 @@
   }
   
   /* Colors */
-  .brand-orange {
-    color: #FF654E;
+  .brand {
+    color: #02BAC2;
   }
   
   /* fonts */
@@ -133,7 +143,23 @@
     margin-bottom: 0px;
     color:var(--heading-color);
   }
+
+  #nav-bar-logo {
+    width: 70px
+  }
   
+
+  @media (min-width:900px){
+    .site-title {
+      text-align: center;
+    }
+    #nav-bar-logo {
+      width: 100px
+    }
+    
+  }
+
+ 
   .sidebar {
     width: 240px;
     height: 100vh;
@@ -480,7 +506,7 @@
   }
   
   .btn-primary {
-      background-color: var(--orange-600); 
+      background-color: var(--brand-color); 
       color: var(--offwhite);     
       border-color: var(--offwhite);
       
@@ -494,14 +520,13 @@
   
   .btn-primary:hover {
     background-color: #fff;
-    color: #fe4f18; 
-    border-color: #fe4f18;
+    color: var(--brand-color); 
+    border-color: var(--brand-color); ;
   }
   
   
   .no-styling {
     text-decoration:none;
-    color:inherit;
   }
 
   @media (max-width:900px){
@@ -524,6 +549,7 @@
   .form-control {
     box-shadow: var(--base-box-shadow);
     border:var(--base-border);
+    border-radius:var(--base-border-radius);
     height: 44px;
   }
 

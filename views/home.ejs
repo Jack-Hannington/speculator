@@ -3,15 +3,18 @@
 
 
 <% if (user.role === 'admin') { %>
-<h1>Dashboard</h1>
 <section>
+  <h1>Welcome back, <%= user.first_name %></h1>
+</section>
+<section>
+ 
   <div class="row summary-blocks header-row gap-lg-0 gap-3">
     <div class="col">
       <div class="card summary-card px-3 py-3">
-        <p class="fw-semibold mb-1">Bookings this week</p>
+        <p class="fw-semibold mb-1">Total sign-ups</p>
         <div class="d-flex align-items-start flex-column">
-          <h3 class="mb-1 fw-bold">120</h3><span style="color:green;font-size:14px;">
-            <iconify-icon class="m-0" inline icon="solar:arrow-up-bold-duotone"></iconify-icon>20% vs last month
+          <h3 class="mb-1 fw-bold">0</h3><span style="color:green;font-size:14px;">
+            <iconify-icon class="m-0" inline icon="solar:arrow-up-bold-duotone"></iconify-icon>0% vs last month
           </span>
         </div>
       </div>

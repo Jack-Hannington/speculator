@@ -1,35 +1,37 @@
 document.addEventListener("DOMContentLoaded", function () {
-    var navToggleButton = document.getElementById("navToggle");
-    var sidebarNav = document.querySelector(".sidebar-nav");
-    var navIcon = document.querySelector('#nav-icon1')
-    if (navToggleButton){
-    navToggleButton.addEventListener("click", function () {
-      if (sidebarNav.classList.contains("show")) {
-        // Closing the sidebar
-        sidebarNav.classList.add("animate__fadeOutUp", "animate__animated");
-        navIcon.classList.add('open');
+  var navToggleButton = document.getElementById("navToggle");
+  var sidebarNav = document.querySelector(".sidebar-nav");
+  var navIcon = document.querySelector('#nav-icon1');
   
-        setTimeout(function () {
-          // document.body.style.overflowY = "auto"; // Allow scrolling again
-          sidebarNav.classList.remove(
-            "show",
-            "animate__fadeOutUp",
-            "animate__animated"
-          );
-         navIcon.classList.remove('open');
-        }, 100);
-      } else {
-        // Opening the sidebar
-        document.body.style.overflowY = "hidden"; // Prevent scrolling when menu is active
-        sidebarNav.classList.add(
-          "show",
-          "animate__fadeInDown",
-          "animate__animated"
-        );
-       navIcon.classList.add('open');
-      }
-    });
+  if (navToggleButton) {
+      navToggleButton.addEventListener("click", function () {
+          if (sidebarNav.classList.contains("show")) {
+              // Closing the sidebar
+              sidebarNav.classList.add("animate__slideOutRight", "animate__animated");
+              navIcon.classList.add('open');
+      
+              setTimeout(function () {
+                  // document.body.style.overflowY = "auto"; // Allow scrolling again
+                  sidebarNav.classList.remove(
+                      "show",
+                      "animate__slideOutRight",
+                      "animate__animated"
+                  );
+                  navIcon.classList.remove('open');
+              }, 100);
+          } else {
+              // Opening the sidebar
+              document.body.style.overflowY = "hidden"; // Prevent scrolling when menu is active
+              sidebarNav.classList.add(
+                  "show",
+                  "animate__slideInRight",
+                  "animate__animated"
+              );
+              navIcon.classList.add('open');
+          }
+      });
   }
+
 
     const flashMessageContainer = document.querySelector('.flash-messages-container');
     if (flashMessageContainer) {
