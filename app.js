@@ -117,15 +117,15 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Middleware to make user available in all views
 app.use((req, res, next) => {
   if (req.user) {
-      res.locals.user = req.user;  // For view templates
-      req.session.user_id = req.user.id;  // Set user ID in session
-      req.session.membership_id = req.user.membershipId;  // Set membership ID in session, adjust according to your user object structure
+    res.locals.user = req.user;  // For view templates
+    req.session.user_id = req.user.id;  // Set user ID in session
+    req.session.role = req.user.role;
   }
   next();
 });
+
 
 
 // Authentication and Authorization Routes

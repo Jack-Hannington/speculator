@@ -10,14 +10,18 @@ router.use(accessControl('admin'));
 router.get('/', async (req, res) => {
   const { data: customers, error } = await supabase
     .from('users')
-    .select(`
-      *,
-      memberships(name)
-    `);  // Correctly references the foreign key relationship
+    .select(`*`);
 
   if (error) return res.status(500).send({ message: "Failed to fetch users", error });
   res.render('customers', { customers });
 });
+
+// Load assessments
+router.get('/assessments', async (req, res) => {
+  res.render('customers/assessments');
+});
+
+
 
 
 

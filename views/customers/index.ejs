@@ -4,11 +4,11 @@
   <section>
     <div class="row">
       <div class="header-row col-lg-8 col-12">
-        <h1>Customers</h1>
-        <p>Manage customers and memberships here.</p>
+        <h1>Clients</h1>
+        <p>Manage clients and assessments here.</p>
       </div>
       <div class="col-lg-4 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
-        <a href="/customers/create" class="btn btn-primary">+ New customer</a>
+        <a href="/customers/create" class="btn btn-primary">+ New client</a>
       </div>
     </div>
   </section>
@@ -23,6 +23,7 @@
                         <th>Email</th>
                         <th>Status</th>
                         <th>Membership</th>
+                        <th>Business</th>
                         <th colspan="2">Edit</th>
                     </thead>
                     <tbody>
@@ -33,8 +34,9 @@
                             <td><%=customer.email%></td>
                             <td><%=customer.role%></td>
                             <td><%= customer.memberships ? customer.memberships.name : 'No Membership' %></td>
+                            <td>Business</td>
                             <td colspan="2"><a href="/customers/edit/<%=customer.id%>" class="me-3">Edit</a>
-                             <a href="/customers/bookings/<%=customer.id%>">Bookings</a></td>
+                             <a href="/customers/assessments/?user_id=<%=customer.id%>">New assessment</a></td>
                           </tr>
                         <% }) %>
                     </tbody>
