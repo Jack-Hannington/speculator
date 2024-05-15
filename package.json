@@ -1,7 +1,7 @@
 {
-  "name": "booking_app",
+  "name": "atlius_wellness",
   "version": "1.0.0",
-  "description": "Takes a set of GTINs and queries them using the pricerunner API within the limit of 10k requests per day.",
+  "description": "A platform for personalised wellness guidance for Altius Healthcare clients.",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
