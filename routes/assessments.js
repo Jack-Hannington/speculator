@@ -8,7 +8,7 @@ router.use(express.json()); // Use for regular routes that need JSON
 router.use(bodyParser.urlencoded({ extended: true }));
 
 
-app.post('/completed-assessments', async (req, res) => {
+router.post('/completed-assessments', async (req, res) => {
     let assessmentData;
 
     // Check if the request is from webhook
@@ -72,3 +72,5 @@ app.post('/completed-assessments', async (req, res) => {
 
     res.status(201).send('Assessment added successfully');
 });
+
+module.exports = router; 

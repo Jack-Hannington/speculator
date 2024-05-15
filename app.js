@@ -384,6 +384,7 @@ app.get('/', async (req, res) => {
 const customersRoute = require('./routes/customers');
 const bookingRoute = require('./routes/bookings');
 const servicesRoute = require('./routes/services');
+const assessmentsRoute = require('./routes/assessments');
 
 
 
@@ -391,6 +392,7 @@ const servicesRoute = require('./routes/services');
 app.use('/bookings', bookingRoute)
 app.use('/services', servicesRoute);
 app.use('/customers', customersRoute)
+app.use('/assessments', assessmentsRoute)
 
 
 // fs.readFile('public/washer.png', async (err, avatarFile) => {
