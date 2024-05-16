@@ -32,7 +32,7 @@ router.post('/completed-assessments', async (req, res) => {
             blood_pressure: fields.find(field => field.key === "question_0VAXa9").options.find(option => option.id === fields.find(field => field.key === "question_0VAXa9").value[0]).text,
             hours_sitting_per_day: fields.find(field => field.key === "question_zEblLk").value,
             recovery_score: fields.find(field => field.key === "question_5XORMN_2f002fa0-89d8-4db4-abda-13fd2424d664").value,
-            sleep_quality_score: fields.find(field => field.key === "question_dbRrvr").value,
+            sleep_hours: fields.find(field => field.key === "question_dbRrvr").value,
             respiratory_rate: fields.find(field => field.key === "question_Yjq8kN").options.find(option => option.id === fields.find(field => field.key === "question_Yjq8kN").value[0]).text,
             heart_rate_variability: fields.find(field => field.key === "question_DqWQMl").value,
             mental_health_score: fields.find(field => field.key === "question_la4Qvo_cd1c05e3-2b1b-42a5-a829-db058733f23d").value,

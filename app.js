@@ -175,7 +175,7 @@ app.post('/login', (req, res, next) => {
   
 
 app.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
+  const { first_name, last_name, email, password } = req.body;
   console.log(req.body)
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -183,7 +183,7 @@ app.post('/register', async (req, res) => {
     const { data, error } = await supabase
       .from('users')
       .insert([
-        { name: name, email: email, password: hashedPassword}
+        { first_name, last_name, email: email, password: hashedPassword}
       ]);
 
     if (error) {
@@ -363,9 +363,15 @@ app.get('/', async (req, res) => {
       const tenantId = req.user.tenant_id;
       const userId = req.user.id;
 
-      // Render the home page with the bookings and tenant ID
-      // const messages = req.flash('success'); // Retrieve the flash message
-      res.render('home');
+        // Fetch all assessmnetns
+        const { data: assessments, error: assessmentsError } = await supabase
+        .from('completed_assessments')
+        .select('*')
+        .eq('id', userId)
+
+        console.log(assessments)
+
+      res.render('home', {assessments});
 
     } catch (err) {
       console.error('Error during data fetching:', err);

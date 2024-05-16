@@ -22,9 +22,6 @@ router.get('/assessments', async (req, res) => {
 });
 
 
-
-
-
 // GET route to fetch a specific member's data for editing along with all memberships
 router.get('/edit/:id', async (req, res) => {
   const { id } = req.params;
@@ -39,14 +36,16 @@ router.get('/edit/:id', async (req, res) => {
 
     if (userError) throw userError;
 
-    // Fetch all memberships
-    const { data: memberships, error: membershipsError } = await supabase
-      .from('memberships')
-      .select('id, name');
 
-    if (membershipsError) throw membershipsError;
+  // Fetch all assessmnetns
+    const { data: assessments, error: assessmentsError } = await supabase
+    .from('completed_assessments')
+    .select('*')
+    .eq('id', id)
 
-    res.render('customers/edit', { customer, memberships });
+    if (assessmentsError) throw assessmentsError;
+    console.log(assessments)
+    res.render('customers/edit', { customer, assessments });
   } catch (error) {
     console.error('Error fetching data:', error);
     res.status(500).send({ message: "Failed to fetch data", details: error });
@@ -107,20 +106,20 @@ router.post('/create', async (req, res) => {
 
 router.post('/edit/:id', async (req, res) => {
   const { id } = req.params;
-  let { name, email, role, membership_id } = req.body; // Assuming these are the fields you want to update
+  let { first_name, last_name, email, role, membership_id } = req.body; // Assuming these are the fields you want to update
   console.log(req.body)
   if(membership_id === ''){
     membership_id = null;
   }
   // Check for required fields
-  if (!name || !email || !role) {
+  if (!first_name || !email || !role) {
     return res.status(400).send({ message: "Missing required fields" });
   }
 
   // Update user information
   const { data: updatedUser, error } = await supabase
     .from('users')
-    .update({ name, email, role, membership_id })
+    .update({ first_name, last_name, email, role, membership_id })
     .eq('id', id);
 
   if (error) return res.status(500).send({ message: "Failed to update user", error });
@@ -153,6 +152,8 @@ router.get('/bookings/:userId', async (req, res) => {
     res.status(500).send({ message: "Failed to fetch bookings", details: error.message });
   }
 });
+
+
 
 
 

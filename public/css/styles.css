@@ -100,7 +100,6 @@
   }
   
   p {
-    font-size:var(--base-font-size);
     line-height:26px;
     margin-bottom:4px;
   }
@@ -611,10 +610,7 @@
   }
 
   /* cards */
-  .summary-card {
-    min-width:200px;
-  }
-  
+
   
   /* Booking specific */
   
@@ -672,6 +668,18 @@
   }
   .active > .nav-item {
       color:var(--brand-color);
+  }
+
+  .accordion-button::after {
+    margin-left: 20px;
+  }
+
+  .accordion-button:not(.collapsed){
+    background-color: var(--cyan-100);
+  }
+
+  .dotted-bottom-border {
+    border-bottom: 1px dotted #000;
   }
   
   /* FLASH messages  */

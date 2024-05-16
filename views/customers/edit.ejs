@@ -1,7 +1,10 @@
 <%- include('../partials/header') %>
 <%- include('../partials/nav') %>
 
-<h1>Edit <%= customer.name %></h1>
+<section>
+<h2>Viewing <%= customer.first_name %>'s profile</h2>
+</section>
+<section>
 <form action="/customers/edit/<%= customer.id %>" method="post">
   <!-- Hidden input for customer ID -->
   <input type="hidden" name="id" value="<%= customer.id %>">
@@ -11,8 +14,11 @@
     <div class="col-lg-3 col-12">
       <label class="form-label" for="name">Name:</label>
     </div>
-    <div class="col-lg-9 col-12">
-      <input type="text" class="form-control" id="name" name="name" value="<%= customer.name %>" required>
+    <div class="col-lg-4 col-12">
+      <input type="text" class="form-control mb-3 mb-lg-0" id="first_name" name="first_name" value="<%= customer.first_name %>" placeholder="First name" required>
+    </div>
+    <div class="col-lg-5 col-12">
+      <input type="text" class="form-control" id="last_name" name="last_name" value="<%= customer.last_name %>" required placeholder="Last name">
     </div>
   </div>
 
@@ -36,24 +42,6 @@
     </div>
   </div>
 
-    <!-- Membership Role -->
-    <div class="form-row row mb-3">
-      <div class="col-lg-3 col-12">
-        <label class="form-label" for="role">Membership:</label>
-        <p class="supporting-text font-14">Change membership level to grant different access</p>
-      </div>
-      <div class="col-lg-9 col-12">
-        <select class="form-control" id="membership_id" name="membership_id">
-          <% memberships.forEach(function(membership) { %>
-            <option></option>
-            <option value="<%= membership.id %>" <%= customer.membership_id === membership.id ? 'selected' : '' %>>
-              <%= membership.name %>
-            </option>
-          <% }); %>
-        </select>
-      </div>
-    </div>
-
   <!-- customer Status -->
   <div class="form-row row mb-3">
     <div class="col-lg-3 col-12">
@@ -67,7 +55,40 @@
       </select>
     </div>
   </div>
-
+  <div class="row form-row mb-3">
+    <div class="col-12">
+      <h4 class="mb-3">Assessments</h4>
+    </div>
+    <div class="col-12">
+      <div class="accordion" id="accordionExample">
+        <% assessments.forEach((assessment, index) => { %>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="heading<%= index %>">
+              <div class="accordion-button collapsed d-flex justify-content-space-between fw-normal font-14" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<%= index %>" aria-expanded="false" aria-controls="collapse<%= index %>">
+                <span class="d-block">Overall Score: <strong><%= assessment.overall_score %></strong></span>
+                <span class="d-block ms-auto"><%= new Date(assessment.assessment_date).toLocaleDateString('en-GB', { year: 'numeric', day: '2-digit', month: '2-digit' }) %></span>
+              </div>
+            </h2>
+            <div id="collapse<%= index %>" class="accordion-collapse collapse" aria-labelledby="heading<%= index %>" data-bs-parent="#accordionExample">
+              <div class="accordion-body w-100 ">
+                <% Object.keys(assessment).forEach(key => { %>
+                  <% if (key !== 'id' && key !== 'user_id' && key !== 'assessment_date' && key !== 'overall_score') { %>
+                    <div class="d-flex justify-content-between border-bottom py-3 ">
+                      <div class="font-14"><p class="dotted-bottom-border"><%= key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') %>:</p></div>
+                      <div class="font-14 text-end"><p><%= assessment[key] %></p></div>
+                    </div>
+                  <% } %>
+                <% }) %>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
   <!-- Submit Button -->
-  <button type="submit" class="btn btn-success">Update customer</button>
+  <button type="submit" class="btn btn-success">Save updates</button>
 </form>
+</section>
+
+<%- include('../partials/footer') %>

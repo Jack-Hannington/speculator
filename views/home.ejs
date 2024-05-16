@@ -1,7 +1,14 @@
 <%- include('./partials/header') %>
 <%- include('./partials/nav') %>
 
-
+<style>
+          .ct-series-a .ct-line {
+            stroke: rgba(75, 192, 192, 1);
+        }
+        .ct-series-a .ct-area {
+            fill: rgba(75, 192, 192, 0.2);
+        }
+</style>
 <% if (user.role === 'admin') { %>
 <section>
   <h1>Welcome back, <%= user.first_name %></h1>
@@ -9,52 +16,32 @@
 <section>
  
   <div class="row summary-blocks header-row gap-lg-0 gap-3">
-    <div class="col">
-      <div class="card summary-card px-3 py-3">
-        <p class="fw-semibold mb-1">Total sign-ups</p>
-        <div class="d-flex align-items-start flex-column">
-          <h3 class="mb-1 fw-bold">0</h3><span style="color:green;font-size:14px;">
-            <iconify-icon class="m-0" inline icon="solar:arrow-up-bold-duotone"></iconify-icon>0% vs last month
-          </span>
+    <% if (assessments && assessments.length > 0) { %>
+      <% const assessment = assessments[0]; %>
+      <% Object.keys(assessment).forEach(key => { %>
+        <% if (key.endsWith('_score') && assessment[key] !== null) { %>
+          <div class="col">
+            <div class="card summary-card px-3 py-3">
+              <p class="fw-semibold mb-1"><%= key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') %></p>
+              <div class="d-flex align-items-start flex-column">
+                <h3 class="mb-1 fw-bold"><%= assessment[key] %></h3>
+              </div>
+              <p>Above or below benchmark</p>
+            </div>
+          </div>
+        <% } %>
+      <% }); %>
+    <% } else { %>
+      <div class="col">
+        <div class="card summary-card px-3 py-3">
+          <p class="fw-semibold mb-1">No assessments available</p>
         </div>
       </div>
-
-    </div>
-    <div class="col ">
-      <div class="card summary-card px-3 py-3">
-        <p class="fw-semibold mb-1">Bookings this week</p>
-        <div class="d-flex align-items-start flex-column">
-          <h3 class="mb-1 fw-bold">120</h3><span style="color:green;font-size:14px;">
-            <iconify-icon class="m-0" inline icon="solar:arrow-up-bold-duotone"></iconify-icon>20% vs last month
-          </span>
-        </div>
-      </div>
-
-    </div>
-    <div class="col">
-      <div class="card summary-card px-3 py-3">
-        <p class="fw-semibold mb-1">Bookings this week</p>
-        <div class="d-flex align-items-start flex-column">
-          <h3 class="mb-1 fw-bold">120</h3><span style="color:green;font-size:14px;">
-            <iconify-icon class="m-0" inline icon="solar:arrow-up-bold-duotone"></iconify-icon>20% vs last month
-          </span>
-        </div>
-      </div>
-
-    </div>
-    <div class="col">
-      <div class="card summary-card px-3 py-3">
-        <p class="fw-semibold mb-1">Bookings this week</p>
-        <div class="d-flex align-items-start flex-column">
-          <h3 class="mb-1 fw-bold">120</h3><span style="color:green;font-size:14px;">
-            <iconify-icon class="m-0" inline icon="solar:arrow-up-bold-duotone"></iconify-icon>20% vs last month
-          </span>
-        </div>
-      </div>
-
-    </div>
-    <p class="support-text mt-2 font-14">Supporting grey text</p>
+    <% } %>
   </div>
+  
+  
+  
 </section>
 <% } else if (user.role === 'customer') {%>
     <h2 class="mb-3 mt-3">Your Bookings</h2>
@@ -139,5 +126,33 @@
     
 <% } %>
 
+<script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+<script>
+  new Chartist.Line('.ct-chart', {
+      labels: Array(6).fill(''), // Hidden labels
+      series: [
+          [2, 4, 6, 7, 6, 8]
+      ]
+  }, {
+      showPoint: false,
+      lineSmooth: Chartist.Interpolation.simple(),
+      axisX: {
+          showLabel: false,
+          showGrid: false
+      },
+      axisY: {
+          showLabel: false,
+          showGrid: false
+      },
+      fullWidth: true,
+      chartPadding: {
+          right: 0,
+          left: 0,
+          top: 0,
+          bottom: 0
+      },
+      showArea: true
+  });
+</script>
 
 <%- include('./partials/footer') %>

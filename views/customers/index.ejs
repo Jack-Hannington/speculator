@@ -35,8 +35,9 @@
                             <td><%=customer.role%></td>
                             <td><%= customer.memberships ? customer.memberships.name : 'No Membership' %></td>
                             <td>Business</td>
-                            <td colspan="2"><a href="/customers/edit/<%=customer.id%>" class="me-3">Edit</a>
-                             <a href="/customers/assessments/?user_id=<%=customer.id%>">New assessment</a></td>
+                            <td colspan="2">
+                             <a href="/customers/edit/<%=customer.id%>" class="me-3 unstyled"><iconify-icon icon="solar:pen-new-square-linear" inline></iconify-icon>Edit</a>
+                             <a class="unstyled" href="/customers/assessments/?user_id=<%=customer.id%>"><iconify-icon inline icon="solar:add-square-linear"></iconify-icon>Assessment</a></td>
                           </tr>
                         <% }) %>
                     </tbody>
