@@ -11,22 +11,23 @@
 </style>
 <% if (user.role === 'admin') { %>
 <section>
-  <h1>Welcome back, <%= user.first_name %></h1>
+  <h1>Hello, <%= user.first_name %></h1>
+  <p class="supporting-text">Once your first assessment is complete you'll see your results and personalised wellness plans below. </p>
 </section>
 <section>
- 
-  <div class="row summary-blocks header-row gap-lg-0 gap-3">
+  <div class="row summary-blocks header-row row-gap-3">
     <% if (assessments && assessments.length > 0) { %>
       <% const assessment = assessments[0]; %>
       <% Object.keys(assessment).forEach(key => { %>
         <% if (key.endsWith('_score') && assessment[key] !== null) { %>
-          <div class="col">
+          <div class="col-lg-3">
             <div class="card summary-card px-3 py-3">
               <p class="fw-semibold mb-1"><%= key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') %></p>
               <div class="d-flex align-items-start flex-column">
                 <h3 class="mb-1 fw-bold"><%= assessment[key] %></h3>
               </div>
-              <p>Above or below benchmark</p>
+              <div class="ct-chart ct-perfect-fourth"></div>
+
             </div>
           </div>
         <% } %>
@@ -39,6 +40,75 @@
       </div>
     <% } %>
   </div>
+
+  <section>
+    <div class="row">
+      <div class="col-12">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Progress</th>
+                <th>Status</th>
+                <th>Plans</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="d-flex gap-2 align-items-center py-2">
+                 <div class="category-icon-container d-flex align-items-center justify-content-center me-2" style="background-color: rgb(235, 251, 251);width: 40px;height: 40px;border-radius:50%;color:rgb(13, 152, 194)">
+                  <iconify-icon icon="iconoir:gym" inline style="font-size: 30px;margin-right: 0px;"></iconify-icon>
+                 </div>
+                <div class="table-cell-stacked">
+                  <span class="mb-1 fw-semibold">Strength</span>
+                  <span class="support-text mt-0 d-block">1/5</p>
+                </div>
+              </td>
+                <td>
+                50%
+                </td>
+                <td>
+                  <span class="token green">Complete</span>
+                </td>
+                <td>
+                  Pathway for improving posture at your desk 
+                </td>
+                <td>
+                 View plan ->
+                </td>
+                </tr>
+                <tr>
+                  <td class="d-flex gap-2 align-items-center py-2">
+                   <div class="category-icon-container d-flex align-items-center justify-content-center me-2" style="background-color: rgb(235, 251, 251);width: 40px;height: 40px;border-radius:50%;color:rgb(13, 152, 194)">
+                    <iconify-icon icon="iconoir:gym" inline style="font-size: 30px;margin-right: 0px;"></iconify-icon>
+                   </div>
+                  <div class="table-cell-stacked">
+                    <span class="mb-1 fw-semibold">Strength</span>
+                    <span class="support-text mt-0 d-block">1/5</p>
+                  </div>
+                </td>
+                  <td>
+                  50%
+                  </td>
+                  <td>
+                    <span class="token green">Complete</span>
+                  </td>
+                  <td>
+                    Pathway for improving posture at your desk 
+                  </td>
+                  <td>
+                   View plan ->
+                  </td>
+                  </tr>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
   
   
   

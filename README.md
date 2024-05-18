@@ -4,7 +4,7 @@ Users are graded across 7 base categories including weight, heart rate, strength
 
 After an assessment the scores will update on the user's dashboard as top-level score cards where they can review them, compare with similar users - this is locked to their company participants if their on a corporate package and scores an anonymised so it's a "you're in the top 20%" of people in your age group / gender. Below the scorecards will be a series of plans for users to undertake to improve their scores before any follow-up assessment. The user's can choose their own goals and begin the chosen plans. Each plan will have a series of help guides, articles and resources to help improve their wellness. once enrolled users will receive a series of emails to keep them updated and on-track to improve their wellbeing. Once a user has read a resource and completed an exercise they can mark it as complete to see their progress. 
 
-There is a users table, plans table, content table, content makes up what a plan is, completed_assessments, tenants (for business customers who add their employees)
+There is a users table, plans table, content table, content makes up what a plan is, completed_assessments, businesses (for business customers who add their employees)
 
 Technical details ---
 -- Database: Postgres (Supabase)

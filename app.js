@@ -353,7 +353,7 @@ app.post('/reset-password', async (req, res) => {
 });
 
 
-
+// get total entries. Get highest score. Calculate 
   
   
 app.get('/', async (req, res) => {
