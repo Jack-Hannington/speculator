@@ -68,8 +68,8 @@
   h1, h2, h3, h4, h5, h6 {
     color:var(--heading-color);
     letter-spacing:-0.3px;
-    font-weight:700;
-    font-family: Manrope;
+    font-weight:600;
+    font-family: Inter;
   }
   
   h1 {
@@ -176,6 +176,7 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    padding:0px 10px
   }
   
   .site-title,
@@ -191,6 +192,7 @@
   .nav-item {
     padding-top: 10px;
     padding-bottom: 10px;
+    border-radius: var(--base-border-radius);
   }
   
   .nav-item:hover {
@@ -200,6 +202,7 @@
   nav > a {
     text-decoration: none;
     color: inherit;
+    border-radius: 8px;
   }
   .nav-item > span > iconify-icon {
     margin-right: 8px;
@@ -382,13 +385,17 @@
       height:100vh;
       width:100%;
       left:0;
-      top:65px;
+      top:80px;
       background:white;
       border-bottom:1px solid var(--light-grey);
       box-shadow: rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
   }
   .sidebar-footer {
     margin-top: inherit;
+  }
+  .nav-item {
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
     .nav-toggle {
       display:block;

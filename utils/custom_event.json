@@ -1,0 +1,31 @@
+{
+    "id": "evt_1IrWgTL2viQUdXEeMSnTeuNZ",
+    "object": "event",
+    "api_version": "2024-05-15",
+    "created": 1716117590,
+    "data": {
+      "object": {
+        "id": "cs_test_a1T1nxCrIdO1kvEnnadVTluSdvAmkR1LebPv3hZFUGTeVLGUKuk6p2EVAm",
+        "object": "checkout.session",
+        "customer_details": {
+          "email": "hannington94@gmail.com",
+          "name": "Stripe test User",
+          "address": {
+            "city": "San Francisco",
+            "country": "US",
+            "line1": "1234 Test St",
+            "line2": null,
+            "postal_code": "94111",
+            "state": "CA"
+          }
+        },
+        "metadata": { "business": "3" },
+        "payment_status": "paid"
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 1,
+    "request": { "id": null, "idempotency_key": null },
+    "type": "checkout.session.completed"
+  }
+  

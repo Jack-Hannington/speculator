@@ -6,20 +6,23 @@ const methodOverride = require('method-override');
 const bodyParser = require('body-parser');
 
 
-async function getLatestAssessmentRank(userId) {
-    const { data, error } = await supabase.rpc('get_latest_assessment_rank', { p_user_id: userId });
-    if (error) {
-      console.error('Error fetching rank:', error);
-      return null;
-    } else {
-      return data;
-    }
-  }
+// async function getLatestAssessmentRank(userId) {
+//     const { data, error } = await supabase.rpc('get_latest_assessment_rank', { p_user_id: userId });
+//     if (error) {
+//       console.error('Error fetching rank:', error);
+//       return null;
+//     } else {
+//       return data;
+//     }
+//   }
   
-  // Example usage:
-  getLatestAssessmentRank(2).then(rank => {
-    console.log('Rank:', rank);
-  });
+//   // Example usage:
+//   getLatestAssessmentRank(2).then(rank => {
+//     console.log('Rank:', rank);
+//   });
+
+
+
 
 router.use(express.json()); // Use for regular routes that need JSON 
 router.use(bodyParser.urlencoded({ extended: true }));

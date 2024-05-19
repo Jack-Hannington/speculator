@@ -14,7 +14,7 @@ const methodOverride = require('method-override');
 const base_url = process.env.NODE_ENV === 'DEV' ? process.env.DEV_URL : process.env.PROD_URL;
 const {bookingConfirmation, resetPasswordEmail} = require('./config/sendgrid');
 const responseTimeLogger = require('./utils/responseLogger');
-console.log(resetPasswordEmail)
+
 
 // Initialize Express app
 const app = express();
@@ -22,7 +22,7 @@ require('dotenv').config();
 const stripeWebhookRouter = require('./routes/stripeWebhookRouter');
 const accessControl = require('./middleware/middleware');
 
-app.use('/stripe', stripeWebhookRouter);  // Mount the webhook router
+app.use('/stripe', stripeWebhookRouter);  
 
 
 app.use(methodOverride('_method'));
@@ -354,24 +354,81 @@ app.post('/reset-password', async (req, res) => {
 
 
 // get total entries. Get highest score. Calculate 
+
+async function getLatestAssessmentRanks(userId, ageBand, businessId) {
+  const { data, error } = await supabase.rpc('get_latest_assessment_ranks', {
+    p_user_id: userId,
+    p_age_band: ageBand,
+    p_business: businessId
+  });
+  if (error) {
+    console.error('Error fetching ranks:', error);
+    return null;
+  } else {
+    return data;
+  }
+}
+
+// // Example usage:
+// getLatestAssessmentRanks(2, '<35', 3).then(ranks => {
+//   console.log('Ranks:', ranks);
+// });
+
   
   
+// app.get('/', async (req, res) => {
+//   if (req.isAuthenticated()) {
+//     try {
+//       // Retrieve the authenticated user's tenant ID and ID
+//       const tenantId = req.user.tenant_id;
+//       const userId = req.user.id;
+
+//         // Fetch all assessmnetns
+//         const { data: assessments, error: assessmentsError } = await supabase
+//         .from('completed_assessments')
+//         .select('*')
+//         .eq('id', userId)
+
+//         console.log(assessments)
+
+//       res.render('home', {assessments});
+
+//     } catch (err) {
+//       console.error('Error during data fetching:', err);
+//       return res.status(500).send('Error fetching user data.');
+//     }
+//   } else {
+//     // Handle unauthenticated access (redirect to login)
+//     res.redirect('/login');
+//   }
+// });
+
 app.get('/', async (req, res) => {
   if (req.isAuthenticated()) {
     try {
       // Retrieve the authenticated user's tenant ID and ID
-      const tenantId = req.user.tenant_id;
+      const tenantId = req.user.business;
       const userId = req.user.id;
+      const ageBand = '<35'; // Example age band, replace with actual logic
+      const businessId = 3;  // Example business ID, replace with actual logic
 
-        // Fetch all assessmnetns
-        const { data: assessments, error: assessmentsError } = await supabase
+      // Fetch all assessments
+      const { data: assessments, error: assessmentsError } = await supabase
         .from('completed_assessments')
         .select('*')
-        .eq('id', userId)
+        .eq('user_id', userId);
 
-        console.log(assessments)
+      if (assessmentsError) {
+        throw assessmentsError;
+      }
 
-      res.render('home', {assessments});
+      // Fetch ranks
+      const ranks = await getLatestAssessmentRanks(userId, ageBand, tenantId);
+
+      console.log('Assessments:', assessments);
+      console.log('Ranks:', ranks);
+
+      res.render('home', { assessments, ranks });
 
     } catch (err) {
       console.error('Error during data fetching:', err);
