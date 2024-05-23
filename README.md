@@ -1,10 +1,86 @@
-Altius Wellness is a modern online wellness platform offering tailored wellness and physiotherapy plans based on user scores on in-person or online assessements. 
+Altius Wellness Platform Overview
+Objective: Altius Wellness is an online platform offering personalized wellness and physiotherapy plans based on user assessments.
 
-Users are graded across 7 base categories including weight, heart rate, strength, mental wellbing, mobility, blood pressure and recovery. The assessments give the user a score 1, 3 or 5 depending on their results per question. For example a user may average 4 hours of sleep per night which would give them a score of 1. Sleep is part of the recovery section of the assessment so 1 will be added to their recovery whereas if they answered 8+ hours they might receive a 5 on the score. Other questions will be asked to give an overall recovery score. This repeats for 7 categories before all scores are added up.
+Assessment Categories: Users are assessed across seven categories, each containing multiple elements. Scores are given on a scale of 1 (Red), 3 (Amber), or 5 (Green) for each element. The categories and their elements are:
 
-After an assessment the scores will update on the user's dashboard as top-level score cards where they can review them, compare with similar users - this is locked to their company participants if their on a corporate package and scores an anonymised so it's a "you're in the top 20%" of people in your age group / gender. Below the scorecards will be a series of plans for users to undertake to improve their scores before any follow-up assessment. The user's can choose their own goals and begin the chosen plans. Each plan will have a series of help guides, articles and resources to help improve their wellness. once enrolled users will receive a series of emails to keep them updated and on-track to improve their wellbeing. Once a user has read a resource and completed an exercise they can mark it as complete to see their progress. 
+Obesity
 
-There is a users table, plans table, content table, content makes up what a plan is, completed_assessments, businesses (for business customers who add their employees)
+Weight (KG)
+Waist Circumference (inches)
+BMI
+Visceral Fat
+Cardiovascular Fitness
+
+Resting Heart Rate
+Heart Index
+Blood Pressure
+Time Spent Sitting
+Recovery
+
+Sleep Quality Score
+Respiratory Rate
+Heart Rate Variability
+Mental Health
+
+Wellbeing Score
+Strength
+
+Muscle Mass (KG)
+Grip Strength
+Neck Strength
+Glute Strength
+Mobility
+
+Sit and Reach Test
+Thomas Test
+Chest Test
+Trap Complex Test
+Nutrition
+
+Glucose
+Cholesterol
+Calorie Balance
+Body Water Percentage
+Scoring: Each element is scored as 1 (Red), 3 (Amber), or 5 (Green) based on predefined criteria. Each category score is a sum of its element scores.
+
+Technical Details
+Database: Postgres (Supabase)
+Storage: Supabase
+Backend: Node.js, Express
+Rendering: EJS
+Emails: SendGrid
+Auth: Passport
+Payments: Stripe
+Hosting: Railway.app (Backup: fly.io)
+Database Schema:
+
+Users Table: Stores user information.
+Completed Assessments Table: Stores assessment results.
+Businesses Table: Stores business customer details.
+Functions and Triggers
+Calculate Overall Scores:
+
+Function: calculate_scores()
+Trigger: Runs before insert or update on completed_assessments.
+Get Latest Assessment Rank:
+
+Function: get_latest_assessment_rank(p_user_id INTEGER)
+Purpose: Returns the rank of the latest assessment based on overall score and gender.
+Frontend Interactions
+Routes for rendering user assessments, calculating and updating percentiles, and making RPC calls for ranks and statistics.
+User Experience
+Assessment Process:
+
+Users complete pre-assessment information (online or in-person).
+Scores are updated on the user dashboard.
+Users can compare scores within their corporate group (anonymized).
+Personalized plans are provided to improve scores.
+Users track their progress, mark completed tasks, and receive email nudges.
+Content Delivery:
+
+Content is triggered based on scores (Red, Amber, Green) and delivered via email or platform resources.
+Confirmation
+This summary encapsulates the key features and technical details of the Altius Wellness platform. If this aligns with your understanding and intentions, we can proceed to address any specific areas you need help with or further details on.
 
 Technical details ---
 -- Database: Postgres (Supabase)

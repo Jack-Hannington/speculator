@@ -6,6 +6,8 @@ const supabase = require('../config/supabaseClient');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const sendgrid = require('../config/sendgrid');
 
+const base_url = process.env.NODE_ENV === 'DEV' ? process.env.DEV_URL : process.env.PROD_URL;
+
 const { bookingConfirmation } = require('../config/sendgrid');
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -92,25 +94,29 @@ async function createCorporateWellnessUser(name, email, business) {
     const user = data[0];
 
     // Send registration email using SendGrid
-    // const msg = {
-    //     to: email,
-    //     from: 'no-reply@yourdomain.com', // Use your verified sender
-    //     templateId: 'your_template_id', // Replace with your SendGrid template ID
-    //     dynamic_template_data: {
-    //         name: user.name,
-    //         registration_link: 'https://yourdomain.com/register' // Replace with your registration link
-    //     }
-    // };
+    const msg = {
+        to: email,
+        from: 'jack@hanningtondigital.com', 
+        templateId: 'd-0b3e6d7d1dab41cc8db3bb362303f33d', 
+        dynamic_template_data: {
+            name: user.name,
+            registration_link: `${base_url}/register`
+        }
+    };
 
-    // try {
-    //     await sendGrid.send(msg);
-    //     console.log(`Registration email sent to ${email}`);
-    // } catch (error) {
-    //     console.error(`Failed to send registration email: ${error.message}`);
-    //     throw new Error(`Failed to send registration email: ${error.message}`);
-    // }
+    try {
+        await sendGrid.send(msg);
+        console.log(`Registration email sent to ${email}`);
+    } catch (error) {
+        console.error(`Failed to send registration email: ${error.message}`);
+        throw new Error(`Failed to send registration email: ${error.message}`);
+    }
 }
 
+
+async function generateAccessCode(){
+    
+}
 
 
 

@@ -1,0 +1,20 @@
+<%- include('../partials/header') %>
+    <%- include('../partials/nav') %>
+
+    <% if (message && message.length > 0) { %>
+      <div class="flash-messages-container animate__animated">
+          <div class="flash-message"><iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %></div>
+      </div>
+      <% } %>
+  
+    <h1>Questions</h1>
+    <ul>
+      <% questions.forEach(question => { %>
+        <li>
+          <%= question.categories.name %>: <%= question.question %>
+          <a href="/questions/edit/<%= question.id %>">Edit</a>
+        </li>
+      <% }) %>
+    </ul>
+
+<%- include('../partials/footer') %>

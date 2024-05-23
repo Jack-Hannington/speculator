@@ -427,8 +427,8 @@ app.get('/', async (req, res) => {
 
       console.log('Assessments:', assessments);
       console.log('Ranks:', ranks);
-
-      res.render('home', { assessments, ranks });
+      const messages = req.flash('success'); // Retrieve the flash message
+      res.render('home', { assessments, ranks,  message: messages[0] });
 
     } catch (err) {
       console.error('Error during data fetching:', err);
@@ -448,6 +448,7 @@ const customersRoute = require('./routes/customers');
 const bookingRoute = require('./routes/bookings');
 const servicesRoute = require('./routes/services');
 const assessmentsRoute = require('./routes/assessments');
+const questionsRoute = require('./routes/questions');
 
 
 
@@ -456,6 +457,7 @@ app.use('/bookings', bookingRoute)
 app.use('/services', servicesRoute);
 app.use('/customers', customersRoute)
 app.use('/assessments', assessmentsRoute)
+app.use('/questions', questionsRoute);
 
 
 // fs.readFile('public/washer.png', async (err, avatarFile) => {

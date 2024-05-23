@@ -1,0 +1,58 @@
+<%- include('../partials/header') %>
+<body>
+    <section class="container">
+        <div class="row">
+            <div class="col-12">
+                <form action="/register" method="POST">
+                    <!-- // Amend the post route to post to corporate user -->
+                    <!-- Name -->
+                    <div class="form-row row">
+                        <div class="col-lg-4 col-12">
+                            <label class="form-label" for="">Name</label>
+                        </div>
+                        <div class="col-lg-4 col-12">
+                            <input class="form-control" type="text" id="first_name" name="first_name" required>
+                        </div>
+                        <div class="col-lg-4 col-12">
+                            <input class="form-control" type="text" id="last_name" name="last_name" required>
+                        </div>
+                    </div>
+                
+                    <!-- Email -->
+                    <div class="form-row row">
+                        <div class="col-lg-4 col-12">
+                            <label class="form-label" for="email">Email</label>
+                        </div>
+                        <div class="col-lg-8 col-12">
+                            <input class="form-control" type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+                
+                    <!-- Pin -->
+                    <div class="form-row row">
+                        <div class="col-lg-4 col-12">
+                            <label class="form-label" for="password">Access pin</label>
+                        </div>
+                        <div class="col-lg-8 col-12">
+                            <input class="form-control" type="password" id="password" name="password" required>
+                            <span class="form-text font-12">You will have received your pin via email</span>
+                        </div>
+                    </div>
+                
+                    <!-- Role (hidden) -->
+                    <input type="hidden" id="role" name="role" value="user">
+                
+                    <!-- Submit Button -->
+                    <div class="form-row row">
+                        <div class="col-12">
+                            <button type="submit" class="btn-primary">Register</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    
+</body>
+</html>
