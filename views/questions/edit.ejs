@@ -1,6 +1,8 @@
-<%- include('../partials/header') %>
-    <%- include('../partials/nav') %>
-<% if (message && message.length > 0) { %>
+
+  <%- include('../partials/header') %>
+  <%- include('../partials/nav') %>
+
+  <% if (message && message.length > 0) { %>
     <div class="flash-messages-container animate__animated">
       <div class="flash-message">
         <iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %>
@@ -44,4 +46,18 @@
     <button type="submit" class="btn btn-success">Save</button>
   </form>
 
-<%- include('../partials/footer') %>
+  <h2>Scoring Rules</h2>
+  <a href="/questions/<%= question.id %>/scoring_rules/create">Add Scoring Rule</a>
+  <ul>
+    <% scoringRules.forEach(rule => { %>
+      <li>
+        Gender: <%= rule.gender %>, Age Range: <%= rule.age_range %>, Min Value: <%= rule.min_value %>, Max Value: <%= rule.max_value %>, Score: <%= rule.score %>
+        <a href="/questions/scoring_rules/edit/<%= rule.id %>">Edit</a>
+        <form action="/questions/scoring_rules/delete/<%= rule.id %>" method="POST" style="display:inline;">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
+
+  <%- include('../partials/footer') %>

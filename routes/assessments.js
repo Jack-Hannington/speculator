@@ -6,24 +6,6 @@ const methodOverride = require('method-override');
 const bodyParser = require('body-parser');
 
 
-// async function getLatestAssessmentRank(userId) {
-//     const { data, error } = await supabase.rpc('get_latest_assessment_rank', { p_user_id: userId });
-//     if (error) {
-//       console.error('Error fetching rank:', error);
-//       return null;
-//     } else {
-//       return data;
-//     }
-//   }
-  
-//   // Example usage:
-//   getLatestAssessmentRank(2).then(rank => {
-//     console.log('Rank:', rank);
-//   });
-
-
-
-
 router.use(express.json()); // Use for regular routes that need JSON 
 router.use(bodyParser.urlencoded({ extended: true }));
 
@@ -89,4 +71,143 @@ router.post('/completed-assessments', async (req, res) => {
   res.status(201).send('Assessment added successfully');
 });
 
+// Show assessments
+router.get('/', async (req, res) => {
+  const { data: assessments, error } = await supabase
+    .from('assessments')
+    .select('*, assessment_questions(question_id, questions(question))');
+
+  const messages = req.flash('success');
+  if (error) {
+    req.flash('error', 'Failed to fetch assessments');
+    return res.status(500).send({ message: "Failed to fetch assessments", error });
+  }
+  res.render('assessments', { assessments, message: messages[0] });
+});
+
+// Show creat assessmnet form
+router.get('/create', async (req, res) => {
+  const { data: questions, error } = await supabase
+    .from('questions')
+    .select('*');
+
+  const messages = req.flash('success');
+  if (error) {
+    req.flash('error', 'Failed to fetch questions');
+    return res.status(500).send({ message: "Failed to fetch questions", error });
+  }
+  res.render('assessments/create', { questions, message: messages[0] });
+});
+
+// Post create assessment
+router.post('/create', async (req, res) => {
+  const { name, description, question_ids } = req.body;
+
+  console.log(req.body);
+
+  const { data: assessments, error: assessmentError } = await supabase
+    .from('assessments')
+    .insert([{ name, description }])
+    .select();
+
+  if (assessmentError) {
+    req.flash('error', 'Failed to create assessment');
+    return res.status(500).send({ message: "Failed to create assessment", error: assessmentError });
+  }
+
+  const assessment_id = assessments[0].id; // Accessing the first element to get the assessment ID
+
+  const questions = question_ids.map(question_id => ({
+    assessment_id,
+    question_id
+  }));
+
+  const { error: assessmentQuestionsError } = await supabase
+    .from('assessment_questions')
+    .insert(questions);
+
+  if (assessmentQuestionsError) {
+    req.flash('error', 'Failed to add questions to assessment');
+    return res.status(500).send({ message: "Failed to add questions to assessment", error: assessmentQuestionsError });
+  }
+
+  req.flash('success', 'Assessment created successfully');
+  res.redirect('/assessments');
+});
+
+
+// Edit assessment 
+router.get('/edit/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { data: assessment, error: assessmentError } = await supabase
+      .from('assessments')
+      .select('*, assessment_questions(question_id)')
+      .eq('id', id)
+      .single();
+
+    if (assessmentError) throw assessmentError;
+
+    const { data: questions, error: questionsError } = await supabase
+      .from('questions')
+      .select('*');
+
+    if (questionsError) throw questionsError;
+
+    const messages = req.flash('success');
+    res.render('assessments/edit', { assessment, questions, message: messages[0] });
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    req.flash('error', 'Failed to fetch data');
+    res.status(500).send({ message: "Failed to fetch data", details: error });
+  }
+});
+
+router.post('/edit/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, description, question_ids } = req.body;
+
+  console.log(req.body)
+
+  const { data, error: assessmentError } = await supabase
+    .from('assessments')
+    .update({ name, description })
+    .eq('id', id);
+
+  if (assessmentError) {
+    req.flash('error', 'Failed to update assessment');
+    return res.status(500).send({ message: "Failed to update assessment", error: assessmentError });
+  }
+
+  // Delete existing questions for the assessment
+  const { error: deleteError } = await supabase
+    .from('assessment_questions')
+    .delete()
+    .eq('assessment_id', id);
+
+  if (deleteError) {
+    req.flash('error', 'Failed to update questions for assessment');
+    return res.status(500).send({ message: "Failed to update questions for assessment", error: deleteError });
+  }
+
+  const questions = question_ids.map(question_id => ({
+    assessment_id: id,
+    question_id
+  }));
+
+  const { error: assessmentQuestionsError } = await supabase
+    .from('assessment_questions')
+    .insert(questions);
+
+  if (assessmentQuestionsError) {
+    req.flash('error', 'Failed to add questions to assessment');
+    return res.status(500).send({ message: "Failed to add questions to assessment", error: assessmentQuestionsError });
+  }
+
+  req.flash('success', 'Assessment updated successfully');
+  res.redirect('/assessments');
+});
+
 module.exports = router;
+

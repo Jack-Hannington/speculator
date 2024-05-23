@@ -1,0 +1,47 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<% if (message && message.length > 0) { %>
+    <div class="flash-messages-container animate__animated">
+      <div class="flash-message">
+        <iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %>
+      </div>
+    </div>
+  <% } %>
+
+  <h1>Edit Assessment</h1>
+  <form action="/assessments/edit/<%= assessment.id %>" method="POST">
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="name">Name:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="text" class="form-control" id="name" name="name" value="<%= assessment.name %>" required>
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="description">Description:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="text" class="form-control" id="description" name="description" value="<%= assessment.description %>" required>
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="questions">Questions:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <select class="form-control" id="questions" name="question_ids" multiple>
+          <% questions.forEach(question => { %>
+            <option value="<%= question.id %>" <%= assessment.assessment_questions.map(aq => aq.question_id).includes(question.id) ? 'selected' : '' %>><%= question.question %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save Changes</button>
+  </form>
+
+  <%- include('../partials/footer') %>

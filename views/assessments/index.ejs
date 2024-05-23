@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<% if (message && message.length > 0) { %>
+    <div class="flash-messages-container animate__animated">
+      <div class="flash-message">
+        <iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %>
+      </div>
+    </div>
+  <% } %>
+
+  <h1>Assessments</h1>
+  <ul>
+    <% assessments.forEach(assessment => { %>
+      <li>
+        <strong><%= assessment.name %>:</strong> <%= assessment.description %>
+        <ul>
+          <% assessment.assessment_questions.forEach(q => { %>
+            <li><%= q.questions.question %></li>
+          <% }) %>
+        </ul>
+        <a href="/assessments/edit/<%= assessment.id %>">Edit</a>
+      </li>
+    <% }) %>
+  </ul>
+  <a href="/assessments/create">Create New Assessment</a>
+
+  <%- include('../partials/footer') %>

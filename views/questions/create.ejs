@@ -1,0 +1,48 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<% if (message && message.length > 0) { %>
+  <div class="flash-messages-container animate__animated">
+    <div class="flash-message">
+      <iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %>
+    </div>
+  </div>
+<% } %>
+
+<h1>Create Question</h1>
+<form action="/questions/create" method="POST">
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="category">Category:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <select class="form-control" id="category" name="category_id" required>
+        <% categories.forEach(category => { %>
+          <option value="<%= category.id %>"><%= category.name %></option>
+        <% }) %>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="question">Question:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="text" class="form-control" id="question" name="question" required>
+    </div>
+  </div>
+
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="question_type">Question Type:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="text" class="form-control" id="question_type" name="question_type" required>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-success">Create</button>
+</form>
+
+<%- include('../partials/footer') %>

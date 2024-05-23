@@ -1,0 +1,64 @@
+
+  <%- include('../partials/header') %>
+  <%- include('../partials/nav') %>
+
+  <% if (message && message.length > 0) { %>
+    <div class="flash-messages-container animate__animated">
+      <div class="flash-message">
+        <iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %>
+      </div>
+    </div>
+  <% } %>
+
+  <h1>Create Scoring Rule for <%= question.question %></h1>
+  <form action="/questions/<%= question.id %>/scoring_rules/create" method="POST">
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="gender">Gender:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="text" class="form-control" id="gender" name="gender" required>
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="age_range">Age Range:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="text" class="form-control" id="age_range" name="age_range" required>
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="min_value">Min Value:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="number" class="form-control" id="min_value" name="min_value">
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="max_value">Max Value:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="number" class="form-control" id="max_value" name="max_value">
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="score">Score:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="number" class="form-control" id="score" name="score" required>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Create</button>
+  </form>
+
+  <%- include('../partials/footer') %>
+
