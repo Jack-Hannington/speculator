@@ -1,15 +1,37 @@
-<%- include('../partials/header') %>
-<%- include('../partials/nav') %>
+<%- include('../partials/header') %> <%- include('../partials/nav') %>
 
 <h1>Create New Client</h1>
 <form action="/customers/create" method="post">
-  <!-- Customer Name -->
+  <!-- Name -->
   <div class="form-row row mb-3">
     <div class="col-lg-3 col-12">
       <label class="form-label" for="name">Name:</label>
     </div>
-    <div class="col-lg-9 col-12">
-      <input type="text" class="form-control" id="name" name="name" required>
+    <div class="col-lg-4 col-12">
+      <div class="form-floating mb-3 mb-lg-0">
+        <input
+          type="text"
+          class="form-control"
+          id="first_name"
+          name="first_name"
+          placeholder="First name"
+          required
+        />
+        <label for="first_name">First name</label>
+      </div>
+    </div>
+    <div class="col-lg-5 col-12">
+      <div class="form-floating">
+        <input
+          type="text"
+          class="form-control"
+          id="last_name"
+          name="last_name"
+          placeholder="Last name"
+          required
+        />
+        <label for="last_name">Last name</label>
+      </div>
     </div>
   </div>
 
@@ -19,7 +41,13 @@
       <label class="form-label" for="email">Email:</label>
     </div>
     <div class="col-lg-9 col-12">
-      <input type="email" class="form-control" id="email" name="email" required>
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        name="email"
+        required
+      />
     </div>
   </div>
 
@@ -29,7 +57,7 @@
       <label class="form-label" for="role">Role:</label>
     </div>
     <div class="col-lg-9 col-12">
-      <input type="text" class="form-control" id="role" name="role" required>
+      <input type="text" class="form-control" id="role" name="role" required />
     </div>
   </div>
 
@@ -42,7 +70,7 @@
       <select class="form-control" id="membership_id" name="membership_id">
         <option value="">Select Membership</option>
         <% memberships.forEach(function(membership) { %>
-          <option value="<%= membership.id %>"><%= membership.name %></option>
+        <option value="<%= membership.id %>"><%= membership.name %></option>
         <% }); %>
       </select>
     </div>
@@ -54,7 +82,81 @@
       <label class="form-label" for="password">Password:</label>
     </div>
     <div class="col-lg-9 col-12">
-      <input type="password" class="form-control" id="password" name="password" required>
+      <input
+        type="password"
+        class="form-control"
+        id="password"
+        name="password"
+        required
+      />
+    </div>
+  </div>
+  <!-- DOB -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="date_of_birth">Date of birth:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <div class="row">
+        <div class="col">
+          <div class="form-floating">
+            <input
+              type="number"
+              class="form-control"
+              id="day"
+              name="day"
+              placeholder="DD"
+              min="1"
+              max="31"
+              required
+            />
+            <label for="day">Day</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-floating">
+            <input
+              type="number"
+              class="form-control"
+              id="month"
+              name="month"
+              placeholder="MM"
+              min="1"
+              max="12"
+              required
+            />
+            <label for="month">Month</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-floating">
+            <input
+              type="number"
+              class="form-control"
+              id="year"
+              name="year"
+              placeholder="YYYY"
+              min="1900"
+              max="2100"
+              required
+            />
+            <label for="year">Year</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gender -->
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
+      <label class="form-label" for="gender">Gender:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <select class="form-select" id="gender" name="gender" required>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
     </div>
   </div>
 

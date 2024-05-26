@@ -1,0 +1,57 @@
+
+    <%- include('../partials/header') %> 
+    <%- include('../partials/nav') %>
+
+    <h1>
+      New Assessment for <%= customer.first_name %> <%= customer.last_name %>
+    </h1>
+    <form
+      action="/customers/<%= customer.id %>/assessments/<%= assessmentId %>/submit"
+      method="POST"
+    >
+      <% assessmentQuestions.forEach(assessmentQuestion => { %>
+      <div class="form-group">
+        <label for="question-<%= assessmentQuestion.question_id %>"><%= assessmentQuestion.questions.question %></label>
+        <% if (assessmentQuestion.questions.question_type === 'text') { %>
+        <input
+          type="text"
+          class="form-control"
+          id="question-<%= assessmentQuestion.question_id %>"
+          name="question-<%= assessmentQuestion.question_id %>"
+          required
+        />
+        <% } else if (assessmentQuestion.questions.question_type === 'numeric')
+        { %>
+        <input
+          type="number"
+          class="form-control"
+          id="question-<%= assessmentQuestion.question_id %>"
+          name="question-<%= assessmentQuestion.question_id %>"
+          required
+        />
+        <% } else if (assessmentQuestion.questions.question_type === 'date') {
+        %>
+        <input
+          type="date"
+          class="form-control"
+          id="question-<%= assessmentQuestion.question_id %>"
+          name="question-<%= assessmentQuestion.question_id %>"
+          required
+        />
+        <% } else if (assessmentQuestion.questions.question_type === 'textarea')
+        { %>
+        <textarea
+          class="form-control"
+          id="question-<%= assessmentQuestion.question_id %>"
+          name="question-<%= assessmentQuestion.question_id %>"
+          rows="3"
+          required
+        ></textarea>
+        <% } %>
+      </div>
+      <% }) %>
+      <button type="submit" class="btn btn-primary">Submit Assessment</button>
+    </form>
+
+    <%- include('../partials/footer') %>
+

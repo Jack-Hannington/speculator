@@ -33,7 +33,7 @@
         <label class="form-label" for="questions">Questions:</label>
       </div>
       <div class="col-lg-9 col-12">
-        <select class="form-control" id="questions" name="question_ids" multiple>
+        <select style="height:400px" class="form-control" id="questions" name="question_ids" multiple>
           <% questions.forEach(question => { %>
             <option value="<%= question.id %>" <%= assessment.assessment_questions.map(aq => aq.question_id).includes(question.id) ? 'selected' : '' %>><%= question.question %></option>
           <% }) %>

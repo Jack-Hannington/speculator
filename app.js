@@ -12,7 +12,7 @@ const path = require('path');
 const supabase = require('./config/supabaseClient');
 const methodOverride = require('method-override');
 const base_url = process.env.NODE_ENV === 'DEV' ? process.env.DEV_URL : process.env.PROD_URL;
-const {bookingConfirmation, resetPasswordEmail} = require('./config/sendgrid');
+const { bookingConfirmation, resetPasswordEmail } = require('./config/sendgrid');
 const responseTimeLogger = require('./utils/responseLogger');
 
 
@@ -22,7 +22,7 @@ require('dotenv').config();
 const stripeWebhookRouter = require('./routes/stripeWebhookRouter');
 const accessControl = require('./middleware/middleware');
 
-app.use('/stripe', stripeWebhookRouter);  
+app.use('/stripe', stripeWebhookRouter);
 
 
 app.use(methodOverride('_method'));
@@ -59,9 +59,9 @@ app.use(flash());
 
 // Passport Local Strategy for Supabase
 passport.use(new LocalStrategy({
-    usernameField: 'email',
-    passwordField: 'password'
-  },
+  usernameField: 'email',
+  passwordField: 'password'
+},
   async (email, password, done) => {
     try {
       // Query user by email
@@ -94,7 +94,7 @@ passport.use(new LocalStrategy({
 ));
 
 // Passport Serialize User
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
 
@@ -166,13 +166,13 @@ app.post('/login', (req, res, next) => {
       req.session.role = user.role; // Ensure 'role' is included in the user object
       console.log(user)
       // Redirect to the dashboard or any appropriate page
-      req.flash('success','Login successful')
+      req.flash('success', 'Login successful')
       return res.redirect('/');
     });
   })(req, res, next);
 });
 
-  
+
 
 app.post('/register', async (req, res) => {
   const { first_name, last_name, email, password } = req.body;
@@ -183,7 +183,7 @@ app.post('/register', async (req, res) => {
     const { data, error } = await supabase
       .from('users')
       .insert([
-        { first_name, last_name, email: email, password: hashedPassword}
+        { first_name, last_name, email: email, password: hashedPassword }
       ]);
 
     if (error) {
@@ -197,7 +197,7 @@ app.post('/register', async (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-  req.logout(function(err) {
+  req.logout(function (err) {
     if (err) { return next(err); }
     res.redirect('/login');
   });
@@ -248,8 +248,8 @@ app.post('/request-reset', async (req, res) => {
 
       // Send an email with the reset link
       await resetPasswordEmail(user.email, 'Your password reset', `${base_url}/reset/${token}`);
-      req.flash('success', 'Password reset link sent'); 
-      res.redirect('/login'); 
+      req.flash('success', 'Password reset link sent');
+      res.redirect('/login');
     } else {
       res.status(404).send('Email not found');
     }
@@ -280,13 +280,13 @@ app.get('/reset/:token', async (req, res) => {
 
     const currentDate = new Date();
     const expirationDate = new Date(user.reset_password_expires);
-    
+
     console.log('Current date:', currentDate.toISOString());
     console.log('Expiration date:', expirationDate.toISOString());
-    
+
     if (currentDate.getTime() < expirationDate.getTime()) {
       // Token is valid
-      res.render('auth/reset-password', { token , message: req.flash('Success')});
+      res.render('auth/reset-password', { token, message: req.flash('Success') });
     } else {
       // Token has expired
       console.log('Token has expired');
@@ -325,7 +325,7 @@ app.post('/reset-password', async (req, res) => {
       console.log("User found with token, updating password for user ID:", user.id);
       const updateResponse = await supabase
         .from('users')
-        .update({ 
+        .update({
           password: await bcrypt.hash(password, 10), // Ensure hashing of the password
           reset_password_token: null, // Clear the reset token
           reset_password_expires: null // Clear the expiration
@@ -340,7 +340,7 @@ app.post('/reset-password', async (req, res) => {
       console.log("Password updated successfully for user ID:", user.id);
 
       //send over flash message here
-      req.flash('success', 'Password changed successfully'); 
+      req.flash('success', 'Password changed successfully');
       res.redirect('/login');
     } else {
       console.log("No user found with provided token, or token has expired.");
@@ -374,8 +374,8 @@ async function getLatestAssessmentRanks(userId, ageBand, businessId) {
 //   console.log('Ranks:', ranks);
 // });
 
-  
-  
+
+
 // app.get('/', async (req, res) => {
 //   if (req.isAuthenticated()) {
 //     try {
@@ -425,10 +425,10 @@ app.get('/', async (req, res) => {
       // Fetch ranks
       const ranks = await getLatestAssessmentRanks(userId, ageBand, tenantId);
 
-      console.log('Assessments:', assessments);
-      console.log('Ranks:', ranks);
+      // console.log('Assessments:', assessments);
+      // console.log('Ranks:', ranks);
       const messages = req.flash('success'); // Retrieve the flash message
-      res.render('home', { assessments, ranks,  message: messages[0] });
+      res.render('home', { assessments, ranks, message: messages[0] });
 
     } catch (err) {
       console.error('Error during data fetching:', err);
