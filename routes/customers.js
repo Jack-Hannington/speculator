@@ -282,15 +282,12 @@ router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) =>
     const totalPossibleScores = {};
 
     latestResponses.forEach(response => {
-      console.log(`Processing response: ${JSON.stringify(response)}`);
       const rules = scoringRules.filter(rule => rule.question_id === response.question_id);
-      console.log(`Filtered rules for question ${response.question_id}: ${JSON.stringify(rules)}`);
       const rule = rules.find(r => {
         const ageMatch = (r.min_age === null || userAge >= r.min_age) && (r.max_age === null || userAge <= r.max_age);
         const genderMatch = r.gender === 'All' || r.gender === userGender;
         const minValueMatch = r.min_value === null || response.response_value >= r.min_value;
         const maxValueMatch = r.max_value === null || response.response_value <= r.max_value;
-        console.log(`Checking rule: ${JSON.stringify(r)} - Age Match: ${ageMatch}, Gender Match: ${genderMatch}, Min Value Match: ${minValueMatch}, Max Value Match: ${maxValueMatch}`);
         return ageMatch && genderMatch && minValueMatch && maxValueMatch;
       });
       const question = questions.find(q => q.id === response.question_id);
@@ -318,7 +315,8 @@ router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) =>
       assessment_id: assessmentId,
       category_id: categoryId,
       score: categoryScores[categoryId],
-      total_possible_score: totalPossibleScores[categoryId]
+      total_possible_score: totalPossibleScores[categoryId],
+      response_set_id: responseSetId
     }));
 
     const { error: scoreInsertError } = await supabase
