@@ -1,65 +1,69 @@
 <%- include('./partials/header') %>
 <%- include('./partials/nav') %>
 
-<% if (user.role === 'admin') { %>
-<section>
-  <h1>Hello, <%= user.first_name %></h1>
-  <p class="supporting-text">Your personalised wellness plans are below</p>
-</section>
-<section>
-  <div class="row summary-blocks header-row row-gap-3 scroll-container pb-3">
-    <% const categories = ['strength', 'mobility', 'obesity', 'cardiovascular_fitness', 'recovery', 'mental_health', 'nutrition']; %>
-    <% function formatCategoryName(category) {
-      return category.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    } %>
-    <% categories.forEach(category => { %>
-      <% const score = latestScores[`${category}_score`]; %>
-      <% const maxScore = latestScores[`${category}_max_score`]; %>
-      <% if (score !== null && maxScore !== null) { %>
-        <% const percentage = (score / maxScore) * 100; %>
-        <% let color = '#12B76A'; %>
-        <% if (percentage < 30) { %> 
-          <% color = 'red'; %>
-        <% } else if (percentage < 60) { %>
-          <% color = 'amber'; %>
-        <% } %>
-        <div class="col" style="min-width:240px;">
-          <div class="metric-ring-container d-flex align-items-center justify-content-center flex-column" style="max-width: 220px;text-align: center;">
-            <span class="mb-2 fw-bold"><%= formatCategoryName(category) %></span>
-            <div class="metric-ring">
-              <canvas id="metricRing-<%= category %>"></canvas>
-              <div class="metric-ring-text">
-                <span id="metricValue-<%= category %>"><%= score %></span><small>/ <%= maxScore %></small>
+<div class="container-xxl px-0" >
+  <% if (user.role === 'admin') { %>
+    <section>
+      <h1>Welcome back, <%= user.first_name %></h1>
+      <p class="support-text">These are your four focus wellness metrics.</p>
+    </section>
+    <section class="mt-3">
+      <div class="row summary-blocks header-row row-gap-3 scroll-container pb-3">
+        <% function formatCategoryName(category) {
+          return category.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        } %>
+        <% focusCategories.forEach(category => { %>
+          <% const percentage = (category.score / category.max_score) * 100; %>
+          <% let color = '#12B76A'; %>
+          <% if (percentage < 30) { %> 
+            <% color = '#E01A0D'; %>
+          <% } else if (percentage < 60) { %>
+            <% color = '#FF6B00'; %>
+          <% } %>
+          <div class="col">
+            <div class="metric-ring-container d-flex align-items-center justify-content-center flex-column" style="text-align: center;min-width:200px;">
+              <span class="mb-2 fw-semibold"><%= formatCategoryName(category.name) %></span>
+              <div class="metric-ring">
+                <canvas id="metricRing-<%= category.name %>"></canvas>
+                <div class="metric-ring-text">
+                  <span id="metricValue-<%= category.name %>"><%= category.score %></span><small>/ <%= category.max_score %></small>
+                </div>
               </div>
+              <span class="mb-2 mt-3 font-14 fw-medium">
+                <iconify-icon style="color:<%= color %>;" inline icon="solar:course-up-bold"></iconify-icon>Top 20% for age group
+              </span>
             </div>
-            <span class="mb-2 mt-3 font-14 fw-medium">
-              <iconify-icon style="color:<%= color %>;" inline icon="solar:course-up-bold"></iconify-icon>Top 20% for age group
-            </span>
           </div>
-        </div>
-      <% } %>
-    <% }) %>
+        <% }) %>
+      </div>
+    </section>    
   </div>
-</section>    
-  
-</section>
-<% } else if (user.role === 'customer') {%>
+  <% } else if (user.role === 'customer') {%>
     
-<% } %>
+  <% } %>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const categories = ['strength', 'mobility', 'obesity', 'cardiovascular_fitness', 'recovery', 'mental_health', 'nutrition'];
-    categories.forEach(category => {
-      const ctx = document.getElementById(`metricRing-${category}`).getContext('2d');
-      const score = parseInt(document.getElementById(`metricValue-${category}`).innerText);
-      const maxScore = parseInt(document.querySelector(`#metricValue-${category} + small`).innerText.split('/ ')[1]);
+    // Log the focus categories to debug
+    console.log('Focus Categories:', <%- JSON.stringify(focusCategories) %>);
+
+    // Use the dynamically rendered focus categories
+    const focusCategories = <%- JSON.stringify(focusCategories) %>;
+    focusCategories.forEach(category => {
+      // Log each category to debug
+      console.log('Rendering chart for:', category.name);
+
+      const ctx = document.getElementById(`metricRing-${category.name}`).getContext('2d');
+      const score = parseInt(document.getElementById(`metricValue-${category.name}`).innerText);
+      const maxScore = parseInt(document.querySelector(`#metricValue-${category.name} + small`).innerText.split('/ ')[1]);
       const percentage = (score / maxScore) * 100;
       let color = '#12B76A';
       if (percentage < 30) { 
-        color = 'red';
+        color = '#E01A0D';
       } else if (percentage < 60) {
-        color = 'amber';
+        color = '#FF6B00';
+      } else if (percentage == 100){
+        color = '#54B7C0';
       }
       new Chart(ctx, {
         type: 'doughnut',

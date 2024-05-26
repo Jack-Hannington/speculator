@@ -748,7 +748,7 @@ label {
 .metric-ring-container {
   border: 1px solid #ededed;
   border-radius: var(--base-border-radius);
-  padding: 12px;
+  padding: 12px 8px;
 }
 
 .metric-ring {

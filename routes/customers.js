@@ -336,4 +336,135 @@ router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) =>
 
 
 
+
+// router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) => {
+//   const { customerId, assessmentId } = req.params;
+//   const assessmentData = req.body;
+//   const responseSetId = uuidv4(); // Generate a unique response set ID
+//   console.log(`this is assessment data for customer ${customerId}: response ${responseSetId}: assessment${assessmentData}`)
+
+//   try {
+//     // Insert user responses
+//     const assessmentEntries = Object.keys(assessmentData).map(key => {
+//       const questionId = key.split('-')[1];
+//       return {
+//         user_id: customerId,
+//         assessment_id: assessmentId,
+//         question_id: questionId,
+//         response_value: assessmentData[key],
+//         response_set_id: responseSetId
+//       };
+//     });
+
+//     const { data: insertedResponses, error: insertError } = await supabase
+//       .from('user_responses')
+//       .insert(assessmentEntries);
+
+//     if (insertError) throw insertError;
+
+//     // Fetch the most recent response set for the user and assessment
+//     const { data: latestResponses, error: latestResponsesError } = await supabase
+//       .from('user_responses')
+//       .select('question_id, response_value')
+//       .eq('user_id', customerId)
+//       .eq('assessment_id', assessmentId)
+//       .eq('response_set_id', responseSetId);
+
+//     if (latestResponsesError) throw latestResponsesError;
+
+//     // Fetch scoring rules for the questions answered
+//     const questionIds = latestResponses.map(response => response.question_id);
+//     const { data: scoringRules, error: scoringRulesError } = await supabase
+//       .from('scoring_rules')
+//       .select('*')
+//       .in('question_id', questionIds);
+
+//     if (scoringRulesError) throw scoringRulesError;
+
+//     // Fetch question details to get categories
+//     const { data: questions, error: questionsError } = await supabase
+//       .from('questions')
+//       .select('id, category_id')
+//       .in('id', questionIds);
+
+//     if (questionsError) throw questionsError;
+
+//     // Calculate scores
+//     const categoryScores = {};
+//     const totalPossibleScores = {};
+
+//     latestResponses.forEach(response => {
+//       const rules = scoringRules.filter(rule => rule.question_id === response.question_id);
+//       const rule = rules.find(r => {
+//         if (r.min_value !== null && r.max_value !== null) {
+//           return response.response_value >= r.min_value && response.response_value <= r.max_value;
+//         } else if (r.min_value !== null) {
+//           return response.response_value >= r.min_value;
+//         } else if (r.max_value !== null) {
+//           return response.response_value <= r.max_value;
+//         }
+//         return false;
+//       });
+
+//       const question = questions.find(q => q.id === response.question_id);
+
+//       if (rule) {
+//         if (!categoryScores[question.category_id]) {
+//           categoryScores[question.category_id] = 0;
+//           totalPossibleScores[question.category_id] = 0;
+//         }
+
+//         categoryScores[question.category_id] += rule.score;
+//         totalPossibleScores[question.category_id] += Math.max(...rules.map(r => r.score)); // Dynamic possible score
+//       } else {
+//         console.warn(`No matching scoring rule found for response: ${response.response_value} for question ID: ${response.question_id}`);
+//       }
+//     });
+
+//     // Insert the calculated scores into user_scores table
+//     const scoreEntries = Object.keys(categoryScores).map(categoryId => ({
+//       user_id: customerId,
+//       assessment_id: assessmentId,
+//       category_id: categoryId,
+//       score: categoryScores[categoryId],
+//       total_possible_score: totalPossibleScores[categoryId],
+//       response_set_id: responseSetId
+//     }));
+
+//     const { error: scoreInsertError } = await supabase
+//       .from('user_scores')
+//       .insert(scoreEntries);
+
+//     if (scoreInsertError) throw scoreInsertError;
+
+//     // Get the lowest 4 scores
+//     const lowestScores = await getLowestScores(customerId);
+
+//     // Fetch user-selected goals
+//     const userGoals = await getUserGoals(customerId);
+
+//     // If no user-selected goals, update with the lowest scores
+//     if (userGoals.length === 0) {
+//       const goalEntries = lowestScores.map(categoryName => ({
+//         user_id: customerId,
+//         category_id: categoryName
+//       }));
+
+//       await supabase
+//         .from('user_goals')
+//         .insert(goalEntries);
+//     }
+
+//     req.flash('success', 'Assessment submitted and scores calculated successfully');
+//     res.redirect(`/customers/${customerId}`);
+//   } catch (error) {
+//     console.error('Error submitting assessment and calculating scores:', error);
+//     req.flash('error', 'Failed to submit assessment and calculate scores');
+//     res.status(500).send({ message: "Failed to submit assessment and calculate scores", details: error });
+//   }
+// });
+
+
+
+
 module.exports = router;

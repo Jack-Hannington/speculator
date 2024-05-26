@@ -164,7 +164,7 @@ app.post('/login', (req, res, next) => {
 
       // Store the role in the session explicitly
       req.session.role = user.role; // Ensure 'role' is included in the user object
-      console.log(user)
+
       // Redirect to the dashboard or any appropriate page
       req.flash('success', 'Login successful')
       return res.redirect('/');
@@ -403,6 +403,45 @@ async function getLatestAssessmentRanks(userId, ageBand, businessId) {
 //   }
 // });
 
+// async function getLowestScores(userId) {
+//   const { data: scores, error } = await supabase
+//     .from('user_assessment_scores')
+//     .select('*')
+//     .eq('user_id', userId)
+//     .order('submission_date', { ascending: false })
+//     .limit(1);
+
+//   if (error) throw error;
+
+//   const latestScores = scores[0];
+//   const categories = [
+//     { name: 'strength', score: latestScores.strength_score, max_score: latestScores.strength_max_score },
+//     { name: 'mobility', score: latestScores.mobility_score, max_score: latestScores.mobility_max_score },
+//     { name: 'obesity', score: latestScores.obesity_score, max_score: latestScores.obesity_max_score },
+//     { name: 'cardiovascular_fitness', score: latestScores.cardiovascular_fitness_score, max_score: latestScores.cardiovascular_fitness_max_score },
+//     { name: 'recovery', score: latestScores.recovery_score, max_score: latestScores.recovery_max_score },
+//     { name: 'mental_health', score: latestScores.mental_health_score, max_score: latestScores.mental_health_max_score },
+//     { name: 'nutrition', score: latestScores.nutrition_score, max_score: latestScores.nutrition_max_score },
+//   ];
+
+//   // Sort categories by score (lowest first)
+//   categories.sort((a, b) => (a.score / a.max_score) - (b.score / b.max_score));
+
+//   // Return the lowest 4 categories
+//   return categories.slice(0, 4).map(category => category.name);
+// }
+
+async function getUserGoals(userId) {
+  const { data: goals, error } = await supabase
+    .from('user_goals')
+    .select('category_id')
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  console.log(goals)
+  return goals.map(goal => goal.category_id);
+}
+
 app.get('/', async (req, res) => {
   if (req.isAuthenticated()) {
     try {
@@ -419,18 +458,45 @@ app.get('/', async (req, res) => {
       if (latestScoresError) {
         throw latestScoresError;
       }
+      getUserGoals(userId)
 
-      const messages = req.flash('success'); // Retrieve the flash message
-      res.render('home', { latestScores: latestScores[0], message: messages[0] });
+      if (!latestScores.length) {
+        throw new Error('No assessment scores found for the user.');
+      }
+
+      const latestScore = latestScores[0];
+      console.log('Latest Score:', latestScore);
+
+      // Extract scores and find the lowest 4 categories
+      const categories = [
+        { name: 'strength', score: latestScore.strength_score, max_score: latestScore.strength_max_score },
+        { name: 'mobility', score: latestScore.mobility_score, max_score: latestScore.mobility_max_score },
+        { name: 'obesity', score: latestScore.obesity_score, max_score: latestScore.obesity_max_score },
+        { name: 'cardiovascular_fitness', score: latestScore.cardiovascular_fitness_score, max_score: latestScore.cardiovascular_fitness_max_score },
+        { name: 'recovery', score: latestScore.recovery_score, max_score: latestScore.recovery_max_score },
+        { name: 'mental_health', score: latestScore.mental_health_score, max_score: latestScore.mental_health_max_score },
+        { name: 'nutrition', score: latestScore.nutrition_score, max_score: latestScore.nutrition_max_score }
+      ];
+
+      // Sort categories by score (lowest first)
+      categories.sort((a, b) => (a.score / a.max_score) - (b.score / b.max_score));
+
+      // Get the lowest 4 categories
+      const lowestScores = categories.slice(0, 4);
+      console.log('Lowest Scores:', lowestScores);
+
+      const messages = req.flash('success');
+      res.render('home', { focusCategories: lowestScores, message: messages[0] });
     } catch (err) {
       console.error('Error during data fetching:', err);
       return res.status(500).send('Error fetching user data.');
     }
   } else {
-    // Handle unauthenticated access (redirect to login)
     res.redirect('/login');
   }
 });
+
+
 
 
 
