@@ -10,7 +10,7 @@
   --grey: #475467;
   --light-grey: #D0D5DD;
   --base-line-height: 1.4rem;
-  --default-background-color: #FCFCFD;
+  --default-background-color: #fff;
   --orange-50: #fff7ed;
   --brand-color: #02BAC2;
   --orange-100: #ffedd5;
@@ -335,6 +335,12 @@ iconify-icon.custom-icon svg {
   -webkit-backdrop-filter: blur(10px);
   background-color: rgb(255 255 255 / 28%);
   transition: background-color 0.3s ease;
+}
+
+.clickable-row:hover {
+  background-color: #f9f9f9;
+  color: var(--brand-color);
+  border-radius: var(--base-border-radius);
 }
 
 
@@ -736,4 +742,36 @@ label {
   color: var(--base-color);
   background-color: #fff;
   z-index: 100;
+}
+
+/* Metric rings */
+.metric-ring-container {
+  border: 1px solid #ededed;
+  border-radius: var(--base-border-radius);
+  padding: 12px;
+}
+
+.metric-ring {
+  width: 140px;
+  height: 140px;
+  position: relative;
+}
+
+.metric-ring-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.metric-ring-text span {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.metric-ring-text small {
+  font-size: 14px;
+  display: inline-block;
+  margin-left: 6px;
 }

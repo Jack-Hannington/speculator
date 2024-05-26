@@ -9,8 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
-  <script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+  
     <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
@@ -19,55 +19,3 @@
 </head>
 
 <body>
-  <style>
-.summary-card {
-    position: relative;
-}
-
-.ct-chart {
-    width: 120px;
-    height: 50px; /* Adjust the height to your preference */
-    position: absolute;
-    bottom: 10px; /* Adjust the positioning as needed */
-    right: 10px; /* Adjust the positioning as needed */
-}
-
-.ct-series-a .ct-line {
-    stroke: rgba(75, 192, 192, 1);
-    stroke-width: 2px;
-    stroke-linecap: round;
-}
-
-.ct-series-a .ct-area {
-    fill: rgba(75, 192, 192, 0.2);
-}
-
-</style>
-
-<script>
-  new Chartist.Line('.ct-chart', {
-      labels: Array(6).fill(''), // Hidden labels
-      series: [
-          [2, 4, 6, 7, 6, 8]
-      ]
-  }, {
-      showPoint: false,
-      lineSmooth: Chartist.Interpolation.simple(),
-      axisX: {
-          showLabel: false,
-          showGrid: false
-      },
-      axisY: {
-          showLabel: false,
-          showGrid: false
-      },
-      fullWidth: true,
-      chartPadding: {
-          right: 0,
-          left: 0,
-          top: 0,
-          bottom: 0
-      },
-      showArea: true
-  });
-</script>

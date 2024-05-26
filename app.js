@@ -406,30 +406,22 @@ async function getLatestAssessmentRanks(userId, ageBand, businessId) {
 app.get('/', async (req, res) => {
   if (req.isAuthenticated()) {
     try {
-      // Retrieve the authenticated user's tenant ID and ID
-      const tenantId = req.user.business;
       const userId = req.user.id;
-      const ageBand = '<35'; // Example age band, replace with actual logic
-      const businessId = 3;  // Example business ID, replace with actual logic
 
-      // Fetch all assessments
-      const { data: assessments, error: assessmentsError } = await supabase
-        .from('completed_assessments')
+      // Fetch the latest assessment scores for the user
+      const { data: latestScores, error: latestScoresError } = await supabase
+        .from('user_assessment_scores')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .order('submission_date', { ascending: false })
+        .limit(1);
 
-      if (assessmentsError) {
-        throw assessmentsError;
+      if (latestScoresError) {
+        throw latestScoresError;
       }
 
-      // Fetch ranks
-      const ranks = await getLatestAssessmentRanks(userId, ageBand, tenantId);
-
-      // console.log('Assessments:', assessments);
-      // console.log('Ranks:', ranks);
       const messages = req.flash('success'); // Retrieve the flash message
-      res.render('home', { assessments, ranks, message: messages[0] });
-
+      res.render('home', { latestScores: latestScores[0], message: messages[0] });
     } catch (err) {
       console.error('Error during data fetching:', err);
       return res.status(500).send('Error fetching user data.');
@@ -439,6 +431,7 @@ app.get('/', async (req, res) => {
     res.redirect('/login');
   }
 });
+
 
 
 

@@ -10,9 +10,10 @@ router.use(accessControl('admin'));
 router.get('/', async (req, res) => {
   const { data: questions, error } = await supabase
     .from('questions')
-    .select(`*,
-       categories(name, color, background_color)
-      `)
+    .select(`
+      *,
+      categories(id, name, color, background_color)
+    `)
     .order('category_id', { ascending: true });
 
   const messages = req.flash('success');
@@ -20,8 +21,25 @@ router.get('/', async (req, res) => {
     req.flash('error', 'Failed to fetch questions');
     return res.status(500).send({ message: "Failed to fetch questions", error });
   }
-  res.render('questions', { questions, message: messages[0] });
+
+  // Group questions by category
+  const groupedQuestions = questions.reduce((acc, question) => {
+    const category = question.categories;
+    if (!acc[category.id]) {
+      acc[category.id] = {
+        categoryName: category.name,
+        categoryColor: category.color,
+        categoryBackgroundColor: category.background_color,
+        questions: []
+      };
+    }
+    acc[category.id].questions.push(question);
+    return acc;
+  }, {});
+
+  res.render('questions', { groupedQuestions: Object.values(groupedQuestions), message: messages[0] });
 });
+
 
 // Load question creation form
 router.get('/create', async (req, res) => {
