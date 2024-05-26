@@ -594,12 +594,12 @@ label {
 }
 
 .form-check-input:checked {
-  background-color: var(--orange-600);
-  border-color: var(--orange-600);
+  background-color: var(--cyan-600);
+  border-color: var(--cyan-600);
 }
 
 .form-check-input:focus {
-  border-color: var(--orange-600);
+  border-color: var(--cyan-600);
   /* Adjusts the border color */
   outline: none;
   /* Removes the default browser outline */

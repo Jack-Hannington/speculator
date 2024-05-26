@@ -11,8 +11,9 @@ router.get('/', async (req, res) => {
   const { data: questions, error } = await supabase
     .from('questions')
     .select(`*,
-       categories(name)
-      `);
+       categories(name, color, background_color)
+      `)
+    .order('category_id', { ascending: true });
 
   const messages = req.flash('success');
   if (error) {

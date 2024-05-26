@@ -1,21 +1,47 @@
 <%- include('../partials/header') %>
-    <%- include('../partials/nav') %>
+<%- include('../partials/nav') %>
 
-    <% if (message && message.length > 0) { %>
-      <div class="flash-messages-container animate__animated">
-          <div class="flash-message"><iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %></div>
-      </div>
-      <% } %>
-  
-    <h1>Questions</h1>
-    <a class="btn btn-primary" href="/questions/create">Create</a>
-    <ul>
-      <% questions.forEach(question => { %>
-        <li>
-          <%= question.categories.name %>: <%= question.question %>
-          <a href="/questions/edit/<%= question.id %>">Edit</a>
-        </li>
-      <% }) %>
-    </ul>
+<% if (message && message.length > 0) { %>
+  <div class="flash-messages-container animate__animated">
+    <div class="flash-message">
+      <iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %>
+    </div>
+  </div>
+<% } %>
+<div class="container-xxl">
+<section>
+  <div class="row">
+    <div class="header-row col-lg-8 col-12">
+      <h1>Question Library</h1>
+      <p>Questions can populate user assessments. Each question has its own scores.</p>
+    </div>
+    <div class="col-lg-4 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
+      <a class="btn btn-primary mb-3" href="/questions/create">Create question</a>
+    </div>
+  </div>
+</section>
 
+
+<section class="mt-4">
+  <% questions.forEach(question => { %>
+  <div class="row font-14 border-bottom py-3">
+    <div class="col-lg-3 col-12">
+      <span class="px-3 py-2 fw-medium" style="border-radius: var(--base-border-radius);background-color: #<%= question.categories.background_color %>; color:#<%= question.categories.color %>;">
+        <%= question.categories.name %>
+      </span>
+    </div>
+    <div class="col-lg-5 col-12">
+      <p class="mb-0"><%= question.question %></p>
+    </div>
+    <div class="col-lg-2 col-12">
+      <p class="mb-0"><%= question.question_type %></p>
+    </div>
+
+    <div class="col-lg-2 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
+      <a class="unstyled" href="/questions/edit/<%= question.id %>">Edit</a>
+    </div>
+  </div>
+  <% }) %>
+</section>
+</div>
 <%- include('../partials/footer') %>
