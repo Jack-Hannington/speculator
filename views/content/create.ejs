@@ -21,12 +21,12 @@
   <form action="/content/create" method="POST">
     <div class="form-row row mb-3">
       <div class="col-lg-3 col-12">
-        <label class="form-label" for="category">Category:</label>
+        <label class="form-label" for="category_id">Category:</label>
       </div>
       <div class="col-lg-9 col-12">
-        <select class="form-select" id="category" name="category" required>
+        <select class="form-select" id="category_id" name="category_id" required>
           <% categories.forEach(category => { %>
-            <option value="<%= category.name %>"><%= category.name %></option>
+            <option value="<%= category.id %>"><%= category.name %></option>
           <% }) %>
         </select>
       </div>
@@ -64,8 +64,52 @@
       </div>
     </div>
 
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="wordpress_post">WordPress Post:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input list="wordpress_posts" class="form-control" id="wordpress_post" name="wordpress_post_title" required>
+        <datalist id="wordpress_posts">
+          <!-- WordPress posts will be populated here by JavaScript -->
+        </datalist>
+        <input type="hidden" id="wordpress_post_id" name="wordpress_post_id">
+      </div>
+    </div>
+
     <button type="submit" class="btn btn-primary">Create</button>
   </form>
 </div>
+
+<script>
+  async function fetchWordPressPosts(page = 1) {
+    const response = await fetch(`https://altiushealthcare.co.uk/wp-json/wp/v2/posts?per_page=100&page=${page}`);
+    const posts = await response.json();
+
+    const datalist = document.getElementById('wordpress_posts');
+    const postInput = document.getElementById('wordpress_post');
+
+    posts.forEach(post => {
+      const option = document.createElement('option');
+      option.value = post.title.rendered;
+      option.dataset.id = post.id;
+      datalist.appendChild(option);
+    });
+
+    if (posts.length === 100) {
+      // If we fetched 100 posts, there might be more. Fetch the next page.
+      fetchWordPressPosts(page + 1);
+    }
+
+    postInput.addEventListener('input', function() {
+      const selectedOption = Array.from(datalist.options).find(option => option.value === postInput.value);
+      if (selectedOption) {
+        document.getElementById('wordpress_post_id').value = selectedOption.dataset.id;
+      }
+    });
+  }
+
+  fetchWordPressPosts();
+</script>
 
 <%- include('../partials/footer') %>

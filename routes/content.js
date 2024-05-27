@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
         *,
         categories(id, name, color, background_color)
       `)
-        .order('category', { ascending: true });
+        .order('category_id', { ascending: true });
 
     const messages = req.flash('success');
     if (error) {
@@ -59,13 +59,11 @@ router.get('/create', async (req, res) => {
 
 // Post create content
 router.post('/create', async (req, res) => {
-    const { title, type, link, category } = req.body;
-
-    console.log(req.body);
+    const { title, type, link, category_id, wordpress_post_id } = req.body;
 
     const { data: content, error: contentError } = await supabase
         .from('content')
-        .insert([{ title, type, link, category }])
+        .insert([{ title, type, link, category_id, wordpress_post_id }])
         .select();
 
     if (contentError) {
@@ -76,6 +74,26 @@ router.post('/create', async (req, res) => {
     req.flash('success', 'Content created successfully');
     res.redirect('/content');
 });
+
+// View content
+router.get('/view/:id', async (req, res) => {
+    const { id } = req.params;
+
+    const { data: content, error } = await supabase
+        .from('content')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error) {
+        req.flash('error', 'Failed to fetch content');
+        return res.status(500).send({ message: "Failed to fetch content", error });
+    }
+
+    res.render('content/view', { content });
+});
+
+
 
 // Edit content
 router.get('/edit/:id', async (req, res) => {
@@ -107,13 +125,11 @@ router.get('/edit/:id', async (req, res) => {
 
 router.post('/edit/:id', async (req, res) => {
     const { id } = req.params;
-    const { title, type, link, category } = req.body;
-
-    console.log(req.body);
+    const { title, type, link, category_id, wordpress_post_id } = req.body;
 
     const { data, error: contentError } = await supabase
         .from('content')
-        .update({ title, type, link, category })
+        .update({ title, type, link, category_id, wordpress_post_id })
         .eq('id', id);
 
     if (contentError) {
@@ -124,6 +140,7 @@ router.post('/edit/:id', async (req, res) => {
     req.flash('success', 'Content updated successfully');
     res.redirect('/content');
 });
+
 
 // Delete content
 router.post('/delete/:id', async (req, res) => {

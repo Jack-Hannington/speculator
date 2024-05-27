@@ -25,13 +25,13 @@
     <% groupedContent.forEach(group => { %>
       <div class="row mb-3 mt-3">
         <div class="col-12 py-3 px-3" style="border-radius:var(--base-border-radius);background-color:#<%= group.categoryBackgroundColor %>; color: #<%= group.categoryColor %>;">
-          <span class="fw-semibold"><%= group.categoryName %></span>
+          <span class="fw-medium"><%= group.categoryName %></span>
         </div>
       </div>
       <% group.contentItems.forEach(item => { %>
-        <a class="unstyled" href="/content/edit/<%= item.id %>">
-          <div class="row py-lg-3 py-2 px-lg-2 px-1 font-14 clickable-row">
-            <div class="col-lg-9 col-10">
+        <div class="row py-lg-3 py-2 px-lg-2 px-1 font-14">
+          <div class="col-lg-9 col-10">
+            <a class="unstyled clickable-row" href="/content/view/<%=item.id%>">
               <p class="mb-0">
                 <% if (item.type === 'Video') { %>
                   <iconify-icon style="font-size:20px" inline icon="solar:video-library-outline"></iconify-icon>
@@ -44,12 +44,14 @@
                 <% } %>
                 <%= item.title %>
               </p>
-            </div>
-            <div class="col-lg-3 col-2 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
-              Edit
-            </div>
+            </a>
           </div>
-        </a>
+          <div class="col-lg-3 col-2 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
+            <a class="unstyled" href="/content/edit/<%= item.id %>">
+              Edit
+            </a>
+          </div>
+        </div>
       <% }) %>
     <% }) %>
   </section>

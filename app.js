@@ -447,46 +447,94 @@ app.get('/', async (req, res) => {
     try {
       const userId = req.user.id;
 
-      // Fetch the latest assessment scores for the user
-      const { data: latestScores, error: latestScoresError } = await supabase
-        .from('user_assessment_scores')
-        .select('*')
+      // Fetch the latest response set ID for the user
+      const { data: latestResponse, error: latestResponseError } = await supabase
+        .from('user_scores')
+        .select('response_set_id')
         .eq('user_id', userId)
-        .order('submission_date', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(1);
+
+      if (latestResponseError) {
+        throw latestResponseError;
+      }
+
+      if (!latestResponse.length) {
+        throw new Error('No assessment scores found for the user.');
+      }
+
+      const latestResponseSetId = latestResponse[0].response_set_id;
+      console.log('Latest Response Set ID:', latestResponseSetId);
+
+      // Fetch the scores for the latest response set ID
+      const { data: latestScores, error: latestScoresError } = await supabase
+        .from('user_scores')
+        .select('*')
+        .eq('response_set_id', latestResponseSetId);
 
       if (latestScoresError) {
         throw latestScoresError;
       }
-      getUserGoals(userId)
 
-      if (!latestScores.length) {
-        throw new Error('No assessment scores found for the user.');
+      console.log('Latest Scores:', latestScores);
+
+      // Fetch categories to include names in the lowestScores
+      const categoryIds = latestScores.map(score => score.category_id);
+      const { data: categories, error: categoriesError } = await supabase
+        .from('categories')
+        .select('*')
+        .in('id', categoryIds);
+
+      if (categoriesError) {
+        throw categoriesError;
       }
 
-      const latestScore = latestScores[0];
-      console.log('Latest Score:', latestScore);
+      const categoriesMap = categories.reduce((acc, category) => {
+        acc[category.id] = category;
+        return acc;
+      }, {});
 
-      // Extract scores and find the lowest 4 categories
-      const categories = [
-        { name: 'strength', score: latestScore.strength_score, max_score: latestScore.strength_max_score },
-        { name: 'mobility', score: latestScore.mobility_score, max_score: latestScore.mobility_max_score },
-        { name: 'obesity', score: latestScore.obesity_score, max_score: latestScore.obesity_max_score },
-        { name: 'cardiovascular_fitness', score: latestScore.cardiovascular_fitness_score, max_score: latestScore.cardiovascular_fitness_max_score },
-        { name: 'recovery', score: latestScore.recovery_score, max_score: latestScore.recovery_max_score },
-        { name: 'mental_health', score: latestScore.mental_health_score, max_score: latestScore.mental_health_max_score },
-        { name: 'nutrition', score: latestScore.nutrition_score, max_score: latestScore.nutrition_max_score }
-      ];
+      // Sort scores by the relative score (score/total_possible_score)
+      latestScores.sort((a, b) => (a.score / a.total_possible_score) - (b.score / b.total_possible_score));
 
-      // Sort categories by score (lowest first)
-      categories.sort((a, b) => (a.score / a.max_score) - (b.score / b.max_score));
-
-      // Get the lowest 4 categories
-      const lowestScores = categories.slice(0, 4);
+      // Get the lowest 4 scores
+      const lowestScores = latestScores.slice(0, 4).map(score => ({
+        ...score,
+        name: categoriesMap[score.category_id].name,
+        percentage: (score.score / score.total_possible_score) * 100
+      }));
       console.log('Lowest Scores:', lowestScores);
 
+      // Fetch content for the lowest 4 categories
+      const lowestCategoryIds = lowestScores.map(score => score.category_id);
+      const { data: content, error: contentError } = await supabase
+        .from('content')
+        .select('*, categories(id, name, color, background_color)')
+        .in('category_id', lowestCategoryIds);
+
+      if (contentError) {
+        throw contentError;
+      }
+
+      // Group content by category
+      const groupedContent = content.reduce((acc, item) => {
+        const category = item.categories;
+        if (!acc[category.id]) {
+          acc[category.id] = {
+            categoryName: category.name,
+            categoryColor: category.color,
+            categoryBackgroundColor: category.background_color,
+            contentItems: []
+          };
+        }
+        acc[category.id].contentItems.push(item);
+        return acc;
+      }, {});
+
+      console.log('Grouped Content:', groupedContent);
+
       const messages = req.flash('success');
-      res.render('home', { focusCategories: lowestScores, message: messages[0] });
+      res.render('home', { focusCategories: lowestScores, groupedContent: Object.values(groupedContent), message: messages[0] });
     } catch (err) {
       console.error('Error during data fetching:', err);
       return res.status(500).send('Error fetching user data.');
@@ -495,6 +543,8 @@ app.get('/', async (req, res) => {
     res.redirect('/login');
   }
 });
+
+
 
 
 // More routes and middleware as needed
