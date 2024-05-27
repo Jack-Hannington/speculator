@@ -1,0 +1,66 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<% if (message && message.length > 0) { %>
+  <div class="flash-messages-container animate__animated">
+    <div class="flash-message">
+      <iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %>
+    </div>
+  </div>
+<% } %>
+
+<div class="container-xxl px-xl-4 px-0">
+  <section>
+    <div class="row">
+      <div class="col-lg-9 col-12">
+        <h1>Edit Content</h1>
+      </div>
+    </div>
+  </section>
+  
+  <form action="/content/edit/<%= content.id %>" method="POST">
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="category">Category:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <select class="form-select" id="category" name="category" required>
+          <% categories.forEach(category => { %>
+            <option value="<%= category.name %>" <%= category.name === content.category ? 'selected' : '' %>><%= category.name %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="title">Title:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="text" class="form-control" id="title" name="title" value="<%= content.title %>" required>
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="type">Type:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="text" class="form-control" id="type" name="type" value="<%= content.type %>" required>
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="link">Link:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="text" class="form-control" id="link" name="link" value="<%= content.link %>" required>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

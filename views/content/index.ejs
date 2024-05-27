@@ -1,0 +1,58 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<% if (message && message.length > 0) { %>
+  <div class="flash-messages-container animate__animated">
+    <div class="flash-message">
+      <iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %>
+    </div>
+  </div>
+<% } %>
+<div class="container-xxl px-xl-4 px-0">
+  <section>
+    <div class="row">
+      <div class="header-row col-lg-8 col-12">
+        <h1>Content Library</h1>
+        <p>Each content item has a category and relevant details such as type and link.</p>
+      </div>
+      <div class="col-lg-4 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
+        <a href="/content/create" class="btn btn-primary">+ Add Content</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-3">
+    <% groupedContent.forEach(group => { %>
+      <div class="row mb-3 mt-3">
+        <div class="col-12 py-3 px-3" style="border-radius:var(--base-border-radius);background-color:#<%= group.categoryBackgroundColor %>; color: #<%= group.categoryColor %>;">
+          <span class="fw-semibold"><%= group.categoryName %></span>
+        </div>
+      </div>
+      <% group.contentItems.forEach(item => { %>
+        <a class="unstyled" href="/content/edit/<%= item.id %>">
+          <div class="row py-lg-3 py-2 px-lg-2 px-1 font-14 clickable-row">
+            <div class="col-lg-9 col-10">
+              <p class="mb-0">
+                <% if (item.type === 'Video') { %>
+                  <iconify-icon style="font-size:20px" inline icon="solar:video-library-outline"></iconify-icon>
+                <% } else if (item.type === 'Exercise') { %>
+                  <iconify-icon style="font-size:20px" inline icon="solar:running-round-linear"></iconify-icon>
+                <% } else if (item.type === 'Article') { %>
+                  <iconify-icon style="font-size:20px" inline icon="solar:documents-broken"></iconify-icon>
+                <% } else { %>
+                  <iconify-icon style="font-size:20px" inline icon="solar:file-text-outline"></iconify-icon>
+                <% } %>
+                <%= item.title %>
+              </p>
+            </div>
+            <div class="col-lg-3 col-2 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
+              Edit
+            </div>
+          </div>
+        </a>
+      <% }) %>
+    <% }) %>
+  </section>
+</div>
+
+<%- include('../partials/footer') %>

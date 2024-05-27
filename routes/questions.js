@@ -57,11 +57,11 @@ router.get('/create', async (req, res) => {
 
 // Create a new question
 router.post('/create', async (req, res) => {
-  const { category_id, question, question_type } = req.body;
+  const { category_id, question, detail, question_type } = req.body;
 
   const { data, error } = await supabase
     .from('questions')
-    .insert([{ category_id, question, question_type }]);
+    .insert([{ category_id, question, detail, question_type }]);
 
   if (error) {
     req.flash('error', 'Failed to create question');
@@ -110,13 +110,13 @@ router.get('/edit/:id', async (req, res) => {
 // Update a question
 router.post('/edit/:id', async (req, res) => {
   const { id } = req.params;
-  const { category_id, question, question_type } = req.body;
+  const { category_id, question, detail, question_type } = req.body;
 
   console.log('edit question', req.body);
 
   const { data, error } = await supabase
     .from('questions')
-    .update({ category_id, question, question_type })
+    .update({ category_id, question, detail, question_type })
     .eq('id', id);
 
   if (error) {

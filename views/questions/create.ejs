@@ -23,7 +23,7 @@
       <label class="form-label" for="category">Category:</label>
     </div>
     <div class="col-lg-9 col-12">
-      <select class="form-control" id="category" name="category_id" required>
+      <select class="form-select" id="category" name="category_id" required>
         <% categories.forEach(category => { %>
           <option value="<%= category.id %>"><%= category.name %></option>
         <% }) %>
@@ -42,10 +42,19 @@
 
   <div class="form-row row mb-3">
     <div class="col-lg-3 col-12">
+      <label class="form-label" for="question_type">Detail:</label>
+    </div>
+    <div class="col-lg-9 col-12">
+      <input type="text" class="form-control" id="question_type" name="detail">
+    </div>
+  </div>
+
+  <div class="form-row row mb-3">
+    <div class="col-lg-3 col-12">
       <label class="form-label" for="question_type">Question Type:</label>
     </div>
     <div class="col-lg-9 col-12">
-      <input type="text" class="form-control" id="question_type" name="question_type" required>
+      <input type="text" class="form-control" id="question_type" name="question_type" value="numeric" readonly required>
     </div>
   </div>
 

@@ -497,26 +497,19 @@ app.get('/', async (req, res) => {
 });
 
 
-
-
-
-
-
 // More routes and middleware as needed
 const customersRoute = require('./routes/customers');
-const bookingRoute = require('./routes/bookings');
-const servicesRoute = require('./routes/services');
 const assessmentsRoute = require('./routes/assessments');
 const questionsRoute = require('./routes/questions');
+const contentRoute = require('./routes/content');
 
 
 
 // Use routes
-app.use('/bookings', bookingRoute)
-app.use('/services', servicesRoute);
 app.use('/customers', customersRoute)
 app.use('/assessments', assessmentsRoute)
 app.use('/questions', questionsRoute);
+app.use('/content', contentRoute);
 
 
 // fs.readFile('public/washer.png', async (err, avatarFile) => {
