@@ -9,56 +9,82 @@
       </div>
     </div>
   <% } %>
-
-  <h1>Create Scoring Rule for <%= question.question %></h1>
-  <form action="/questions/<%= question.id %>/scoring_rules/create" method="POST">
-    <div class="form-row row mb-3">
-      <div class="col-lg-3 col-12">
-        <label class="form-label" for="gender">Gender:</label>
-      </div>
-      <div class="col-lg-9 col-12">
-        <input type="text" class="form-control" id="gender" name="gender" required>
-      </div>
+  <div class="container-xxl px-xl-4 px-0">
+  <section>
+    <div class="row">
+    <div class="col-lg-12 col-12">
+      <h3>New scoring rule for: <%= question.question %></h1>
     </div>
-
-    <div class="form-row row mb-3">
-      <div class="col-lg-3 col-12">
-        <label class="form-label" for="age_range">Age Range:</label>
+  </div>
+  </section> 
+  <section>
+    <form action="/questions/<%= question.id %>/scoring_rules/create" method="POST">
+      <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+          <label class="form-label" for="gender">Gender:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+          <select class="form-select" id="gender" name="gender" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="All">All</option>
+          </select>
+        </div>
       </div>
-      <div class="col-lg-9 col-12">
-        <input type="text" class="form-control" id="age_range" name="age_range" required>
+    
+      <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+          <label class="form-label" for="min_age">Age from:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+          <input type="number" class="form-control" id="min_age" name="min_age" required>
+        </div>
       </div>
-    </div>
-
-    <div class="form-row row mb-3">
-      <div class="col-lg-3 col-12">
-        <label class="form-label" for="min_value">Min Value:</label>
+    
+      <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+          <label class="form-label" for="max_age">Age to:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+          <input type="number" class="form-control" id="max_age" name="max_age" required>
+        </div>
       </div>
-      <div class="col-lg-9 col-12">
-        <input type="number" class="form-control" id="min_value" name="min_value">
+    
+      <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+          <label class="form-label" for="min_value">Min Value:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+          <input type="number" step="0.1" class="form-control" id="min_value" name="min_value">
+        </div>
       </div>
-    </div>
-
-    <div class="form-row row mb-3">
-      <div class="col-lg-3 col-12">
-        <label class="form-label" for="max_value">Max Value:</label>
+    
+      <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+          <label class="form-label" for="max_value">Max Value:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+          <input type="number" class="form-control" id="max_value" name="max_value">
+        </div>
       </div>
-      <div class="col-lg-9 col-12">
-        <input type="number" class="form-control" id="max_value" name="max_value">
+    
+      <div class="form-row row mb-3">
+        <div class="col-lg-3 col-12">
+          <label class="form-label" for="score">Score:</label>
+        </div>
+        <div class="col-lg-9 col-12">
+          <select class="form-select" id="score" name="score" required>
+            <option value="1">1</option>
+            <option value="3">3</option>
+            <option value="5">5</option>
+          </select>
+        </div>
       </div>
-    </div>
-
-    <div class="form-row row mb-3">
-      <div class="col-lg-3 col-12">
-        <label class="form-label" for="score">Score:</label>
-      </div>
-      <div class="col-lg-9 col-12">
-        <input type="number" class="form-control" id="score" name="score" required>
-      </div>
-    </div>
-
-    <button type="submit" class="btn btn-success">Create</button>
-  </form>
-
+    
+      <button type="submit" class="btn btn-success">Create</button>
+    </form>
+    
+</section>
+</div>
   <%- include('../partials/footer') %>
 

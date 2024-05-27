@@ -153,11 +153,14 @@ router.get('/:id/scoring_rules/create', async (req, res) => {
 // Create a new scoring rule
 router.post('/:id/scoring_rules/create', async (req, res) => {
   const { id } = req.params;
-  const { gender, age_range, min_value, max_value, score } = req.body;
+  const { gender, min_age, max_age, min_value, max_value, score } = req.body;
+
+  const minValue = min_value ? parseFloat(min_value) : null;
+  const maxValue = max_value ? parseFloat(max_value) : null;
 
   const { data, error } = await supabase
     .from('scoring_rules')
-    .insert([{ question_id: id, gender, age_range, min_value, max_value, score }]);
+    .insert([{ question_id: id, gender, min_age, max_age, min_value: minValue, max_value: maxValue, score }]);
 
   if (error) {
     req.flash('error', 'Failed to create scoring rule');
@@ -167,6 +170,7 @@ router.post('/:id/scoring_rules/create', async (req, res) => {
   req.flash('success', 'Scoring rule created successfully');
   res.redirect(`/questions/edit/${id}`);
 });
+
 // Load scoring rule editing form
 router.get('/scoring_rules/edit/:rule_id', async (req, res) => {
   const { rule_id } = req.params;
@@ -189,11 +193,29 @@ router.get('/scoring_rules/edit/:rule_id', async (req, res) => {
 // Update a scoring rule
 router.post('/scoring_rules/edit/:rule_id', async (req, res) => {
   const { rule_id } = req.params;
-  const { gender, age_range, min_value, max_value, score } = req.body;
+  const { gender, min_age, max_age, min_value, max_value, score } = req.body;
 
+  const minValue = min_value ? parseFloat(min_value) : null;
+  const maxValue = max_value ? parseFloat(max_value) : null;
+
+  // First, get the question_id associated with the scoring rule
+  const { data: scoringRuleData, error: fetchError } = await supabase
+    .from('scoring_rules')
+    .select('question_id')
+    .eq('id', rule_id)
+    .single();
+
+  if (fetchError) {
+    req.flash('error', 'Failed to fetch scoring rule');
+    return res.status(500).send({ message: "Failed to fetch scoring rule", error: fetchError });
+  }
+
+  const question_id = scoringRuleData.question_id;
+
+  // Perform the update operation
   const { data, error } = await supabase
     .from('scoring_rules')
-    .update({ gender, age_range, min_value, max_value, score })
+    .update({ gender, min_age, max_age, min_value: minValue, max_value: maxValue, score })
     .eq('id', rule_id);
 
   if (error) {
@@ -202,8 +224,10 @@ router.post('/scoring_rules/edit/:rule_id', async (req, res) => {
   }
 
   req.flash('success', 'Scoring rule updated successfully');
-  res.redirect('/questions');
+  res.redirect(`/questions/edit/${question_id}`);
 });
+
+
 
 // Delete a scoring rule
 router.post('/scoring_rules/delete/:rule_id', async (req, res) => {

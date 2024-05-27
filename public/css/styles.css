@@ -12,7 +12,7 @@
   --base-line-height: 1.4rem;
   --default-background-color: #fff;
   --orange-50: #fff7ed;
-  --brand-color: #02BAC2;
+  --brand-color: #098c95;
   --orange-100: #ffedd5;
   --orange-200: #fed7aa;
   --orange-300: #fdba74;
@@ -583,7 +583,8 @@ label {
   font-weight: 500;
 }
 
-.form-control {
+.form-control,
+.form-select {
   box-shadow: var(--base-box-shadow);
   border: var(--base-border);
   border-radius: var(--base-border-radius);

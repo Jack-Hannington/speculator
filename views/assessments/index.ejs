@@ -8,21 +8,46 @@
       </div>
     </div>
   <% } %>
-
-  <h1>Assessments</h1>
-  <ul>
-    <% assessments.forEach(assessment => { %>
-      <li>
-        <strong><%= assessment.name %>:</strong> <%= assessment.description %>
-        <ul>
-          <% assessment.assessment_questions.forEach(q => { %>
-            <li><%= q.questions.question %></li>
+  <div class="container-xxl px-xl-4 px-0">
+<section>
+  <div class="row">
+  <div class="col-lg-9 col-12">
+    <h1>Assessments</h1>
+  </div>
+  <div class="col-lg-3 col-12 d-flex justify-content-lg-end mt-lg-0 mt-2">
+    <a class="btn btn-primary" href="/assessments/create">+ Add assessment</a>
+  </div>
+</div>
+</section>
+<section class="mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="table-container">
+        <table>
+        <thead>
+          <tr>
+            <th>Created on</th>
+            <th>Name</th>
+            <th>About</th>
+            <th>Questions</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% assessments.forEach(assessment => { %>
+            <tr>
+              <td><%= new Date(assessment.created_on).toLocaleDateString('en-gb') %></td>
+              <td class="fw-semibold"><%= assessment.name %></td>
+              <td><%= assessment.description %></td>
+              <td><%= assessment.assessment_questions.length %></td>
+              <td><a href="/assessments/edit/<%= assessment.id %>">Edit</a></td>
+            </tr>
           <% }) %>
-        </ul>
-        <a href="/assessments/edit/<%= assessment.id %>">Edit</a>
-      </li>
-    <% }) %>
-  </ul>
-  <a href="/assessments/create">Create New Assessment</a>
-
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
   <%- include('../partials/footer') %>

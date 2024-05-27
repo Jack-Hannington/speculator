@@ -10,7 +10,14 @@
     </div>
   <% } %>
 
-  <h1>Edit Question</h1>
+  <div class="container-xxl px-xl-4 px-0">
+    <section>
+      <div class="row">
+      <div class="col-lg-9 col-12">
+        <h1>Edit question</h1>
+      </div>
+    </div>
+    </section>
   <form action="/questions/edit/<%= question.id %>" method="POST">
     <div class="form-row row mb-3">
       <div class="col-lg-3 col-12">
@@ -45,19 +52,52 @@
 
     <button type="submit" class="btn btn-success">Save</button>
   </form>
+  <section class="mt-3 mb-3">
+    <div class="row">
+    <div class="col-lg-9 col-12">
+      <h2>Scoring rules</h2>
+    </div>
+    <div class="col-lg-3 col-12 d-flex justify-content-lg-end mt-lg-0 mt-2">
+      <a class="btn btn-primary"  href="/questions/<%= question.id %>/scoring_rules/create">New scoring rule</a>
+    </div>
+  </div>
+  </section>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Gender</th>
+          <th>Age Range</th>
+          <th>Min Value</th>
+          <th>Max Value</th>
+          <th>Score</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% scoringRules.forEach(rule => { %>
+          <tr>
+            <td><%= rule.gender %></td>
+            <td><%= rule.min_age %> - <%= rule.max_age %></td>
 
-  <h2>Scoring Rules</h2>
-  <a href="/questions/<%= question.id %>/scoring_rules/create">Add Scoring Rule</a>
-  <ul>
-    <% scoringRules.forEach(rule => { %>
-      <li>
-        Gender: <%= rule.gender %>, Age Range: <%= rule.age_range %>, Min Value: <%= rule.min_value %>, Max Value: <%= rule.max_value %>, Score: <%= rule.score %>
-        <a href="/questions/scoring_rules/edit/<%= rule.id %>">Edit</a>
-        <form action="/questions/scoring_rules/delete/<%= rule.id %>" method="POST" style="display:inline;">
-          <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
-      </li>
-    <% }) %>
-  </ul>
-
+            <td><%= rule.min_value %></td>
+            <td><%= rule.max_value %></td>
+            <td><%= rule.score %></td>
+            <td class="text-end">
+              <a href="/questions/scoring_rules/edit/<%= rule.id %>">Edit</a>
+              <form action="/questions/scoring_rules/delete/<%= rule.id %>" method="POST" style="display:inline;" onsubmit="return confirmDelete();">
+                <button type="submit" class="ms-2 btn btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+  function confirmDelete() {
+    return confirm("Are you sure you want to delete? Once deleted this rule cannot be retrieved.");
+  }
+</script>
   <%- include('../partials/footer') %>
