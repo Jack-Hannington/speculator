@@ -5,10 +5,10 @@ require('dotenv').config();
 const supabase = require('../config/supabaseClient');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const sendgrid = require('../config/sendgrid');
-
+const generatePin = require('../utils/pinGenerator');
 const base_url = process.env.NODE_ENV === 'DEV' ? process.env.DEV_URL : process.env.PROD_URL;
 
-const { bookingConfirmation } = require('../config/sendgrid');
+const { bookingConfirmation, corporateRegistrationEmail } = require('../config/sendgrid');
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -18,7 +18,7 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
 
     try {
         event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-        console.log('Constructed event:', event);
+        // console.log('Constructed event:', event);
     } catch (err) {
         console.error(`Webhook Error: ${err.message}`);
         return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -43,7 +43,7 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
 
         try {
             await handlePaymentSuccess(session, business);
-            console.log('Payment success handled', session);
+            // console.log('Payment success handled', session);
         } catch (error) {
             console.error('Error in handlePaymentSuccess:', error.message);
             return res.status(500).send(`Error in handlePaymentSuccess: ${error.message}`);
@@ -54,7 +54,6 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
 
     res.status(200).send({ received: true });
 });
-
 
 async function handlePaymentSuccess(session, business) {
     const customerDetails = session.customer_details;
@@ -78,13 +77,16 @@ async function handlePaymentSuccess(session, business) {
     }
 }
 
-
-
 async function createCorporateWellnessUser(name, email, business) {
+    const accessPin = generatePin();
+
     // Create new user in Supabase
     const { data, error } = await supabase
         .from('users')
-        .insert([{ name, email, business }]); // Include business in the insert
+        .insert([{ name, email, business, access_pin: accessPin }])
+        .select();
+
+    console.log('supabase:', data)
 
     if (error) {
         console.error(`Failed to create user: ${error.message}`);
@@ -93,32 +95,21 @@ async function createCorporateWellnessUser(name, email, business) {
 
     const user = data[0];
 
-    // Send registration email using SendGrid
-    const msg = {
-        to: email,
-        from: 'jack@hanningtondigital.com', 
-        templateId: 'd-0b3e6d7d1dab41cc8db3bb362303f33d', 
-        dynamic_template_data: {
-            name: user.name,
-            registration_link: `${base_url}/register`
-        }
-    };
-
+    // Send registration email using the new email function
     try {
-        await sendGrid.send(msg);
+        await corporateRegistrationEmail(
+            email,
+            'Welcome to Altius Wellness',
+            user.name,
+            `Your access pin is: <strong>${accessPin}</strong>`,
+            `${base_url}/complete-registration?access_pin=${accessPin}`
+        );
         console.log(`Registration email sent to ${email}`);
     } catch (error) {
         console.error(`Failed to send registration email: ${error.message}`);
         throw new Error(`Failed to send registration email: ${error.message}`);
     }
 }
-
-
-async function generateAccessCode(){
-    
-}
-
-
 
 
 module.exports = router;

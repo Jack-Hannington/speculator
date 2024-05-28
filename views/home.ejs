@@ -2,7 +2,7 @@
 <%- include('./partials/nav') %>
 
 <div class="container-xxl px-xl-4 px-0">
-  <% if (user.role === 'admin') { %>
+  <% if (user.role === 'admin' || user.role === 'customer') { %>
     <section>
       <h1>Welcome back, <%= user.first_name %></h1>
       <p class="support-text">These are your four focus wellness metrics.</p>

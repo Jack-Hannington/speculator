@@ -15,6 +15,9 @@ const base_url = process.env.NODE_ENV === 'DEV' ? process.env.DEV_URL : process.
 const { bookingConfirmation, resetPasswordEmail } = require('./config/sendgrid');
 const responseTimeLogger = require('./utils/responseLogger');
 
+const generatePin = require('./utils/pinGenerator');
+const emailService = require('./utils/emailService');
+
 
 // Initialize Express app
 const app = express();
@@ -195,6 +198,120 @@ app.post('/register', async (req, res) => {
     res.status(400).send(error.message);
   }
 });
+
+
+
+// corporate registration
+app.get('/complete-registration', async (req, res) => {
+  const { access_pin } = req.query;
+
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('email')
+      .eq('access_pin', access_pin)
+      .single();
+
+    if (error || !data) {
+      req.flash('error', 'Invalid access pin.');
+      return res.redirect('/error-page'); // Adjust the redirect to your actual error page
+    }
+
+    const email = data.email;
+    const messages = req.flash('success'); // Retrieve the flash message
+    res.render('auth/register-corporate', { accessPin: access_pin, email, message: messages[0] });
+  } catch (error) {
+    console.error('Error fetching user email:', error.message);
+    req.flash('error', 'An error occurred while fetching user data.');
+    return res.redirect('/error-page'); // Adjust the redirect to your actual error page
+  }
+});
+
+// Complete registration route
+// Complete registration route
+app.post('/complete-registration', async (req, res) => {
+  const { access_pin, first_name, last_name, day, month, year, gender } = req.body;
+
+  // Combine day, month, year into a single date field
+  const date_of_birth = new Date(Date.UTC(year, month - 1, day));
+
+  try {
+    console.log(req.body);
+    const { data, error } = await supabase
+      .from('users')
+      .update({ first_name, last_name, date_of_birth, gender, is_registered: true })
+      .eq('access_pin', access_pin)
+      .select();
+
+    if (error) {
+      throw error;
+    }
+
+    console.log(data)
+
+    if (!data || data[0].length === 0) {
+      req.flash('error', 'Invalid access pin.');
+      return res.redirect('/complete-registration?access_pin=' + access_pin);
+    }
+
+    req.flash('success', 'Registration completed successfully.');
+    res.redirect('/corporate-login');
+  } catch (error) {
+    req.flash('error', error.message);
+    res.redirect('/complete-registration?access_pin=' + access_pin);
+  }
+});
+
+
+// Corporate login
+// GET route for corporate login page
+app.get('/corporate-login', responseTimeLogger, (req, res) => {
+  const messages = req.flash('success');
+  res.render('auth/corporate-login', { message: messages[0] });
+});
+
+// POST route for corporate login
+app.post('/corporate-login', async (req, res) => {
+  const { email, access_pin } = req.body;
+
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .eq('access_pin', access_pin)
+      .single();
+
+    if (error || !data) {
+      req.flash('error', 'Invalid email or access pin.');
+      return res.redirect('/corporate-login');
+    }
+
+    // Assuming the user object is returned correctly
+    const user = data;
+
+    req.logIn(user, (err) => {
+      if (err) {
+        console.log('Error during session creation:', err);
+        req.flash('error', 'Failed to create a session. Please try again.');
+        return res.redirect('/corporate-login');
+      }
+
+      req.session.role = user.role; // Ensure 'role' is included in the user object
+
+      req.flash('success', 'Login successful');
+      return res.redirect('/');
+    });
+  } catch (error) {
+    console.error('Error during authentication:', error);
+    req.flash('error', 'An unexpected error occurred. Please try again.');
+    res.redirect('/corporate-login');
+  }
+});
+
+
+
+
 
 app.get('/logout', (req, res) => {
   req.logout(function (err) {
@@ -460,7 +577,9 @@ app.get('/', async (req, res) => {
       }
 
       if (!latestResponse.length) {
-        throw new Error('No assessment scores found for the user.');
+        // No assessment scores found, render home without additional data
+        const messages = req.flash('success');
+        return res.render('home', { focusCategories: [], groupedContent: [], message: messages[0] });
       }
 
       const latestResponseSetId = latestResponse[0].response_set_id;
@@ -543,6 +662,7 @@ app.get('/', async (req, res) => {
     res.redirect('/login');
   }
 });
+
 
 
 
