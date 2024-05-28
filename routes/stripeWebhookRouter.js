@@ -8,17 +8,22 @@ const sendgrid = require('../config/sendgrid');
 const generatePin = require('../utils/pinGenerator');
 const base_url = process.env.NODE_ENV === 'DEV' ? process.env.DEV_URL : process.env.PROD_URL;
 
+console.log(`this is ${base_url}`)
+
 const { bookingConfirmation, corporateRegistrationEmail } = require('../config/sendgrid');
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+// Apply bodyParser.raw only to the webhook endpoint
 router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req, res) => {
     const sig = req.headers['stripe-signature'];
     let event;
 
+    console.log('Headers:', req.headers);
+    console.log('Raw body:', req.body.toString()); // Ensure raw body is logged
+
     try {
         event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-        // console.log('Constructed event:', event);
     } catch (err) {
         console.error(`Webhook Error: ${err.message}`);
         return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -43,7 +48,6 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req
 
         try {
             await handlePaymentSuccess(session, business);
-            // console.log('Payment success handled', session);
         } catch (error) {
             console.error('Error in handlePaymentSuccess:', error.message);
             return res.status(500).send(`Error in handlePaymentSuccess: ${error.message}`);
@@ -110,6 +114,5 @@ async function createCorporateWellnessUser(name, email, business) {
         throw new Error(`Failed to send registration email: ${error.message}`);
     }
 }
-
 
 module.exports = router;
