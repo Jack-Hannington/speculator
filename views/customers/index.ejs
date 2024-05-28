@@ -22,9 +22,8 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Status</th>
-                        <th>Membership</th>
                         <th>Business</th>
-                        <th colspan="2">Edit</th>
+                        <th colspan="2"></th>
                     </thead>
                     <tbody>
 
@@ -33,11 +32,12 @@
                             <td><%=customer.name%></td>
                             <td><%=customer.email%></td>
                             <td><%=customer.role%></td>
-                            <td><%= customer.memberships ? customer.memberships.name : 'No Membership' %></td>
-                            <td><%=customer.business%></td>
-                            <td colspan="2">
-                             <a href="/customers/edit/<%=customer.id%>" class="me-3 unstyled"><iconify-icon icon="solar:pen-new-square-linear" inline></iconify-icon>Edit</a>
+                            <td><%=customer.businesses.name%></td>
+                            <td colspan="2" >
+                              <div class="d-flex justify-content-end align-items-center gap-4">
+                             <a href="/customers/edit/<%=customer.id%>" class="unstyled"><iconify-icon icon="solar:pen-new-square-linear" inline></iconify-icon>Edit</a>
                              <a class="unstyled" href="/customers/<%= customer.id %>/assessments/1/new"><iconify-icon inline icon="solar:add-square-linear"></iconify-icon>Assessment</a>
+                             </div>
                             </td>
                           </tr>
                         <% }) %>

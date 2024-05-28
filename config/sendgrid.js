@@ -82,6 +82,7 @@ async function bookingConfirmation(recipientEmail, subject, bookingDetails) {
 async function corporateRegistrationEmail(recipientEmail, subject, name, registrationLink) {
     // Construct the HTML body using recipient details
     const htmlBody = `
+        <img src="https://altiuswellness-production.up.railway.app/wellness_by_altius%20(1).png" alt="Altius wellness logo" style="width:80px">
         <h1>Welcome to Altius Wellness</h1>
         <p>Hi ${name},</p>
         <p>Thank you for joining our corporate wellness program. Please use the following link to complete your registration:</p>

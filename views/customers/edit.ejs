@@ -2,160 +2,176 @@
 <%- include('../partials/nav') %>
 
 <section>
-<h2>Viewing <%= customer.first_name %>'s profile</h2>
+  <h2>Viewing <%= customer.first_name %>'s profile</h2>
 </section>
 <section>
-<form action="/customers/edit/<%= customer.id %>" method="post">
-  <!-- Hidden input for customer ID -->
-  <input type="hidden" name="id" value="<%= customer.id %>">
+  <form action="/customers/edit/<%= customer.id %>" method="post">
+    <!-- Hidden input for customer ID -->
+    <input type="hidden" name="id" value="<%= customer.id %>">
 
-  <!-- Customer Name -->
-  <div class="form-row row mb-3">
-    <div class="col-lg-3 col-12">
-      <label class="form-label" for="name">Name:</label>
-    </div>
-    <div class="col-lg-4 col-12">
-      <div class="form-floating mb-3 mb-lg-0">
-        <input
-          type="text"
-          class="form-control"
-          id="first_name"
-          name="first_name"
-          value="<%= customer.first_name %>"
-          placeholder="First name"
-          required
-        />
-        <label for="first_name">First name</label>
+    <!-- Customer Name -->
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="name">Name:</label>
       </div>
-    </div>
-    <div class="col-lg-5 col-12">
-      <div class="form-floating">
-        <input
-          type="text"
-          class="form-control"
-          id="last_name"
-          name="last_name"
-          value="<%= customer.last_name %>"
-          placeholder="Last name"
-          required
-        />
-        <label for="last_name">Last name</label>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- customer Email -->
-  <div class="form-row row mb-3">
-    <div class="col-lg-3 col-12">
-      <label class="form-label" for="email">Email:</label>
-    </div>
-    <div class="col-lg-9 col-12">
-      <input type="email" class="form-control" id="email" name="email" value="<%= customer.email %>" required>
-    </div>
-  </div>
-
-  <!-- customer Role -->
-  <div class="form-row row mb-3">
-    <div class="col-lg-3 col-12">
-      <label class="form-label" for="role">Role:</label>
-    </div>
-    <div class="col-lg-9 col-12">
-      <input type="text" class="form-control" id="role" name="role" value="<%= customer.role %>" required>
-    </div>
-  </div>
-<!-- DOB -->
-<div class="form-row row mb-3">
-  <div class="col-lg-3 col-12">
-    <label class="form-label" for="date_of_birth">Date of birth:</label>
-  </div>
-  <div class="col-lg-9 col-12">
-    <div class="row">
-      <div class="col">
-        <div class="form-floating">
-          <input type="number" class="form-control" id="day" name="day" placeholder="DD" min="1" max="31" value="<%= new Date(user.date_of_birth).getDate() %>" required>
-          <label for="day">Day</label>
+      <div class="col-lg-4 col-12">
+        <div class="form-floating mb-3 mb-lg-0">
+          <input
+            type="text"
+            class="form-control"
+            id="first_name"
+            name="first_name"
+            value="<%= customer.first_name %>"
+            placeholder="First name"
+            required
+          />
+          <label for="first_name">First name</label>
         </div>
       </div>
-      <div class="col">
+      <div class="col-lg-5 col-12">
         <div class="form-floating">
-          <input type="number" class="form-control" id="month" name="month" placeholder="MM" min="1" max="12" value="<%= new Date(user.date_of_birth).getMonth() + 1 %>" required>
-          <label for="month">Month</label>
-        </div>
-      </div>
-      <div class="col">
-        <div class="form-floating">
-          <input type="number" class="form-control" id="year" name="year" placeholder="YYYY" min="1900" max="2100" value="<%= new Date(user.date_of_birth).getFullYear() %>" required>
-          <label for="year">Year</label>
+          <input
+            type="text"
+            class="form-control"
+            id="last_name"
+            name="last_name"
+            value="<%= customer.last_name %>"
+            placeholder="Last name"
+            required
+          />
+          <label for="last_name">Last name</label>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-
-<!-- Gender -->
-<div class="form-row row mb-3">
-  <div class="col-lg-3 col-12">
-    <label class="form-label" for="gender">Gender:</label>
-  </div>
-  <div class="col-lg-9 col-12">
-    <select class="form-select" id="gender" name="gender" required>
-      <option value="Male" <%= user.gender === 'Male' ? 'selected' : '' %>>Male</option>
-      <option value="Female" <%= user.gender === 'Female' ? 'selected' : '' %>>Female</option>
-    </select>
-  </div>
-</div>
-
-
-
-  <!-- customer Status -->
-  <div class="form-row row mb-3">
-    <div class="col-lg-3 col-12">
-      <label class="form-label" for="status">Account status:</label>
-      <p class="supporting-text font-14">Disabling an account will revoke their access.</p>
+    <!-- Customer Email -->
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="email">Email:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="email" class="form-control" id="email" name="email" value="<%= customer.email %>" required>
+      </div>
     </div>
-    <div class="col-lg-9 col-12">
-      <select class="form-select" id="status" name="status">
-        <option value="active" <%= customer.status === 'active' ? 'selected' : '' %>>Active</option>
-        <option value="inactive" <%= customer.status === 'inactive' ? 'selected' : '' %>>Disabled</option>
-      </select>
+
+    <!-- Customer Role -->
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="role">Role:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="text" class="form-control" id="role" name="role" value="<%= customer.role %>" required>
+      </div>
     </div>
-  </div>
-  <div class="row form-row mb-3">
-    <div class="col-12">
-      <h4 class="mb-3">Assessments</h4>
+
+    <!-- Associated Business -->
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="business_id">Associated Business:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <select class="form-control" id="business_id" name="business_id">
+          
+          <% businesses.forEach(function(business) { %>
+            <option value="<%= business.id %>" <%= business.id === customer.business_id ? 'selected' : '' %>><%= business.name %></option>
+          <% }); %>
+        </select>
+      </div>
     </div>
-    <div class="col-12">
-      <div class="accordion" id="accordionExample">
-        <% assessments.forEach((assessment, index) => { %>
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="heading<%= index %>">
-              <div class="accordion-button collapsed d-flex justify-content-space-between fw-normal font-14" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<%= index %>" aria-expanded="false" aria-controls="collapse<%= index %>">
-                <span class="d-block">Overall Score: <strong><%= assessment.overall_score %></strong></span>
-                <span class="d-block ms-auto"><%= new Date(assessment.assessment_date).toLocaleDateString('en-GB', { year: 'numeric', day: '2-digit', month: '2-digit' }) %></span>
-              </div>
-            </h2>
-            <div id="collapse<%= index %>" class="accordion-collapse collapse" aria-labelledby="heading<%= index %>" data-bs-parent="#accordionExample">
-              <div class="accordion-body w-100 ">
-                <% Object.keys(assessment).forEach(key => { %>
-                  <% if (key !== 'id' && key !== 'user_id' && key !== 'assessment_date' && key !== 'overall_score') { %>
-                    <div class="d-flex justify-content-between border-bottom py-3 ">
-                      <div class="font-14"><p class="dotted-bottom-border"><%= key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') %>:</p></div>
-                      <div class="font-14 text-end"><p><%= assessment[key] %></p></div>
-                    </div>
-                  <% } %>
-                <% }) %>
-              </div>
+
+    <!-- DOB -->
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="date_of_birth">Date of birth:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <div class="row">
+          <div class="col">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="day" name="day" placeholder="DD" min="1" max="31" value="<%= new Date(customer.date_of_birth).getDate() %>" required>
+              <label for="day">Day</label>
             </div>
           </div>
-        <% }); %>
+          <div class="col">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="month" name="month" placeholder="MM" min="1" max="12" value="<%= new Date(customer.date_of_birth).getMonth() + 1 %>" required>
+              <label for="month">Month</label>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="year" name="year" placeholder="YYYY" min="1900" max="2100" value="<%= new Date(customer.date_of_birth).getFullYear() %>" required>
+              <label for="year">Year</label>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <!-- Submit Button -->
-  <button type="submit" class="btn btn-success">Save updates</button>
-</form>
+
+    <!-- Gender -->
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="gender">Gender:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <select class="form-select" id="gender" name="gender" required>
+          <option value="Male" <%= customer.gender === 'Male' ? 'selected' : '' %>>Male</option>
+          <option value="Female" <%= customer.gender === 'Female' ? 'selected' : '' %>>Female</option>
+          <option value="Other" <%= customer.gender === 'Other' ? 'selected' : '' %>>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Customer Status -->
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="status">Account status:</label>
+        <p class="supporting-text font-14">Disabling an account will revoke their access.</p>
+      </div>
+      <div class="col-lg-9 col-12">
+        <select class="form-select" id="status" name="status">
+          <option value="active" <%= customer.status === 'active' ? 'selected' : '' %>>Active</option>
+          <option value="inactive" <%= customer.status === 'inactive' ? 'selected' : '' %>>Disabled</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Assessments -->
+    <div class="row form-row mb-3">
+      <div class="col-12">
+        <h4 class="mb-3">Assessments</h4>
+      </div>
+      <div class="col-12">
+        <div class="accordion" id="accordionExample">
+          <% assessments.forEach((assessment, index) => { %>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="heading<%= index %>">
+                <div class="accordion-button collapsed d-flex justify-content-space-between fw-normal font-14" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<%= index %>" aria-expanded="false" aria-controls="collapse<%= index %>">
+                  <span class="d-block">Overall Score: <strong><%= assessment.overall_score %></strong></span>
+                  <span class="d-block ms-auto"><%= new Date(assessment.assessment_date).toLocaleDateString('en-GB', { year: 'numeric', day: '2-digit', month: '2-digit' }) %></span>
+                </div>
+              </h2>
+              <div id="collapse<%= index %>" class="accordion-collapse collapse" aria-labelledby="heading<%= index %>" data-bs-parent="#accordionExample">
+                <div class="accordion-body w-100">
+                  <% Object.keys(assessment).forEach(key => { %>
+                    <% if (key !== 'id' && key !== 'user_id' && key !== 'assessment_date' && key !== 'overall_score') { %>
+                      <div class="d-flex justify-content-between border-bottom py-3">
+                        <div class="font-14"><p class="dotted-bottom-border"><%= key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') %>:</p></div>
+                        <div class="font-14 text-end"><p><%= assessment[key] %></p></div>
+                      </div>
+                    <% } %>
+                  <% }) %>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-success">Save updates</button>
+  </form>
 </section>
 
 <%- include('../partials/footer') %>

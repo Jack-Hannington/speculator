@@ -12,7 +12,9 @@ router.use(accessControl('admin'));
 router.get('/', async (req, res) => {
   const { data: customers, error } = await supabase
     .from('users')
-    .select(`*`);
+    .select(`*, businesses(name)`);
+
+  console.log(customers)
 
   if (error) return res.status(500).send({ message: "Failed to fetch users", error });
   res.render('customers', { customers });
@@ -32,22 +34,28 @@ router.get('/edit/:id', async (req, res) => {
     // Fetch user details
     const { data: customer, error: userError } = await supabase
       .from('users')
-      .select('*, memberships(name)')
+      .select('*, businesses(id, name)')
       .eq('id', id)
       .single();
 
     if (userError) throw userError;
 
+    // Fetch all businesses
+    const { data: businesses, error: businessesError } = await supabase
+      .from('businesses')
+      .select('id, name');
 
-    // Fetch all assessmnetns
+    if (businessesError) throw businessesError;
+
+    // Fetch all assessments
     const { data: assessments, error: assessmentsError } = await supabase
       .from('completed_assessments')
       .select('*')
-      .eq('id', id)
+      .eq('user_id', id);
 
     if (assessmentsError) throw assessmentsError;
 
-    res.render('customers/edit', { customer, assessments });
+    res.render('customers/edit', { customer, businesses, assessments });
   } catch (error) {
     console.error('Error fetching data:', error);
     res.status(500).send({ message: "Failed to fetch data", details: error });
@@ -61,13 +69,20 @@ router.get('/create', async (req, res) => {
     .from('memberships')
     .select('id, name');
 
-  res.render('customers/create', { memberships });
+  // Fetch all businesses
+  const { data: businesses } = await supabase
+    .from('businesses')
+    .select('id, name');
+
+  console.log('create route')
+
+  res.render('customers/create', { memberships, businesses });
 });
 
 //Create new customer
 router.post('/create', async (req, res) => {
   const tenantId = req.user.tenant_id;  // Accessed from the logged-in user's session
-  let { name, email, role, membership_id, password } = req.body;
+  let { name, email, role, membership_id, business_id, password } = req.body;
 
   // Check for empty membership_id and convert it to null
   membership_id = membership_id === '' ? null : membership_id;
@@ -88,7 +103,8 @@ router.post('/create', async (req, res) => {
         membership_id,
         tenant_id: tenantId, // Use tenant_id from the logged-in user
         password, // Assuming password is being handled securely
-        active_account: true // Optionally set the account as active on creation
+        active_account: true, // Optionally set the account as active on creation
+        business
       });
 
     if (error) {
@@ -108,17 +124,7 @@ router.post('/create', async (req, res) => {
 
 router.post('/edit/:id', async (req, res) => {
   const { id } = req.params;
-  let { first_name, last_name, email, role, day, month, year, gender, membership_id } = req.body; // Updated to include gender
-  console.log(req.body);
-
-  if (membership_id === '') {
-    membership_id = null;
-  }
-
-  // Check for required fields
-  if (!first_name || !email || !role) {
-    return res.status(400).send({ message: "Missing required fields" });
-  }
+  let { first_name, last_name, email, role, day, month, year, gender, business_id } = req.body;
 
   // Combine day, month, year into a single date field
   const date_of_birth = new Date(Date.UTC(year, month - 1, day));
@@ -126,13 +132,12 @@ router.post('/edit/:id', async (req, res) => {
   // Update user information
   const { data: updatedUser, error } = await supabase
     .from('users')
-    .update({ first_name, last_name, email, role, date_of_birth, gender, membership_id })
+    .update({ first_name, last_name, email, role, date_of_birth, gender, business_id })
     .eq('id', id);
 
   if (error) return res.status(500).send({ message: "Failed to update user", error });
   res.redirect('/customers');
 });
-
 
 
 // Route to render assessment form for a customer
