@@ -71,7 +71,7 @@
       </div>
       <div class="col-lg-9 col-12">
         <select class="form-control" id="business_id" name="business_id">
-          
+          <option value="">Select Business</option>
           <% businesses.forEach(function(business) { %>
             <option value="<%= business.id %>" <%= business.id === customer.business_id ? 'selected' : '' %>><%= business.name %></option>
           <% }); %>
