@@ -5,10 +5,10 @@
   <% if (user.role === 'admin' || user.role === 'customer') { %>
     <section>
       <h1>Welcome back, <%= user.first_name %></h1>
-      <p class="support-text">These are your four focus wellness metrics.</p>
+      <p class="support-text">Here are your 4 goal wellness metrics.</p>
     </section>
     <section class="mt-3">
-      <div class="row summary-blocks header-row row-gap-3 pb-3">
+      <div class="row summary-blocks header-row row-gap-md-3 row-gap-0 pb-3">
         <% function formatCategoryName(category) {
           return category.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         } %>
@@ -20,16 +20,16 @@
           <% } else if (percentage < 60) { %>
             <% color = '#FF6B00'; %>
           <% } %>
-          <div class="col">
-            <div class="metric-ring-container d-flex align-items-center justify-content-center flex-column" style="text-align: center;min-width:200px;">
-              <span class="mb-2 fw-semibold"><%= formatCategoryName(category.name) %></span>
+          <div class="col-lg-3 col-6 metric-ring-column">
+            <div class="metric-ring-container d-flex align-items-center justify-content-center flex-column" style="text-align: center;">
+              <span class="mb-2 metric-ring-category fw-semibold"><%= formatCategoryName(category.name) %></span>
               <div class="metric-ring">
                 <canvas id="metricRing-<%= category.name %>"></canvas>
                 <div class="metric-ring-text">
                   <span id="metricValue-<%= category.name %>"><%= category.score %></span><small>/ <%= category.total_possible_score %></small>
                 </div>
               </div>
-              <span class="mb-2 mt-3 font-14 fw-medium">
+              <span class="mb-2 mt-3 font-14 fw-medium metric-ring-ranking-text">
                 <iconify-icon style="color:<%= color %>;" inline icon="solar:course-up-bold"></iconify-icon>Top 20% for age group
               </span>
             </div>

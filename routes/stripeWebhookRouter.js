@@ -105,7 +105,7 @@ async function createCorporateWellnessUser(name, email, business) {
             email,
             'Welcome to Altius Wellness',
             user.name,
-            `Your access pin is: <strong>${accessPin}</strong>, <br />${base_url}/complete-registration?access_pin=${accessPin}`
+            `Your access pin is: <strong>${accessPin}</strong>, <br /><a href="${base_url}/complete-registration?access_pin=${accessPin}">Complete registration</a>`
         );
         console.log(`Registration email sent to ${email}`);
     } catch (error) {
