@@ -87,7 +87,7 @@ async function createCorporateWellnessUser(name, email, business) {
     // Create new user in Supabase
     const { data, error } = await supabase
         .from('users')
-        .insert([{ name, email, business, access_pin: accessPin }])
+        .insert([{ name, email, business, access_pin: accessPin, role: 'customer' }])
         .select();
 
     console.log('supabase:', data)

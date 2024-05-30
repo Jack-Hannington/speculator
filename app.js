@@ -44,14 +44,18 @@ app.use(express.json());
 
 // Session middleware setup
 app.use(session({
-  secret: 'replace_with_a_long_random_string',
+  secret: process.env.SESSION_SECRET, // Use an environment variable
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false, // Only save the session if something is stored
   cookie: {
-    secure: false, // Use true only if you are on HTTPS
-    maxAge: 1000 * 60 * 60 * 24 // Example: 24 hours
+    secure: process.env.NODE_ENV === 'PROD', // true if on HTTPS
+    httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+    maxAge: 1000 * 60 * 60 * 24, // Example: 24 hours
+    sameSite: 'lax' // Or 'strict' depending on your needs
   }
 }));
+
+
 
 // Initialize Passport
 app.use(passport.initialize());
@@ -120,11 +124,29 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   if (req.user) {
     res.locals.user = req.user;  // For view templates
     req.session.user_id = req.user.id;  // Set user ID in session
     req.session.role = req.user.role;
+
+    // Fetch business details if business ID is present
+    if (req.user.business != null) {
+      const { data: business, error } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('id', req.user.business)
+        .single();
+
+      console.log(business)
+
+      if (error) {
+        console.error('Error fetching business details:', error);
+      } else {
+        res.locals.user.businessName = business.name;
+        res.locals.user.businessImage = business.image;
+      }
+    }
   }
   next();
 });

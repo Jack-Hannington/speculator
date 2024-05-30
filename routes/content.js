@@ -4,12 +4,12 @@ require('dotenv').config();
 const supabase = require('../config/supabaseClient');
 const methodOverride = require('method-override');
 const bodyParser = require('body-parser');
-
+const accessControl = require('../middleware/middleware');
 router.use(express.json()); // Use for regular routes that need JSON 
 router.use(bodyParser.urlencoded({ extended: true }));
 
 // Show content
-router.get('/', async (req, res) => {
+router.get('/', accessControl('admin'), async (req, res) => {
     const { data: content, error } = await supabase
         .from('content')
         .select(`
@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
 
 
 // Show create content form
-router.get('/create', async (req, res) => {
+router.get('/create', accessControl('admin'), async (req, res) => {
     const { data: categories, error } = await supabase
         .from('categories')
         .select('*');
@@ -58,7 +58,7 @@ router.get('/create', async (req, res) => {
 });
 
 // Post create content
-router.post('/create', async (req, res) => {
+router.post('/create', accessControl('admin'), async (req, res) => {
     const { title, type, link, category_id, wordpress_post_id } = req.body;
 
     const { data: content, error: contentError } = await supabase
@@ -96,7 +96,7 @@ router.get('/view/:id', async (req, res) => {
 
 
 // Edit content
-router.get('/edit/:id', async (req, res) => {
+router.get('/edit/:id', accessControl('admin'), async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -123,7 +123,7 @@ router.get('/edit/:id', async (req, res) => {
     }
 });
 
-router.post('/edit/:id', async (req, res) => {
+router.post('/edit/:id', accessControl('admin'), async (req, res) => {
     const { id } = req.params;
     const { title, type, link, category_id, wordpress_post_id } = req.body;
 
@@ -143,7 +143,7 @@ router.post('/edit/:id', async (req, res) => {
 
 
 // Delete content
-router.post('/delete/:id', async (req, res) => {
+router.post('/delete/:id', accessControl('admin'), async (req, res) => {
     const { id } = req.params;
 
     const { data, error: contentError } = await supabase

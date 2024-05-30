@@ -34,16 +34,17 @@
         <label class="form-label" for="questions">Questions:</label>
       </div>
       <div class="col-lg-9 col-12">
-        <div style="height: 400px; overflow-y: auto;padding-left:10px;">
+        <div style="height: 400px; overflow-y: auto; padding-left: 10px;">
           <% questions.forEach(question => { %>
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="question_<%= question.id %>" name="question_ids">
+              <input class="form-check-input" type="checkbox" id="question_<%= question.id %>" name="question_ids[]" value="<%= question.id %>">
               <label class="form-check-label" for="question_<%= question.id %>">
                 <%= question.question %>
               </label>
             </div>
           <% }) %>
         </div>
+        
       </div>
     </div>
 

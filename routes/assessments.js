@@ -5,7 +5,6 @@ const supabase = require('../config/supabaseClient');
 const methodOverride = require('method-override');
 const bodyParser = require('body-parser');
 
-
 router.use(express.json()); // Use for regular routes that need JSON 
 router.use(bodyParser.urlencoded({ extended: true }));
 

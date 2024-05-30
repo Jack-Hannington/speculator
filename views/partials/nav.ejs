@@ -48,13 +48,20 @@
               </span>
           </div>
         </a>
+        <a href="#" aria-disabled="disabled">
+          <div class="nav-item d-flex justify-content-between align-items-center">
+              <span>
+                <iconify-icon icon="solar:buildings-3-linear" inline></iconify-icon>Businesses
+              </span>
+          </div>
+      </a>
         <a href="/customers">
             <div class="nav-item d-flex justify-content-between align-items-center">
                 <span>
                     <iconify-icon inline icon="solar:users-group-two-rounded-broken"></iconify-icon>Clients
                 </span>
             </div>
-          </a>
+        </a>
       <% } %>
       <% if (user.role === 'customer') { %>
       <a href="/">
@@ -64,7 +71,7 @@
           </span>
         </div>
       </a>
-      <a href="/">
+      <a href="/user-assessments">
         <div class="nav-item">
           <span>
             <iconify-icon inline icon="solar:folder-favourite-bookmark-outline"></iconify-icon>My assessments
@@ -72,15 +79,27 @@
         </div>
       </a>
       <% } %>
-
       <div class="sidebar-footer">
-        <a class="no-styling" style="color:inherit" href="/logout">
-          <div class="">
-            <span>
-              <iconify-icon inline icon="solar:user-circle-linear"></iconify-icon><%= user.first_name %>
-            </span>
-          </div>
-        </a>
+        <div class="dropdown w-100">
+          <button class="border dropdown-toggle d-flex align-items-center w-100" type="button" id="profileDropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="nav-profile-container d-flex align-items-start gap-2">
+              <% if (user.businessImage != null) { %>       
+              <img class="nav-business-logo" src="<%= user.businessImage %>">
+              <% } %>
+              <div class="font-14 ms-2 me-2 text-start">
+                <span><%= user.first_name %></span>
+                <% if (user.businessName != null) { %>                
+                  <span class="support-text font-12 d-block"><%= user.businessName %></span>
+                <% } %>
+              </div>
+            </div>
+          </button>
+          <ul class="dropdown-menu font-14 w-100 border" aria-labelledby="profileDropdownMenuButton">
+            <li><a class="dropdown-item" href="/profile">View Profile</a></li>
+            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+          </ul>
+        </div>
+        
       </div>
     </nav>
   </div>
