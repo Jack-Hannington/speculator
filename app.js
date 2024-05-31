@@ -48,7 +48,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false, // Only save the session if something is stored
   cookie: {
-    secure: process.env.NODE_ENV === 'PROD', // true if on HTTPS
+    secure: false, // true if on HTTPS
     httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
     maxAge: 1000 * 60 * 60 * 24, // Example: 24 hours
     sameSite: 'lax' // Or 'strict' depending on your needs
