@@ -34,6 +34,9 @@ app.use(methodOverride('_method'));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+if (process.env.NODE_ENV === 'PROD') {
+  app.set('trust proxy', 1);
+}
 // Serve static files
 app.use(express.static('public'));
 
@@ -48,7 +51,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false, // Only save the session if something is stored
   cookie: {
-    secure: false, // true if on HTTPS
+    secure: process.env.NODE_ENV === 'PROD', // Only secure cookies in production
     httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
     maxAge: 1000 * 60 * 60 * 24, // Example: 24 hours
     sameSite: 'lax' // Or 'strict' depending on your needs
