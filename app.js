@@ -56,6 +56,12 @@ app.use(session({
 }));
 
 
+console.log('Session Config:', {
+  secret: process.env.SESSION_SECRET,
+  secure: process.env.NODE_ENV === 'PROD',
+  nodeEnv: process.env.NODE_ENV
+});
+
 
 // Initialize Passport
 app.use(passport.initialize());
@@ -138,7 +144,7 @@ app.use(async (req, res, next) => {
         .eq('id', req.user.business)
         .single();
 
-      console.log(business)
+      // console.log(business)
 
       if (error) {
         console.error('Error fetching business details:', error);
@@ -617,7 +623,7 @@ app.get('/', async (req, res) => {
         throw latestScoresError;
       }
 
-      console.log('Latest Scores:', latestScores);
+      // console.log('Latest Scores:', latestScores);
 
       // Fetch categories to include names in the lowestScores
       const categoryIds = latestScores.map(score => score.category_id);
@@ -644,7 +650,7 @@ app.get('/', async (req, res) => {
         name: categoriesMap[score.category_id].name,
         percentage: (score.score / score.total_possible_score) * 100
       }));
-      console.log('Lowest Scores:', lowestScores);
+      // console.log('Lowest Scores:', lowestScores);
 
       // Fetch content for the lowest 4 categories
       const lowestCategoryIds = lowestScores.map(score => score.category_id);
@@ -672,7 +678,7 @@ app.get('/', async (req, res) => {
         return acc;
       }, {});
 
-      console.log('Grouped Content:', groupedContent);
+      // console.log('Grouped Content:', groupedContent);
 
       const messages = req.flash('success');
       res.render('home', { focusCategories: lowestScores, groupedContent: Object.values(groupedContent), message: messages[0] });

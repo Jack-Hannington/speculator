@@ -119,7 +119,23 @@
                     </div>
 
                     <!-- Role (hidden) -->
-                    <input type="hidden" id="role" name="role" value="user">
+                    <input type="hidden" id="role" name="role" value="customer">
+                    
+                    <!-- Terms and conditions -->
+                    <div class="form-row row mb-3">
+                        <div class="col-lg-3 col-12">
+                          <label class="form-label" for="terms">Terms and Conditions</label>
+                        </div>
+                        <div class="col-lg-9 col-12">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                            <label class="form-check-label" for="terms">
+                              I agree to the <a href="/terms" target="_blank">terms and conditions</a>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      
 
                     <!-- Submit Button -->
                     <div class="form-row row mb-3">
