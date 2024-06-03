@@ -12,9 +12,8 @@ router.use(accessControl('admin'));
 router.get('/', async (req, res) => {
   const { data: customers, error } = await supabase
     .from('users')
-    .select(`*, businesses(name)`);
-
-  console.log(customers)
+    .select(`*, businesses(name)`)
+    .eq('role', 'client');
 
   if (error) return res.status(500).send({ message: "Failed to fetch users", error });
   res.render('customers', { customers });

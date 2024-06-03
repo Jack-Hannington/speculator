@@ -59,11 +59,11 @@ app.use(session({
 }));
 
 
-console.log('Session Config:', {
-  secret: process.env.SESSION_SECRET,
-  secure: process.env.NODE_ENV === 'PROD',
-  nodeEnv: process.env.NODE_ENV
-});
+// console.log('Session Config:', {
+//   secret: process.env.SESSION_SECRET,
+//   secure: process.env.NODE_ENV === 'PROD',
+//   nodeEnv: process.env.NODE_ENV
+// });
 
 
 // Initialize Passport

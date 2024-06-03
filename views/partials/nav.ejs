@@ -48,13 +48,13 @@
               </span>
           </div>
         </a>
-        <a href="#" aria-disabled="disabled">
+        <!-- <a href="#" aria-disabled="disabled">
           <div class="nav-item d-flex justify-content-between align-items-center">
               <span>
                 <iconify-icon icon="solar:buildings-3-linear" inline></iconify-icon>Businesses
               </span>
           </div>
-      </a>
+      </a> -->
         <a href="/customers">
             <div class="nav-item d-flex justify-content-between align-items-center">
                 <span>
@@ -63,7 +63,7 @@
             </div>
         </a>
       <% } %>
-      <% if (user.role === 'customer') { %>
+      <% if (user.role === 'client') { %>
       <a href="/">
         <div class="nav-item">
           <span>
@@ -71,13 +71,13 @@
           </span>
         </div>
       </a>
-      <a href="/user-assessments">
+      <!-- <a href="/user-assessments">
         <div class="nav-item">
           <span>
             <iconify-icon inline icon="solar:folder-favourite-bookmark-outline"></iconify-icon>My assessments
           </span>
         </div>
-      </a>
+      </a> -->
       <% } %>
       <div class="sidebar-footer">
         <div class="dropdown w-100">
@@ -95,7 +95,7 @@
             </div>
           </button>
           <ul class="dropdown-menu font-14 w-100 border" aria-labelledby="profileDropdownMenuButton">
-            <li><a class="dropdown-item" href="/profile">View Profile</a></li>
+            <!-- <li><a class="dropdown-item" href="/profile">View Profile</a></li> -->
             <li><a class="dropdown-item" href="/logout">Logout</a></li>
           </ul>
         </div>
