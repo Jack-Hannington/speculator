@@ -9,4 +9,5 @@ const accessControl = (requiredRole) => {
     };
 };
 
+
 module.exports = accessControl;

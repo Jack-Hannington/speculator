@@ -6,7 +6,7 @@
   <% if (user.role === 'client') { %>
     <section>
       <h1>Welcome to your wellness dashboard, <%= user.first_name %></h1>
-      <p class="support-text">Your wellness metrics will populate here after your assessment</p>
+      <p class="support-text">Your target wellness metrics based on your last assessment are below</p>
     </section>
     <% function formatCategoryName(category) {
       return category.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
