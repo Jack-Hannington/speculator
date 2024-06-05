@@ -234,7 +234,7 @@ router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) =>
 
     console.log(`User ID: ${customerId}, Gender: ${userGender}, Age: ${userAge}`);
 
-    // Insert user responses
+    // Insert last user responses and generate responseSetId3
     const assessmentEntries = Object.keys(assessmentData).map(key => {
       const questionId = key.split('-')[1];
       return {

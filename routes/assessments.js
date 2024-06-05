@@ -84,7 +84,7 @@ router.get('/', async (req, res) => {
   res.render('assessments', { assessments, message: messages[0] });
 });
 
-// Show creat assessmnet form
+// Show create assessmnet form
 router.get('/create', async (req, res) => {
   const { data: questions, error } = await supabase
     .from('questions')
@@ -207,6 +207,64 @@ router.post('/edit/:id', async (req, res) => {
   req.flash('success', 'Assessment updated successfully');
   res.redirect('/assessments');
 });
+
+// View user assessment
+
+async function getUniqueResponseSets(userId) {
+  const { data: responseSets, error } = await supabase
+    .from('distinct_response_sets')
+    .select('response_set_id, response_date, assessment_name')
+    .eq('user_id', userId);
+
+  if (error) {
+    console.error('Error:', error);
+    return { error };
+  } else {
+    console.log('Unique Response Sets:', responseSets);
+    return { data: responseSets };
+  }
+}
+
+
+
+router.get('/view', async (req, res) => {
+  const { data: responseSets, error } = await getUniqueResponseSets(req.user.id);
+
+  if (error) {
+    req.flash('error', 'Failed to fetch response sets');
+    return res.status(500).send({ message: "Failed to fetch response sets", error });
+  }
+
+  const messages = req.flash('success');
+  res.render('assessments/view', { responseSets, message: messages[0] });
+});
+// Replace 32 with the actual user_id you want to query
+
+
+router.get('/getResponseDetails/:responseSetId', async (req, res) => {
+  const { responseSetId } = req.params;
+
+  try {
+    const { data: details, error } = await supabase
+      .from('user_responses')
+      .select(`
+        response_value,
+        questions(question, detail)
+      `)
+      .eq('response_set_id', responseSetId);
+
+    if (error) {
+      return res.status(500).json({ error: 'Failed to fetch response details' });
+    }
+
+    console.log(details)
+
+    res.json({ data: details });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 module.exports = router;
 

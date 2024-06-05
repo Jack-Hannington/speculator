@@ -180,6 +180,10 @@ img {
     border-top: 1px solid #ededed;
   }
 
+  .sidebar-nav {
+    padding: 0px 10px;
+  }
+
 }
 
 
@@ -199,7 +203,7 @@ img {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding: 0px 10px
+  padding: 0px;
 }
 
 .site-title,
