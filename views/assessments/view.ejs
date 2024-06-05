@@ -12,8 +12,8 @@
   <section>
     <div class="row">
       <div class="header-row col-lg-8 col-12">
-        <h1>Your assessments</h1>
-        <p>Each content item has a category and relevant details such as type and link.</p>
+        <h1>My assessments</h1>
+        <p>View your latest wellness asssessments below</p>
       </div>
       <div class="col-lg-4 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
         
@@ -28,8 +28,8 @@
           <div class="card mb-3">
             <div class="card-body">
               <h5 class="card-title"><%= response.assessment_name %></h5>
-              <p class="card-text">Response Date: <%= response.response_date %></p>
-              <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<%= response.response_set_id %>">
+              <p class="card-text">Response Date: <%= new Date(response.response_date).toLocaleDateString('gb') %></p>
+              <button class="btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<%= response.response_set_id %>">
                 View Details
               </button>
             </div>
