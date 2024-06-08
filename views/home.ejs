@@ -6,11 +6,11 @@
   <% if (user.role === 'client') { %>
       <section>
         <div class="row">
-          <div class="header-row col-lg-8 col-12">
-            <h1>Welcome to your wellness dashboard<span class="d-none d-lg-flex">,<%= user.first_name %></span></h1>
+          <div class="header-row col-lg-10 col-12">
+            <h1>Welcome to your wellness dashboard<span class="d-none d-lg-inline">, <%= user.first_name %></span></h1>
             <p class="support-text">Your target wellness metrics based on your last assessment are below</p>
           </div>
-          <div class="col-lg-4 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0 d-none d-lg-flex">
+          <div class="col-lg-2 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0 d-none d-lg-flex">
             <a class="btn btn-primary" href="/assessments/view">Full results</a>
           </div>
           
