@@ -208,7 +208,7 @@ router.post('/edit/:id', async (req, res) => {
   res.redirect('/assessments');
 });
 
-// View user assessment
+// View user assessment this view method is needed because supabase api doesn't have a distinct option
 
 async function getUniqueResponseSets(userId) {
   const { data: responseSets, error } = await supabase
@@ -224,8 +224,6 @@ async function getUniqueResponseSets(userId) {
     return { data: responseSets };
   }
 }
-
-
 
 router.get('/view', async (req, res) => {
   const { data: responseSets, error } = await getUniqueResponseSets(req.user.id);
@@ -249,21 +247,50 @@ router.get('/getResponseDetails/:responseSetId', async (req, res) => {
       .from('user_responses')
       .select(`
         response_value,
-        questions(question, detail)
+        questions (
+          question,
+          detail,
+          categories (
+            id,
+            name,
+            color,
+            background_color
+          )
+        )
       `)
       .eq('response_set_id', responseSetId);
 
     if (error) {
+      console.error('Error fetching response details:', error);
       return res.status(500).json({ error: 'Failed to fetch response details' });
     }
 
-    console.log(details)
+    // Group responses by category
+    const groupedResponses = details.reduce((acc, item) => {
+      const category = item.questions.categories;
+      if (!acc[category.id]) {
+        acc[category.id] = {
+          categoryName: category.name,
+          categoryColor: category.color,
+          categoryBackgroundColor: category.background_color,
+          questions: []
+        };
+      }
+      acc[category.id].questions.push({
+        question: item.questions.question,
+        detail: item.questions.detail,
+        response_value: item.response_value
+      });
+      return acc;
+    }, {});
 
-    res.json({ data: details });
+    res.json({ data: Object.values(groupedResponses) });
   } catch (error) {
+    console.error('Internal server error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 module.exports = router;

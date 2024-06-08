@@ -24,17 +24,24 @@
   <section class="mt-3">
     <div class="row">
       <% responseSets.forEach((response, index) => { %>
-        <div class="col-12">
-          <div class="card mb-3">
-            <div class="card-body">
-              <h5 class="card-title"><%= response.assessment_name %></h5>
-              <p class="card-text">Response Date: <%= new Date(response.response_date).toLocaleDateString('gb') %></p>
-              <button class="btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<%= response.response_set_id %>">
-                View Details
-              </button>
-            </div>
+        <div class="col-12 mb-3 card px-3 py-3 d-flex flex-row justify-content-between align-items-center">
+          <div>
+            <p class="font-14 support-text">Completed: 
+              <%= 
+                new Date(response.response_date).toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                })
+              %>
+            </p>
+            
+            <p class="fw-medium"><%= response.assessment_name %></p>
           </div>
-  
+          <a class="ms-auto unstyled font-14" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<%= response.response_set_id %>">
+            View ->
+          </a>
+    
           <!-- Offcanvas for response set -->
           <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas<%= response.response_set_id %>" aria-labelledby="offcanvasLabel<%= response.response_set_id %>">
             <div class="offcanvas-header">
@@ -48,32 +55,44 @@
         </div>
       <% }) %>
     </div>
+    
   </section>
   
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.offcanvas').forEach(offcanvas => {
-        offcanvas.addEventListener('show.bs.offcanvas', async event => {
-          const offcanvasElement = event.target;
-          const responseSetId = offcanvasElement.id.replace('offcanvas', '');
-          
-          // Fetch scores and questions for the response set
-          const { data: details, error } = await fetch(`/assessments/getResponseDetails/${responseSetId}`).then(res => res.json());
-  
-          if (error) {
-            offcanvasElement.querySelector('.offcanvas-body').innerHTML = '<p>Error loading details.</p>';
-          } else {
-            let html = '<ul>';
-            details.forEach(detail => {
-              html += `<li>${detail.questions.question}: ${detail.response_value}</li>`;
-            });
-            html += '</ul>';
-            offcanvasElement.querySelector('.offcanvas-body').innerHTML = html;
-          }
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.offcanvas').forEach(offcanvas => {
+    offcanvas.addEventListener('show.bs.offcanvas', async event => {
+      const offcanvasElement = event.target;
+      const responseSetId = offcanvasElement.id.replace('offcanvas', '');
+
+      // Fetch scores and questions for the response set
+      const { data: details, error } = await fetch(`/assessments/getResponseDetails/${responseSetId}`).then(res => res.json());
+
+      if (error) {
+        offcanvasElement.querySelector('.offcanvas-body').innerHTML = '<p>Error loading details.</p>';
+      } else {
+        let html = '';
+        details.forEach(detail => {
+          html += `<div class="row mb-2 mt-3">
+                     <div class="col-12">
+                       <div class="py-2 px-2 font-14" style="border-radius:var(--base-border-radius); background-color: #${detail.categoryBackgroundColor}; color: #${detail.categoryColor};">
+                         <span class="fw-medium">${detail.categoryName}</span>
+                       </div>
+                     </div>
+                   </div>`;
+          html += '<div class="d-flex flex-column gap-2">';
+          detail.questions.forEach(question => {
+            html += `<div class="d-flex justify-content-between flex-row"><span class="form-text">${question.question}:</span> <span class="font-14 form-text fw-medium"> ${question.response_value}</span></div>`;
+          });
+          html += '</div>';
         });
-      });
+        offcanvasElement.querySelector('.offcanvas-body').innerHTML = html;
+      }
     });
+  });
+});
+
   </script>
 
 <%- include('../partials/footer') %>
