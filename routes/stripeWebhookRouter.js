@@ -10,7 +10,7 @@ const base_url = process.env.NODE_ENV === 'DEV' ? process.env.DEV_URL : process.
 
 console.log(`this is ${base_url}`)
 
-const { bookingConfirmation, corporateRegistrationEmail } = require('../config/sendgrid');
+const { corporateRegistrationEmail } = require('../config/sendgrid');
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

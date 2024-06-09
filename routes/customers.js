@@ -5,7 +5,7 @@ const router = express.Router();
 const { accessControl, ensureAuthenticated } = require('../middleware/middleware');
 const { v4: uuidv4 } = require('uuid');
 
-router.use(accessControl('admin'));
+// router.use(accessControl('admin'));
 
 
 // Get all customers
@@ -176,48 +176,12 @@ router.get('/:customerId/assessments/:assessmentId/new', async (req, res) => {
   }
 });
 
-// Route to handle assessment form submission
-router.post('/:customerId/assessments/:assessmentId', async (req, res) => {
-  const { customerId, assessmentId } = req.params;
-  const assessmentData = req.body;
-
-  console.log(assessmentData)
-
-  try {
-    // Prepare the data for insertion
-    const assessmentEntries = Object.keys(assessmentData).map(key => {
-      const questionId = key.split('-')[1];
-      return {
-        user_id: customerId,
-        assessment_id: assessmentId,
-        question_id: questionId,
-        response_value: assessmentData[key]
-      };
-    });
-
-    // Insert assessment data into the database
-    const { data: assessment, error } = await supabase
-      .from('user_responses')
-      .insert(assessmentEntries);
-
-    if (error) throw error;
-
-    req.flash('success', 'Assessment submitted successfully');
-    res.redirect(`/customers/${customerId}`);
-  } catch (error) {
-    console.error('Error submitting assessment:', error);
-    req.flash('error', 'Failed to submit assessment');
-    res.status(500).send({ message: "Failed to submit assessment", details: error });
-  }
-});
-
-
 
 router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) => {
   const { customerId, assessmentId } = req.params;
   const assessmentData = req.body;
   const responseSetId = uuidv4(); // Generate a unique response set ID
-  console.log(`This is assessment data for customer ${customerId}: response ${responseSetId}: assessment ${JSON.stringify(assessmentData)}`);
+  // console.log(`This is assessment data for customer ${customerId}: response ${responseSetId}: assessment ${JSON.stringify(assessmentData)}`);
 
   try {
     // Fetch the user's details to get gender and age
@@ -234,7 +198,7 @@ router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) =>
 
     console.log(`User ID: ${customerId}, Gender: ${userGender}, Age: ${userAge}`);
 
-    // Insert last user responses and generate responseSetId3
+    // Insert last user responses and generate responseSetId
     const assessmentEntries = Object.keys(assessmentData).map(key => {
       const questionId = key.split('-')[1];
       return {
@@ -255,7 +219,7 @@ router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) =>
     // Fetch the most recent response set for the user and assessment
     const { data: latestResponses, error: latestResponsesError } = await supabase
       .from('user_responses')
-      .select('question_id, response_value')
+      .select('id, question_id, response_value')
       .eq('user_id', customerId)
       .eq('assessment_id', assessmentId)
       .eq('response_set_id', responseSetId);
@@ -271,7 +235,7 @@ router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) =>
 
     if (scoringRulesError) throw scoringRulesError;
 
-    console.log(`Scoring Rules: ${JSON.stringify(scoringRules)}`);
+    // console.log(`Scoring Rules: ${JSON.stringify(scoringRules)}`);
 
     // Fetch question details to get categories
     const { data: questions, error: questionsError } = await supabase
@@ -281,11 +245,12 @@ router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) =>
 
     if (questionsError) throw questionsError;
 
-    console.log(`Questions: ${JSON.stringify(questions)}`);
+    // console.log(`Questions: ${JSON.stringify(questions)}`);
 
     // Calculate scores
     const categoryScores = {};
     const totalPossibleScores = {};
+    const individualScores = [];
 
     latestResponses.forEach(response => {
       const rules = scoringRules.filter(rule => rule.question_id === response.question_id);
@@ -299,7 +264,7 @@ router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) =>
       const question = questions.find(q => q.id === response.question_id);
 
       if (rule) {
-        console.log(`Matched rule: ${JSON.stringify(rule)}`);
+        // console.log(`Matched rule: ${JSON.stringify(rule)}`);
         if (!categoryScores[question.category_id]) {
           categoryScores[question.category_id] = 0;
           totalPossibleScores[question.category_id] = 0;
@@ -307,13 +272,20 @@ router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) =>
 
         categoryScores[question.category_id] += rule.score;
         totalPossibleScores[question.category_id] += Math.max(...rules.map(r => r.score)); // Dynamic possible score
+
+        // Store individual question score
+        individualScores.push({
+          id: response.id, // Ensure the id is included for the upsert operation
+          score: rule.score
+        });
+        console.log(individualScores)
       } else {
-        console.warn(`No matching scoring rule found for response: ${response.response_value} for question ID: ${response.question_id}`);
+        // console.warn(`No matching scoring rule found for response: ${response.response_value} for question ID: ${response.question_id}`);
       }
     });
 
-    console.log(`Category Scores: ${JSON.stringify(categoryScores)}`);
-    console.log(`Total Possible Scores: ${JSON.stringify(totalPossibleScores)}`);
+    // console.log(`Category Scores: ${JSON.stringify(categoryScores)}`);
+    // console.log(`Total Possible Scores: ${JSON.stringify(totalPossibleScores)}`);
 
     // Insert the calculated scores into user_scores table
     const scoreEntries = Object.keys(categoryScores).map(categoryId => ({
@@ -331,6 +303,25 @@ router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) =>
 
     if (scoreInsertError) throw scoreInsertError;
 
+    // Update user_responses with individual scores
+    async function updateIndividualScores(scores) {
+      for (const scoreEntry of scores) {
+        const { id, score } = scoreEntry;
+        const { error } = await supabase
+          .from('user_responses')
+          .update({ score: score })
+          .eq('id', id);
+
+        if (error) {
+          console.error(`Error updating score for id ${id}:`, error);
+          throw error;
+        }
+      }
+    }
+
+    // Call the function with individualScores
+    await updateIndividualScores(individualScores);
+
     req.flash('success', 'Assessment submitted and scores calculated successfully');
     res.redirect(`/customers/${customerId}`);
   } catch (error) {
@@ -339,136 +330,6 @@ router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) =>
     res.status(500).send({ message: "Failed to submit assessment and calculate scores", details: error });
   }
 });
-
-
-
-
-// router.post('/:customerId/assessments/:assessmentId/submit', async (req, res) => {
-//   const { customerId, assessmentId } = req.params;
-//   const assessmentData = req.body;
-//   const responseSetId = uuidv4(); // Generate a unique response set ID
-//   console.log(`this is assessment data for customer ${customerId}: response ${responseSetId}: assessment${assessmentData}`)
-
-//   try {
-//     // Insert user responses
-//     const assessmentEntries = Object.keys(assessmentData).map(key => {
-//       const questionId = key.split('-')[1];
-//       return {
-//         user_id: customerId,
-//         assessment_id: assessmentId,
-//         question_id: questionId,
-//         response_value: assessmentData[key],
-//         response_set_id: responseSetId
-//       };
-//     });
-
-//     const { data: insertedResponses, error: insertError } = await supabase
-//       .from('user_responses')
-//       .insert(assessmentEntries);
-
-//     if (insertError) throw insertError;
-
-//     // Fetch the most recent response set for the user and assessment
-//     const { data: latestResponses, error: latestResponsesError } = await supabase
-//       .from('user_responses')
-//       .select('question_id, response_value')
-//       .eq('user_id', customerId)
-//       .eq('assessment_id', assessmentId)
-//       .eq('response_set_id', responseSetId);
-
-//     if (latestResponsesError) throw latestResponsesError;
-
-//     // Fetch scoring rules for the questions answered
-//     const questionIds = latestResponses.map(response => response.question_id);
-//     const { data: scoringRules, error: scoringRulesError } = await supabase
-//       .from('scoring_rules')
-//       .select('*')
-//       .in('question_id', questionIds);
-
-//     if (scoringRulesError) throw scoringRulesError;
-
-//     // Fetch question details to get categories
-//     const { data: questions, error: questionsError } = await supabase
-//       .from('questions')
-//       .select('id, category_id')
-//       .in('id', questionIds);
-
-//     if (questionsError) throw questionsError;
-
-//     // Calculate scores
-//     const categoryScores = {};
-//     const totalPossibleScores = {};
-
-//     latestResponses.forEach(response => {
-//       const rules = scoringRules.filter(rule => rule.question_id === response.question_id);
-//       const rule = rules.find(r => {
-//         if (r.min_value !== null && r.max_value !== null) {
-//           return response.response_value >= r.min_value && response.response_value <= r.max_value;
-//         } else if (r.min_value !== null) {
-//           return response.response_value >= r.min_value;
-//         } else if (r.max_value !== null) {
-//           return response.response_value <= r.max_value;
-//         }
-//         return false;
-//       });
-
-//       const question = questions.find(q => q.id === response.question_id);
-
-//       if (rule) {
-//         if (!categoryScores[question.category_id]) {
-//           categoryScores[question.category_id] = 0;
-//           totalPossibleScores[question.category_id] = 0;
-//         }
-
-//         categoryScores[question.category_id] += rule.score;
-//         totalPossibleScores[question.category_id] += Math.max(...rules.map(r => r.score)); // Dynamic possible score
-//       } else {
-//         console.warn(`No matching scoring rule found for response: ${response.response_value} for question ID: ${response.question_id}`);
-//       }
-//     });
-
-//     // Insert the calculated scores into user_scores table
-//     const scoreEntries = Object.keys(categoryScores).map(categoryId => ({
-//       user_id: customerId,
-//       assessment_id: assessmentId,
-//       category_id: categoryId,
-//       score: categoryScores[categoryId],
-//       total_possible_score: totalPossibleScores[categoryId],
-//       response_set_id: responseSetId
-//     }));
-
-//     const { error: scoreInsertError } = await supabase
-//       .from('user_scores')
-//       .insert(scoreEntries);
-
-//     if (scoreInsertError) throw scoreInsertError;
-
-//     // Get the lowest 4 scores
-//     const lowestScores = await getLowestScores(customerId);
-
-//     // Fetch user-selected goals
-//     const userGoals = await getUserGoals(customerId);
-
-//     // If no user-selected goals, update with the lowest scores
-//     if (userGoals.length === 0) {
-//       const goalEntries = lowestScores.map(categoryName => ({
-//         user_id: customerId,
-//         category_id: categoryName
-//       }));
-
-//       await supabase
-//         .from('user_goals')
-//         .insert(goalEntries);
-//     }
-
-//     req.flash('success', 'Assessment submitted and scores calculated successfully');
-//     res.redirect(`/customers/${customerId}`);
-//   } catch (error) {
-//     console.error('Error submitting assessment and calculating scores:', error);
-//     req.flash('error', 'Failed to submit assessment and calculate scores');
-//     res.status(500).send({ message: "Failed to submit assessment and calculate scores", details: error });
-//   }
-// });
 
 const thomasTestQuestion = {
   question: "Thomas Test (hip flexors)",
@@ -495,7 +356,104 @@ async function insertData() {
 // insertData()
 
 
+// Rankings //
+async function getUserLatestScores(supabase, userId) {
+  const { data, error } = await supabase
+    .from('user_assessment_scores')
+    .select('*')
+    .eq('user_id', userId)
+    .order('submission_date', { ascending: false })
+    .limit(1);
 
+  if (error) {
+    console.error('Error fetching user latest scores:', error);
+    throw error;
+  }
+
+  return data[0];
+}
+
+
+async function getBracketScores(supabase, gender, ageGroup) {
+  const { data, error } = await supabase
+    .from('user_assessment_scores')
+    .select('*')
+    .eq('gender', gender)
+    .eq('age_group', ageGroup);
+
+  if (error) {
+    console.error('Error fetching bracket scores:', error);
+    throw error;
+  }
+
+  return data;
+}
+
+function calculateRankings(userScores, bracketScores) {
+  const categories = [
+    'obesity_score', 'cardiovascular_fitness_score', 'recovery_score',
+    'mental_health_score', 'strength_score', 'mobility_score', 'nutrition_score'
+  ];
+
+  const rankings = {};
+
+  categories.forEach(category => {
+    const scores = bracketScores.map(score => score[category]).filter(score => score !== null);
+    scores.sort((a, b) => b - a);
+
+    const userScore = userScores[category];
+    const rank = scores.indexOf(userScore) + 1;
+    const percentile = (scores.length - rank) / scores.length * 100;
+
+    rankings[category] = {
+      score: userScore,
+      rank: rank,
+      percentile: percentile
+    };
+  });
+
+  // Calculate overall ranking
+  const overallScore = categories.reduce((sum, category) => sum + (userScores[category] || 0), 0);
+  const overallScores = bracketScores.map(score => categories.reduce((sum, category) => sum + (score[category] || 0), 0));
+  overallScores.sort((a, b) => b - a);
+
+  const overallRank = overallScores.indexOf(overallScore) + 1;
+  const overallPercentile = (overallScores.length - overallRank) / overallScores.length * 100;
+
+  rankings['overall'] = {
+    score: overallScore,
+    rank: overallRank,
+    percentile: overallPercentile
+  };
+
+  return rankings;
+}
+
+router.get('/user/:userId/rankings', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Fetch user's latest scores
+    const userScores = await getUserLatestScores(supabase, userId);
+
+    if (!userScores) {
+      return res.status(404).json({ error: 'User scores not found' });
+    }
+
+    const { gender, age_group: ageGroup } = userScores;
+
+    // Fetch scores for the user's demographic bracket
+    const bracketScores = await getBracketScores(supabase, gender, ageGroup);
+
+    // Calculate rankings and percentiles
+    const rankings = calculateRankings(userScores, bracketScores);
+
+    res.json(rankings);
+  } catch (error) {
+    console.error('Error fetching rankings:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 

@@ -754,7 +754,7 @@ const contentRoute = require('./routes/content');
 
 
 // Use routes
-app.use('/customers', ensureAuthenticated, customersRoute)
+app.use('/customers', customersRoute)
 app.use('/assessments', ensureAuthenticated, assessmentsRoutes);
 app.use('/questions', ensureAuthenticated, questionsRoute);
 app.use('/content', ensureAuthenticated, contentRoute);
