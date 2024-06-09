@@ -4,7 +4,7 @@ require('dotenv').config();
 const supabase = require('../config/supabaseClient');
 const methodOverride = require('method-override');
 const bodyParser = require('body-parser');
-const accessControl = require('../middleware/middleware');
+const { accessControl, ensureAuthenticated } = require('../middleware/middleware');
 router.use(express.json()); // Use for regular routes that need JSON 
 router.use(bodyParser.urlencoded({ extended: true }));
 

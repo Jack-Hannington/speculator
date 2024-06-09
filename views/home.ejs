@@ -11,7 +11,7 @@
             <p class="support-text">Your target wellness metrics based on your last assessment are below</p>
           </div>
           <div class="col-lg-2 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0 d-none d-lg-flex">
-            <a class="btn btn-primary" href="/assessments/view">Full results</a>
+            <a class="btn btn-primary" href="/assessments/view">All results</a>
           </div>
           
         </div>
@@ -33,9 +33,6 @@
                   <span id="metricValue-comingSoon">0</span><small>/ 100</small>
                 </div>
               </div>
-              <span class="mb-2 mt-3 font-14 fw-medium metric-ring-ranking-text">
-                <iconify-icon style="color:#eaeaea;" inline icon="solar:course-up-bold"></iconify-icon>Top 20% for age group
-              </span>
             </div>
           </div>
         </div>
@@ -68,7 +65,7 @@
           <% }) %>
         </div>
       </section>
-    <% } %>
+  
 
     <section class="mt-lg-3 mt-0">
       <div class="row">
@@ -117,6 +114,7 @@
         <% }) %>
       <% }) %>
     </section>
+    <% } %>
   <% } else if (user.role === 'admin') { %>
     <!-- Admin specific content can go here -->
     <section>

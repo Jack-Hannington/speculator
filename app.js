@@ -12,23 +12,27 @@ const path = require('path');
 const supabase = require('./config/supabaseClient');
 const methodOverride = require('method-override');
 const base_url = process.env.NODE_ENV === 'DEV' ? process.env.DEV_URL : process.env.PROD_URL;
-const { bookingConfirmation, resetPasswordEmail } = require('./config/sendgrid');
+const { resetPasswordEmail, sendPinReminderEmail } = require('./config/sendgrid');
 const responseTimeLogger = require('./utils/responseLogger');
-
 const generatePin = require('./utils/pinGenerator');
-const emailService = require('./utils/emailService');
 
 
 // Initialize Express app
 const app = express();
 require('dotenv').config();
 const stripeWebhookRouter = require('./routes/stripeWebhookRouter');
-const accessControl = require('./middleware/middleware');
+const { accessControl, ensureAuthenticated } = require('./middleware/middleware');
 
 app.use('/stripe', stripeWebhookRouter);
-
-
 app.use(methodOverride('_method'));
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  req.flash('error', 'An unexpected error occurred. Please log in again.');
+  res.redirect('/login');
+});
+
 
 // Set view engine
 app.set('views', path.join(__dirname, 'views'));
@@ -169,42 +173,85 @@ app.get('/login', responseTimeLogger, (req, res) => {
   res.render('auth/login', { message: messages[0] });
 });
 
-app.post('/login', (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
-    if (err) {
-      console.log('Error during authentication:', err);
-      let errMsg;
-      if (err.message.includes("JSON object requested, multiple (or no) rows returned")) {
-        errMsg = "Account not found. Did you use a different email address?";
-      } else {
-        errMsg = "An unexpected error occurred. Please try again.";
-      }
-      req.flash('error', `${errMsg} Please try again.`);
+app.post('/login', async (req, res, next) => {
+  const { email, password } = req.body;
+
+  try {
+    // Fetch the user by email
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    if (error || !user) {
+      req.flash('error', 'Invalid email or credentials.');
       return res.redirect('/login');
     }
 
-    if (!user) {
-      req.flash('error', info.message || 'Invalid login credentials.');
-      return res.redirect('/login');
-    }
+    // Determine user role and handle authentication
+    if (user.role === 'admin') {
+      // Admin authentication using Passport
+      passport.authenticate('local', (err, user, info) => {
+        if (err) {
+          console.log('Error during authentication:', err);
+          let errMsg;
+          if (err.message.includes("JSON object requested, multiple (or no) rows returned")) {
+            errMsg = "Account not found. Did you use a different email address?";
+          } else {
+            errMsg = "An unexpected error occurred. Please try again.";
+          }
+          req.flash('error', `${errMsg} Please try again.`);
+          return res.redirect('/login');
+        }
 
-    // After authentication is successful, store the user role in the session
-    req.logIn(user, (err) => {
-      if (err) {
-        console.log('Error during session creation:', err);
-        req.flash('error', 'Failed to create a session. Please try again.');
+        if (!user) {
+          req.flash('error', info.message || 'Invalid login credentials.');
+          return res.redirect('/login');
+        }
+
+        req.logIn(user, (err) => {
+          if (err) {
+            console.log('Error during session creation:', err);
+            req.flash('error', 'Failed to create a session. Please try again.');
+            return res.redirect('/login');
+          }
+
+          req.session.role = user.role;
+          req.flash('success', 'Login successful');
+          return res.redirect('/');
+        });
+      })(req, res, next);
+    } else {
+      // Corporate user authentication using access pin
+      console.log('Non-admin user detected:', user); // Debugging line
+      if (user.access_pin.toString() !== password) {
+        req.flash('error', 'Invalid email or access pin.');
         return res.redirect('/login');
       }
 
-      // Store the role in the session explicitly
-      req.session.role = user.role; // Ensure 'role' is included in the user object
+      req.logIn(user, (err) => {
+        if (err) {
+          console.log('Error during session creation:', err);
+          req.flash('error', 'Failed to create a session. Please try again.');
+          return res.redirect('/login');
+        }
 
-      // Redirect to the dashboard or any appropriate page
-      req.flash('success', 'Login successful')
-      return res.redirect('/');
-    });
-  })(req, res, next);
+        req.session.role = user.role;
+        req.flash('success', 'Login successful');
+        console.log('Login successful for non-admin user'); // Debugging line
+        return res.redirect('/');
+      });
+    }
+  } catch (error) {
+    console.error('Error during authentication:', error);
+    req.flash('error', 'An unexpected error occurred. Please try again.');
+    res.redirect('/login');
+  }
 });
+
+
+
 
 
 
@@ -258,7 +305,7 @@ app.get('/complete-registration', async (req, res) => {
   }
 });
 
-// Complete registration route
+
 // Complete registration route
 app.post('/complete-registration', async (req, res) => {
   const { access_pin, first_name, last_name, day, month, year, gender } = req.body;
@@ -366,22 +413,22 @@ app.post('/request-reset', async (req, res) => {
   try {
     const { data: user, error: userError } = await supabase
       .from('users')
-      .select('id, email')
+      .select('id, email, role, access_pin')
       .eq('email', email)
       .single();
 
-    if (userError) {
+    if (userError || !user) {
       console.error('Error fetching user:', userError);
-      return res.status(404).send('Email not found');
+      req.flash('error', 'Email not found');
+      return res.redirect('/request-reset');
     }
 
     console.log(`This user requested a reset: ${user.email}`);
 
-    if (user) {
+    if (user.role === 'admin') {
       const token = crypto.randomBytes(20).toString('hex'); // Generate a secure token
       const expiration = new Date(Date.now() + 3600000).toISOString(); // Token expires in one hour
 
-      // Store the reset token and expiration in the database
       const { data: updateData, error: updateError } = await supabase
         .from('users')
         .update({ reset_password_token: token, reset_password_expires: expiration })
@@ -389,23 +436,28 @@ app.post('/request-reset', async (req, res) => {
 
       if (updateError) {
         console.error('Error updating user with reset token:', updateError);
-        return res.status(500).send('Failed to store reset token');
+        req.flash('error', 'Failed to store reset token');
+        return res.redirect('/request-reset');
       }
 
       console.log(`Reset token set: ${token}`);
 
-      // Send an email with the reset link
       await resetPasswordEmail(user.email, 'Your password reset', `${base_url}/reset/${token}`);
       req.flash('success', 'Password reset link sent');
-      res.redirect('/login');
     } else {
-      res.status(404).send('Email not found');
+      // Non-admin users
+      await sendPinReminderEmail(user.email, 'Your access pin reminder', `Your access pin is ${user.access_pin}. <br/>Login: ${base_url}/login`);
+      req.flash('success', 'Access pin reminder sent');
     }
+
+    res.redirect('/login');
   } catch (error) {
     console.error('Reset password error:', error);
-    res.status(500).send('Error processing reset request');
+    req.flash('error', 'Error processing reset request');
+    res.redirect('/request-reset');
   }
 });
+
 
 
 // Reset with token route
@@ -694,23 +746,18 @@ app.get('/', async (req, res) => {
   }
 });
 
-
-
-
-
 // More routes and middleware as needed
 const customersRoute = require('./routes/customers');
-const assessmentsRoute = require('./routes/assessments');
+const assessmentsRoutes = require('./routes/assessments');
 const questionsRoute = require('./routes/questions');
 const contentRoute = require('./routes/content');
 
 
-
 // Use routes
-app.use('/customers', customersRoute)
-app.use('/assessments', assessmentsRoute)
-app.use('/questions', questionsRoute);
-app.use('/content', contentRoute);
+app.use('/customers', ensureAuthenticated, customersRoute)
+app.use('/assessments', ensureAuthenticated, assessmentsRoutes);
+app.use('/questions', ensureAuthenticated, questionsRoute);
+app.use('/content', ensureAuthenticated, contentRoute);
 
 
 // fs.readFile('public/washer.png', async (err, avatarFile) => {

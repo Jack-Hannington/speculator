@@ -2,7 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const supabase = require('../config/supabaseClient');
 const router = express.Router();
-const accessControl = require('../middleware/middleware');
+const { accessControl, ensureAuthenticated } = require('../middleware/middleware');
 const { v4: uuidv4 } = require('uuid');
 
 router.use(accessControl('admin'));

@@ -9,7 +9,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
  * @param {Object} bookingDetails - The details of the booking to include in the email.
  */
 async function resetPasswordEmail(recipientEmail, subject, link) {
-    console.log('req received');
+    console.log('reset Password req received');
     // Construct the HTML body using booking details
     const htmlBody = `
         <h1>Password reset</h1>
@@ -37,17 +37,13 @@ async function resetPasswordEmail(recipientEmail, subject, link) {
     }
 }
 
-async function bookingConfirmation(recipientEmail, subject, bookingDetails) {
-    // Construct the HTML body using booking details
+// Pin reminder to non-admins
+async function sendPinReminderEmail(recipientEmail, subject, pin) {
+    console.log('Pin reminder req received');
+    // Construct the HTML body using the pin
     const htmlBody = `
-        <h1>Booking Confirmation</h1>
-        <p>Thank you for your booking. Here are your booking details:</p>
-        <ul>
-            <li>Date: ${bookingDetails.date}</li>
-            <li>Time: ${bookingDetails.time}</li>
-            <li>Service: ${bookingDetails.serviceName}</li>
-            <li>Total Price: £${bookingDetails.totalPrice}</li>
-        </ul>
+        <h1>Access Pin Reminder</h1>
+        <p>Your access pin is ${pin}</p>
     `;
 
     // Setup the message object
@@ -55,7 +51,7 @@ async function bookingConfirmation(recipientEmail, subject, bookingDetails) {
         to: recipientEmail,
         from: 'jack@hanningtondigital.com',  // This should be a verified sender email in your SendGrid account
         subject: subject,
-        text: `Thank you for your booking on ${bookingDetails.date} at ${bookingDetails.time}.`,
+        text: `Your access pin is ${pin}`,
         html: htmlBody,
     };
 
@@ -70,6 +66,7 @@ async function bookingConfirmation(recipientEmail, subject, bookingDetails) {
         }
     }
 }
+
 
 /**
  * Send a corporate registration email using SendGrid.
@@ -110,4 +107,4 @@ async function corporateRegistrationEmail(recipientEmail, subject, name, registr
     }
 }
 
-module.exports = { bookingConfirmation, resetPasswordEmail, corporateRegistrationEmail };
+module.exports = { resetPasswordEmail, corporateRegistrationEmail, sendPinReminderEmail };

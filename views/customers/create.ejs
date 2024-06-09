@@ -1,6 +1,14 @@
 <%- include('../partials/header') %> <%- include('../partials/nav') %>
 
-<h1>Create New Client</h1>
+<div class="container-xxl px-xl-4 px-0">
+  <section>
+    <div class="row">
+      <div class="col-lg-9 col-12">
+        <h1>Create client</h1>
+      </div>
+    </div>
+  </section>
+  <section>
 <form action="/customers/create" method="post">
   <!-- Name -->
   <div class="form-row row mb-3">
@@ -192,5 +200,6 @@
   <!-- Submit Button -->
   <button type="submit" class="btn btn-success">Create Customer</button>
 </form>
-
+</section>
+</div>
 <%- include('../partials/footer') %>
