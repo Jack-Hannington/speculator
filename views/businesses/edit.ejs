@@ -1,0 +1,80 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<% if (message && message.length > 0) { %>
+  <div class="flash-messages-container animate__animated">
+    <div class="flash-message">
+      <iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %>
+    </div>
+  </div>
+<% } %>
+
+<div class="container-xxl px-xl-4 px-0">
+  <section>
+    <div class="row">
+      <div class="col-lg-9 col-12">
+        <h1>Edit Business</h1>
+      </div>
+    </div>
+  </section>
+  
+  <form action="/businesses/edit/<%= business.id %>" method="POST">
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="name">Name:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="text" class="form-control" id="name" name="name" value="<%= business.name %>" required>
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="contact_email">Contact Email:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="email" class="form-control" id="contact_email" name="contact_email" value="<%= business.contact_email %>">
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="contact_phone">Contact Phone:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="tel" class="form-control" id="contact_phone" name="contact_phone" value="<%= business.contact_phone %>">
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="address">Address:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="text" class="form-control" id="address" name="address" value="<%= business.address %>">
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="website">Website:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="url" class="form-control" id="website" name="website" value="<%= business.website %>">
+      </div>
+    </div>
+
+    <div class="form-row row mb-3">
+      <div class="col-lg-3 col-12">
+        <label class="form-label" for="image">Image URL:</label>
+      </div>
+      <div class="col-lg-9 col-12">
+        <input type="text" class="form-control" id="image" name="image" value="<%= business.image %>">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

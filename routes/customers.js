@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 
 // router.use(accessControl('admin'));
 
-
+router.use(ensureAuthenticated)
 // Get all customers
 router.get('/', async (req, res) => {
   const { data: customers, error } = await supabase

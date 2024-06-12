@@ -751,6 +751,7 @@ const customersRoute = require('./routes/customers');
 const assessmentsRoutes = require('./routes/assessments');
 const questionsRoute = require('./routes/questions');
 const contentRoute = require('./routes/content');
+const businessesRoute = require('./routes/businesses');
 
 
 // Use routes
@@ -758,6 +759,7 @@ app.use('/customers', customersRoute)
 app.use('/assessments', ensureAuthenticated, assessmentsRoutes);
 app.use('/questions', ensureAuthenticated, questionsRoute);
 app.use('/content', ensureAuthenticated, contentRoute);
+app.use('/businesses', ensureAuthenticated, businessesRoute);
 
 
 // fs.readFile('public/washer.png', async (err, avatarFile) => {

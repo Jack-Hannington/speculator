@@ -1,0 +1,51 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<% if (message && message.length > 0) { %>
+  <div class="flash-messages-container animate__animated">
+    <div class="flash-message">
+      <iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %>
+    </div>
+  </div>
+<% } %>
+<div class="container-xxl px-xl-4 px-0">
+  <section>
+    <div class="row">
+      <div class="header-row col-lg-8 col-12">
+        <h1>Businesses</h1>
+        <p>Each business has relevant details such as contact information, address, and website.</p>
+      </div>
+      <div class="col-lg-4 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
+        <a href="/businesses/create" class="btn btn-primary">+ Add Business</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-3">
+    <% businesses.forEach(business => { %>
+      <div class="row py-lg-3 py-2 px-lg-2 px-1 font-14">
+        <div class="col-lg-9 col-10">
+          <a class="unstyled clickable-row" href="/businesses/view/<%= business.id %>">
+            <p class="mb-0">
+              <iconify-icon style="font-size:20px" inline icon="solar:building-outline"></iconify-icon>
+              <%= business.name %>
+            </p>
+            <p class="mb-0">
+              <%= business.contact_email %> | <%= business.contact_phone %>
+            </p>
+            <p class="mb-0">
+              <%= business.address %> | <a href="<%= business.website %>" target="_blank"><%= business.website %></a>
+            </p>
+          </a>
+        </div>
+        <div class="col-lg-3 col-2 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0">
+          <a class="unstyled" href="/businesses/edit/<%= business.id %>">
+            Edit
+          </a>
+        </div>
+      </div>
+    <% }) %>
+  </section>
+</div>
+
+<%- include('../partials/footer') %>
