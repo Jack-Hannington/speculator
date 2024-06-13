@@ -862,3 +862,23 @@ label {
   -moz-appearance: textfield;
   /* Firefox */
 }
+
+.fixture-row-flag {
+  width: 20px;
+}
+
+@media (max-width:800px) {
+  .fixture-row {
+    font-size: 14px;
+  }
+
+  .fixture-row-flag {
+    width: 18px;
+  }
+
+  .score-input {
+    width: 38px;
+    padding: 4px !important;
+    height: 38px;
+  }
+}

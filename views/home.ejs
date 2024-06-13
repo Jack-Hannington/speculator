@@ -40,18 +40,18 @@
 <form id="predictions-form" method="post" action="/predictions/user-predictions">
   <% fixtures.forEach(fixture => { %>
     <section>
-      <div class="row py-2" style="background:#f6f6f6;border-radius: 6px;border:solid 1px #ededed;">
+      <div class="row py-2 fixture-row" style="background:#f6f6f6;border-radius: 6px;border:solid 1px #ededed;">
         <div class="col-4 d-flex justify-content-end align-items-center">
-          <img src="<%= fixture.home_team.flag %>" style="width:20px;margin-right:8px;">  <p class="mb-0"><%= fixture.home_team.name %></p>
+          <img src="<%= fixture.home_team.flag %>" class="fixture-row-flag" style="margin-right:8px;">  <p class="mb-0"><%= fixture.home_team.name %></p>
         </div>
         <div class="col-4 d-flex justify-content-center align-items-center">
           <input type="hidden" name="fixture_id_<%= fixture.id %>" value="<%= fixture.id %>">
-          <input class="form-control d-inline-block text-center score-input" style="width: 50px;" type="number" name="home_score_<%= fixture.id %>" placeholder="..." value="<%= predictionsMap[fixture.id]?.predicted_home_score || '' %>">
+          <input class="form-control d-inline-block text-center score-input" type="number" name="home_score_<%= fixture.id %>" placeholder="..." value="<%= predictionsMap[fixture.id]?.predicted_home_score || '' %>">
           <span class="mx-2">-</span>
-          <input class="form-control d-inline-block text-center score-input" style="width: 50px;" type="number" name="away_score_<%= fixture.id %>" placeholder="..." value="<%= predictionsMap[fixture.id]?.predicted_away_score || '' %>">
+          <input class="form-control d-inline-block text-center score-input" type="number" name="away_score_<%= fixture.id %>" placeholder="..." value="<%= predictionsMap[fixture.id]?.predicted_away_score || '' %>">
         </div>
         <div class="col-4 d-flex justify-content-start align-items-center">
-          <p class="mb-0"><%= fixture.away_team.name %></p><img src="<%= fixture.away_team.flag %>" style="width:20px;margin-left:8px;"> 
+          <p class="mb-0"><%= fixture.away_team.name %></p><img class="fixture-row-flag"  src="<%= fixture.away_team.flag %>" style="margin-left:8px;"> 
         </div>
       </div>
     </section>
