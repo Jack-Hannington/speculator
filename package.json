@@ -1,7 +1,7 @@
 {
-  "name": "atlius_wellness",
+  "name": "speculator",
   "version": "1.0.0",
-  "description": "A platform for personalised wellness guidance for Altius Healthcare clients.",
+  "description": "Football score guessing game.",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
