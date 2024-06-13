@@ -1,12 +1,12 @@
 // Authentication middleware
 // Authentication middleware
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
+const ensureAuthenticated = (req, res, next) => {
+    if (req.isAuthenticated() && req.session.user_id) {
         return next();
+    } else {
+        res.redirect('/login');
     }
-    req.flash('error', 'Session expired. Please log in again.');
-    res.redirect('/login');
-}
+};
 
 
 const accessControl = (requiredRole) => {

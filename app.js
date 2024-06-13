@@ -247,6 +247,14 @@ app.post('/login', async (req, res, next) => {
   }
 });
 
+// Log the user to ensure it's being set correctly
+app.use((req, res, next) => {
+  console.log('Current user:', req.user);
+  console.log('Session user ID:', req.session.user_id);
+  next();
+});
+
+
 
 
 
@@ -383,10 +391,6 @@ app.post('/corporate-login', async (req, res) => {
     res.redirect('/corporate-login');
   }
 });
-
-
-
-
 
 app.get('/logout', (req, res) => {
   req.logout(function (err) {
@@ -550,30 +554,6 @@ app.post('/reset-password', async (req, res) => {
 });
 
 
-// get total entries. Get highest score. Calculate 
-
-async function getLatestAssessmentRanks(userId, ageBand, businessId) {
-  const { data, error } = await supabase.rpc('get_latest_assessment_ranks', {
-    p_user_id: userId,
-    p_age_band: ageBand,
-    p_business: businessId
-  });
-  if (error) {
-    console.error('Error fetching ranks:', error);
-    return null;
-  } else {
-    return data;
-  }
-}
-
-// // Example usage:
-// getLatestAssessmentRanks(2, '<35', 3).then(ranks => {
-//   console.log('Ranks:', ranks);
-// });
-
-
-
-
 
 async function getUserGoals(userId) {
   const { data: goals, error } = await supabase
@@ -586,50 +566,7 @@ async function getUserGoals(userId) {
   return goals.map(goal => goal.category_id);
 }
 
-app.get('/', async (req, res) => {
-  const round = req.query.round || '1'; // Default to Round 1 if no round is specified
-
-  try {
-    // Fetch fixtures for the specified round with home and away team details
-    const { data: fixtures, error: fixturesError } = await supabase
-      .from('fixtures')
-      .select(`
-        id,
-        round,
-        kick_off_time,
-        is_finished,
-        home_team: home_team_id (id, name),
-        away_team: away_team_id (id, name)
-      `)
-      .eq('round', round);
-
-    if (fixturesError) {
-      throw fixturesError;
-    }
-
-    // Fetch all rounds for the dropdown selection
-    const { data: allFixtures, error: allFixturesError } = await supabase
-      .from('fixtures')
-      .select('round');
-
-    if (allFixturesError) {
-      throw allFixturesError;
-    }
-
-    // Extract unique rounds from all fixtures
-    const rounds = [...new Set(allFixtures.map(fixture => fixture.round))];
-
-    res.render('home', { fixtures, rounds, selectedRound: round });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-
-const checkSubmissionTime = async (req, res, next) => {
-  const round = req.query.round || '1'; // Default to Round 1 if no round is specified
-
+const checkSubmissionTime = async (round) => {
   try {
     // Fetch the start time of the first fixture for the specified round
     const { data: firstFixture, error } = await supabase
@@ -649,23 +586,91 @@ const checkSubmissionTime = async (req, res, next) => {
       const kickOffTime = new Date(firstFixture.kick_off_time);
       const lockTime = new Date(kickOffTime.getTime() - 2 * 60 * 1000); // 2 minutes before kick-off
 
-      if (now > lockTime) {
-        return res.status(403).send('Predictions are locked 2 minutes before the start of the first fixture.');
-      }
+      return now > lockTime;
     }
 
-    next();
+    return false;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+app.get('/', ensureAuthenticated, async (req, res) => {
+  const round = req.query.round || '1'; // Default to Round 1 if no round is specified
+  const userId = req.user.id;
+
+  try {
+    // Fetch fixtures for the specified round with home and away team details
+    const { data: fixtures, error: fixturesError } = await supabase
+      .from('fixtures')
+      .select(`
+        id,
+        round,
+        kick_off_time,
+        is_finished,
+        home_team: home_team_id (id, name, flag),
+        away_team: away_team_id (id, name, flag)
+      `)
+      .eq('round', round);
+
+    if (fixturesError) {
+      throw fixturesError;
+    }
+
+    // Fetch user's predictions for the specified round
+    const { data: userPredictions, error: predictionsError } = await supabase
+      .from('user_predictions')
+      .select(`
+        fixture_id,
+        predicted_home_score,
+        predicted_away_score
+      `)
+      .eq('user_id', userId)
+      .in('fixture_id', fixtures.map(fixture => fixture.id));
+
+    if (predictionsError) {
+      throw predictionsError;
+    }
+
+    // Map user's predictions to an object for easier access
+    const predictionsMap = userPredictions.reduce((acc, prediction) => {
+      acc[prediction.fixture_id] = prediction;
+      return acc;
+    }, {});
+
+    // Fetch all rounds for the dropdown selection
+    const { data: allFixtures, error: allFixturesError } = await supabase
+      .from('fixtures')
+      .select('round');
+
+    if (allFixturesError) {
+      throw allFixturesError;
+    }
+
+    // Extract unique rounds from all fixtures
+    const rounds = [...new Set(allFixtures.map(fixture => fixture.round))];
+
+    // Check if the fixtures for the selected round have started
+    const isLocked = await checkSubmissionTime(round);
+    const messages = req.flash('success'); // Retrieve the flash message
+    res.render('home', { fixtures, rounds, selectedRound: round, predictionsMap, isLocked, message: messages[0] });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
-};
+});
 
-app.post('/predictions/user-predictions', checkSubmissionTime, async (req, res) => {
+
+
+// Route to handle upserting predictions
+app.post('/predictions/user-predictions', async (req, res) => {
   const userId = req.user.id; // Assume user ID is stored in session
   const predictions = req.body; // All form data
 
   try {
+    console.log('Request body:', predictions); // Log the request body
+
     for (const key in predictions) {
       if (predictions.hasOwnProperty(key) && key.startsWith('fixture_id_')) {
         const fixtureId = key.split('_')[2];
@@ -682,8 +687,8 @@ app.post('/predictions/user-predictions', checkSubmissionTime, async (req, res) 
           prediction_time: new Date().toISOString()
         };
 
-        if (homeScore !== '') predictionData.predicted_home_score = homeScore;
-        if (awayScore !== '') predictionData.predicted_away_score = awayScore;
+        if (homeScore !== '') predictionData.predicted_home_score = parseInt(homeScore, 10);
+        if (awayScore !== '') predictionData.predicted_away_score = parseInt(awayScore, 10);
 
         // Upsert prediction
         const { data, error } = await supabase
@@ -698,8 +703,8 @@ app.post('/predictions/user-predictions', checkSubmissionTime, async (req, res) 
         }
       }
     }
-
-    res.send('Predictions submitted');
+    req.flash('success', 'Scores saved');
+    return res.redirect('/');
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -707,21 +712,11 @@ app.post('/predictions/user-predictions', checkSubmissionTime, async (req, res) 
 });
 
 
-
 // More routes and middleware as needed
-const customersRoute = require('./routes/customers');
-const assessmentsRoutes = require('./routes/assessments');
-const questionsRoute = require('./routes/questions');
-const contentRoute = require('./routes/content');
-const businessesRoute = require('./routes/businesses');
-
+const leagueRoutes = require('./routes/leagues');
 
 // Use routes
-app.use('/customers', customersRoute)
-app.use('/assessments', ensureAuthenticated, assessmentsRoutes);
-app.use('/questions', ensureAuthenticated, questionsRoute);
-app.use('/content', ensureAuthenticated, contentRoute);
-app.use('/businesses', ensureAuthenticated, businessesRoute);
+app.use('/leagues', ensureAuthenticated, leagueRoutes);
 
 
 // fs.readFile('public/washer.png', async (err, avatarFile) => {

@@ -850,3 +850,15 @@ label {
     width: 540px;
   }
 }
+
+/* Score specifics */
+.score-input::-webkit-outer-spin-button,
+.score-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.score-input {
+  -moz-appearance: textfield;
+  /* Firefox */
+}
