@@ -627,6 +627,87 @@ app.get('/', async (req, res) => {
 });
 
 
+const checkSubmissionTime = async (req, res, next) => {
+  const round = req.query.round || '1'; // Default to Round 1 if no round is specified
+
+  try {
+    // Fetch the start time of the first fixture for the specified round
+    const { data: firstFixture, error } = await supabase
+      .from('fixtures')
+      .select('kick_off_time')
+      .eq('round', round)
+      .order('kick_off_time', { ascending: true })
+      .limit(1)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    if (firstFixture) {
+      const now = new Date();
+      const kickOffTime = new Date(firstFixture.kick_off_time);
+      const lockTime = new Date(kickOffTime.getTime() - 2 * 60 * 1000); // 2 minutes before kick-off
+
+      if (now > lockTime) {
+        return res.status(403).send('Predictions are locked 2 minutes before the start of the first fixture.');
+      }
+    }
+
+    next();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+app.post('/predictions/user-predictions', checkSubmissionTime, async (req, res) => {
+  const userId = req.user.id; // Assume user ID is stored in session
+  const predictions = req.body; // All form data
+
+  try {
+    for (const key in predictions) {
+      if (predictions.hasOwnProperty(key) && key.startsWith('fixture_id_')) {
+        const fixtureId = key.split('_')[2];
+        const homeScore = predictions[`home_score_${fixtureId}`];
+        const awayScore = predictions[`away_score_${fixtureId}`];
+
+        if (homeScore === '' && awayScore === '') {
+          continue; // Skip if both scores are empty
+        }
+
+        const predictionData = {
+          user_id: userId,
+          fixture_id: fixtureId,
+          prediction_time: new Date().toISOString()
+        };
+
+        if (homeScore !== '') predictionData.predicted_home_score = homeScore;
+        if (awayScore !== '') predictionData.predicted_away_score = awayScore;
+
+        // Upsert prediction
+        const { data, error } = await supabase
+          .from('user_predictions')
+          .upsert(
+            predictionData,
+            { onConflict: ['user_id', 'fixture_id'] } // Ensure uniqueness on user_id and fixture_id
+          );
+
+        if (error) {
+          throw error;
+        }
+      }
+    }
+
+    res.send('Predictions submitted');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
 // More routes and middleware as needed
 const customersRoute = require('./routes/customers');
 const assessmentsRoutes = require('./routes/assessments');
