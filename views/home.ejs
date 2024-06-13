@@ -1,201 +1,39 @@
 <%- include('./partials/header') %>
 <%- include('./partials/nav') %>
 
-<div class="container-xxl px-xl-4 px-0">
-
-  <% if (user.role === 'client') { %>
-      <section>
-        <div class="row">
-          <div class="header-row col-lg-10 col-12">
-            <h1>Welcome to your wellness dashboard<span class="d-none d-lg-inline">, <%= user.first_name %></span></h1>
-            <p class="support-text">Your target wellness metrics based on your last assessment are below</p>
-          </div>
-          <div class="col-lg-2 col-12 d-flex justify-content-lg-end align-items-start mt-2 mt-lg-0 d-none d-lg-flex">
-            <a class="btn btn-primary" href="/assessments/view">All results</a>
-          </div>
-          
+<div class="container-xxl px-xl-4 p6-0" style="max-width: 500px;">
+  <section>
+    <div class="row border py-2">
+        <div class="col-4 d-flex justify-content-end align-items-center">
+            <p class="mb-0">Germany</p>
         </div>
-      </section>
-    <% function formatCategoryName(category) {
-      return category.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    } %>
-    
-    <% if (focusCategories.length === 0) { %>
-      <section class="mt-3">
-        <div class="row summary-blocks header-row row-gap-md-3 row-gap-0 pb-3">
-          <!-- Display Coming Soon when no focus categories are available -->
-          <div class="col-lg-3 col-6 metric-ring-column">
-            <div class="metric-ring-container d-flex align-items-center justify-content-center flex-column" style="text-align: center;">
-              <span class="mb-2 metric-ring-category fw-semibold">Coming Soon</span>
-              <div class="metric-ring">
-                <canvas id="metricRing-comingSoon"></canvas>
-                <div class="metric-ring-text">
-                  <span id="metricValue-comingSoon">0</span><small>/ 100</small>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="col-4 d-flex justify-content-center align-items-center">
+            <input class="form-control d-inline-block text-center" style="width: 50px;" type="number" id="home_score" placeholder="0">
+            <span class="mx-2">-</span>
+            <input class="form-control d-inline-block text-center" style="width: 50px;" type="number" id="away_score" placeholder="0">
         </div>
-      </section>
-    <% } else { %>
-      <section class="mt-3">
-        <div class="row summary-blocks header-row row-gap-md-3 row-gap-0 pb-3">
-          <% focusCategories.forEach(category => { %>
-            <% const percentage = (category.score / category.total_possible_score) * 100; %>
-            <% let color = '#12B76A'; %>
-            <% if (percentage < 30) { %> 
-              <% color = '#E01A0D'; %>
-            <% } else if (percentage < 60) { %>
-              <% color = '#FF6B00'; %>
-            <% } %>
-            <div class="col-lg-3 col-6 metric-ring-column">
-              <div class="metric-ring-container d-flex align-items-center justify-content-center flex-column" style="text-align: center;">
-                <span class="mb-2 metric-ring-category fw-semibold"><%= formatCategoryName(category.name) %></span>
-                <div class="metric-ring">
-                  <canvas id="metricRing-<%= category.name %>"></canvas>
-                  <div class="metric-ring-text">
-                    <span id="metricValue-<%= category.name %>"><%= category.score %></span><small>/ <%= category.total_possible_score %></small>
-                  </div>
-                </div>
-                <span class="mb-2 mt-3 font-14 fw-medium metric-ring-ranking-text">
-                  <iconify-icon style="color:<%= color %>;" inline icon="solar:course-up-bold"></iconify-icon>Top 20% for age group
-                </span>
-              </div>
-            </div>
-          <% }) %>
+        <div class="col-4 d-flex justify-content-start align-items-center">
+            <p class="mb-0">Scotland</p>
         </div>
-      </section>
-  
-
-    <section class="mt-lg-3 mt-0">
-      <div class="row">
-        <div class="col-lg-9 col-12">
-          <p>Your personalised selection of resources to help improve your wellness before your next assessment.</p>
-        </div>
-   
+    </div>
+</section>
+<% fixtures.forEach(fixture => { %>
+  <section>
+    <div class="row border py-2">
+      <div class="col-4 d-flex justify-content-end align-items-center">
+        <p class="mb-0"><%= fixture.home_team.name %></p>
       </div>
-      <% groupedContent.forEach(group => { %>
-        <div class="row mb-3 mt-3">
-          <div class="col-12">
-            <div class="py-3 px-3" style="border-radius:var(--base-border-radius);background-color:#<%= group.categoryBackgroundColor %>; color: #<%= group.categoryColor %>;">
-              <span class="fw-medium"><%= group.categoryName %></span>
-            </div>
-          </div>
-        </div>
-        <% group.contentItems.forEach(item => { %>
-          <div class="row py-3 px-lg-2 px-1 font-14">
-            <div class="col-lg-2 col-md-3 col-12 mb-2 mb-lg-0">
-              <% if (item.type === 'Video') { %>
-                <iconify-icon style="font-size:20px" inline icon="solar:video-library-outline"></iconify-icon>
-              <% } else if (item.type === 'Exercise') { %>
-                <iconify-icon style="font-size:20px" inline icon="solar:running-round-linear"></iconify-icon>
-              <% } else if (item.type === 'Article') { %>
-                <iconify-icon style="font-size:20px" inline icon="solar:documents-broken"></iconify-icon>
-              <% } else { %>
-                <iconify-icon style="font-size:20px" inline icon="solar:file-text-outline"></iconify-icon>
-              <% } %>
-              <%= item.type %>
-            </div>
-            <div class="col-lg-8 col-12">
-              <a class="unstyled clickable-row" href="/content/view/<%=item.id%>">
-                <p class="mb-0 fw-medium ">
-                  <%= item.title %>
-                </p>
-              </a>
-            </div>
-            <div class="col-lg-2 col-md-2 col-3 d-flex justify-content-lg-end align-items-center d-none d-lg-flex">
-              <a class="unstyled clickable-row" href="/content/view/<%=item.id%>">
-                <p class="mb-0">
-                  View ->
-                </p>
-              </a>
-            </div>
-          </div>
-        <% }) %>
-      <% }) %>
-    </section>
-    <% } %>
-  <% } else if (user.role === 'admin') { %>
-    <!-- Admin specific content can go here -->
-    <section>
-      <h1>Wellness admin</h1>
-      <p class="support-text">Client metrics and overview charts will be here soon</p>
-    </section>
-  <% } else { %>
-    <section>
-      <h1>Hello, <%= user.first_name %></h1>
-      <p class="support-text">Your personalised wellness metrics and content will populate here after your first assessment.</p>
-    </section>
-  <% } %>
+      <div class="col-4 d-flex justify-content-center align-items-center">
+        <input class="form-control d-inline-block text-center" style="width: 50px;" type="number" placeholder="0">
+        <span class="mx-2">-</span>
+        <input class="form-control d-inline-block text-center" style="width: 50px;" type="number" placeholder="0">
+      </div>
+      <div class="col-4 d-flex justify-content-start align-items-center">
+        <p class="mb-0"><%= fixture.away_team.name %></p>
+      </div>
+    </div>
+  </section>
+<% }); %>
+
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  // Log the focus categories to debug
-  console.log('Focus Categories:', <%- JSON.stringify(focusCategories) %>);
-
-  // Use the dynamically rendered focus categories
-  const focusCategories = <%- JSON.stringify(focusCategories) %>;
-
-  if (focusCategories.length === 0) {
-    // Render a default "Coming Soon" ring
-    const ctx = document.getElementById('metricRing-comingSoon').getContext('2d');
-    new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        datasets: [{
-          data: [0, 100],
-          backgroundColor: ['#eaeaea', '#eaeaea'],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        cutout: '80%',
-        plugins: {
-          legend: {
-            display: false
-          }
-        }
-      }
-    });
-  } else {
-    focusCategories.forEach(category => {
-      // Log each category to debug
-      console.log('Rendering chart for:', category.name);
-
-      const ctx = document.getElementById(`metricRing-${category.name}`).getContext('2d');
-      const percentage = (category.score / category.total_possible_score) * 100;
-      let color = '#12B76A';
-      if (percentage < 30) { 
-        color = '#E01A0D';
-      } else if (percentage < 60) {
-        color = '#FF6B00';
-      } else if (percentage === 100) {
-        color = '#54B7C0';
-      }
-
-      new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          datasets: [{
-            data: [category.score, category.total_possible_score - category.score],
-            backgroundColor: [color, '#eaeaea'],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          cutout: '80%',
-          plugins: {
-            legend: {
-              display: false
-            }
-          }
-        }
-      });
-    });
-  }
-});
-</script>
-
 <%- include('./partials/footer') %>

@@ -17,7 +17,7 @@
   --base-line-height: 1.4rem;
   --default-background-color: #fff;
   --orange-50: #fff7ed;
-  --brand-color: #098c95;
+  --brand-color: #12315F;
   --orange-100: #ffedd5;
   --orange-200: #fed7aa;
   --orange-300: #fdba74;
@@ -64,7 +64,7 @@
 
 body {
   color: var(--base-color);
-  font-family: Inter;
+  font-family: 'DM Sans';
   font-weight: 400;
   background-color: var(--default-background-color);
   font-size: var(--base-font-size);
@@ -79,7 +79,7 @@ h6 {
   color: var(--heading-color);
   letter-spacing: -0.3px;
   font-weight: 600;
-  font-family: Inter;
+  font-family: 'DM Sans';
 }
 
 h1 {
@@ -121,7 +121,7 @@ p {
 
 /* Colors */
 .brand {
-  color: #02BAC2;
+  color: #12315F;
 }
 
 /* Images */

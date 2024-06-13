@@ -225,10 +225,7 @@ app.post('/login', async (req, res, next) => {
     } else {
       // Corporate user authentication using access pin
       console.log('Non-admin user detected:', user); // Debugging line
-      if (user.access_pin.toString() !== password) {
-        req.flash('error', 'Invalid email or access pin.');
-        return res.redirect('/login');
-      }
+
 
       req.logIn(user, (err) => {
         if (err) {
@@ -576,60 +573,7 @@ async function getLatestAssessmentRanks(userId, ageBand, businessId) {
 
 
 
-// app.get('/', async (req, res) => {
-//   if (req.isAuthenticated()) {
-//     try {
-//       // Retrieve the authenticated user's tenant ID and ID
-//       const tenantId = req.user.tenant_id;
-//       const userId = req.user.id;
 
-//         // Fetch all assessmnetns
-//         const { data: assessments, error: assessmentsError } = await supabase
-//         .from('completed_assessments')
-//         .select('*')
-//         .eq('id', userId)
-
-//         console.log(assessments)
-
-//       res.render('home', {assessments});
-
-//     } catch (err) {
-//       console.error('Error during data fetching:', err);
-//       return res.status(500).send('Error fetching user data.');
-//     }
-//   } else {
-//     // Handle unauthenticated access (redirect to login)
-//     res.redirect('/login');
-//   }
-// });
-
-// async function getLowestScores(userId) {
-//   const { data: scores, error } = await supabase
-//     .from('user_assessment_scores')
-//     .select('*')
-//     .eq('user_id', userId)
-//     .order('submission_date', { ascending: false })
-//     .limit(1);
-
-//   if (error) throw error;
-
-//   const latestScores = scores[0];
-//   const categories = [
-//     { name: 'strength', score: latestScores.strength_score, max_score: latestScores.strength_max_score },
-//     { name: 'mobility', score: latestScores.mobility_score, max_score: latestScores.mobility_max_score },
-//     { name: 'obesity', score: latestScores.obesity_score, max_score: latestScores.obesity_max_score },
-//     { name: 'cardiovascular_fitness', score: latestScores.cardiovascular_fitness_score, max_score: latestScores.cardiovascular_fitness_max_score },
-//     { name: 'recovery', score: latestScores.recovery_score, max_score: latestScores.recovery_max_score },
-//     { name: 'mental_health', score: latestScores.mental_health_score, max_score: latestScores.mental_health_max_score },
-//     { name: 'nutrition', score: latestScores.nutrition_score, max_score: latestScores.nutrition_max_score },
-//   ];
-
-//   // Sort categories by score (lowest first)
-//   categories.sort((a, b) => (a.score / a.max_score) - (b.score / b.max_score));
-
-//   // Return the lowest 4 categories
-//   return categories.slice(0, 4).map(category => category.name);
-// }
 
 async function getUserGoals(userId) {
   const { data: goals, error } = await supabase
@@ -643,108 +587,29 @@ async function getUserGoals(userId) {
 }
 
 app.get('/', async (req, res) => {
-  if (req.isAuthenticated()) {
-    try {
-      const userId = req.user.id;
+  try {
+    // Fetch fixtures with home and away team details
+    const { data: fixtures, error: fixturesError } = await supabase
+      .from('fixtures')
+      .select(`
+        id,
+        kick_off_time,
+        is_finished,
+        home_team: home_team_id (id, name),
+        away_team: away_team_id (id, name)
+      `);
 
-      // Fetch the latest response set ID for the user
-      const { data: latestResponse, error: latestResponseError } = await supabase
-        .from('user_scores')
-        .select('response_set_id')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (latestResponseError) {
-        throw latestResponseError;
-      }
-
-      if (!latestResponse.length) {
-        // No assessment scores found, render home without additional data
-        const messages = req.flash('success');
-        return res.render('home', { focusCategories: [], groupedContent: [], message: messages[0] });
-      }
-
-      const latestResponseSetId = latestResponse[0].response_set_id;
-      console.log('Latest Response Set ID:', latestResponseSetId);
-
-      // Fetch the scores for the latest response set ID
-      const { data: latestScores, error: latestScoresError } = await supabase
-        .from('user_scores')
-        .select('*')
-        .eq('response_set_id', latestResponseSetId);
-
-      if (latestScoresError) {
-        throw latestScoresError;
-      }
-
-      // console.log('Latest Scores:', latestScores);
-
-      // Fetch categories to include names in the lowestScores
-      const categoryIds = latestScores.map(score => score.category_id);
-      const { data: categories, error: categoriesError } = await supabase
-        .from('categories')
-        .select('*')
-        .in('id', categoryIds);
-
-      if (categoriesError) {
-        throw categoriesError;
-      }
-
-      const categoriesMap = categories.reduce((acc, category) => {
-        acc[category.id] = category;
-        return acc;
-      }, {});
-
-      // Sort scores by the relative score (score/total_possible_score)
-      latestScores.sort((a, b) => (a.score / a.total_possible_score) - (b.score / b.total_possible_score));
-
-      // Get the lowest 4 scores
-      const lowestScores = latestScores.slice(0, 4).map(score => ({
-        ...score,
-        name: categoriesMap[score.category_id].name,
-        percentage: (score.score / score.total_possible_score) * 100
-      }));
-      // console.log('Lowest Scores:', lowestScores);
-
-      // Fetch content for the lowest 4 categories
-      const lowestCategoryIds = lowestScores.map(score => score.category_id);
-      const { data: content, error: contentError } = await supabase
-        .from('content')
-        .select('*, categories(id, name, color, background_color)')
-        .in('category_id', lowestCategoryIds);
-
-      if (contentError) {
-        throw contentError;
-      }
-
-      // Group content by category
-      const groupedContent = content.reduce((acc, item) => {
-        const category = item.categories;
-        if (!acc[category.id]) {
-          acc[category.id] = {
-            categoryName: category.name,
-            categoryColor: category.color,
-            categoryBackgroundColor: category.background_color,
-            contentItems: []
-          };
-        }
-        acc[category.id].contentItems.push(item);
-        return acc;
-      }, {});
-
-      // console.log('Grouped Content:', groupedContent);
-
-      const messages = req.flash('success');
-      res.render('home', { focusCategories: lowestScores, groupedContent: Object.values(groupedContent), message: messages[0] });
-    } catch (err) {
-      console.error('Error during data fetching:', err);
-      return res.status(500).send('Error fetching user data.');
+    if (fixturesError) {
+      throw fixturesError;
     }
-  } else {
-    res.redirect('/login');
+
+    res.render('home', { fixtures });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
   }
 });
+
 
 // More routes and middleware as needed
 const customersRoute = require('./routes/customers');
