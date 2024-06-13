@@ -17,6 +17,20 @@
         </div>
     </div>
 </section>
+<div class="my-3">
+  <form method="get" action="/">
+    <div class="form-group">
+      <select class="form-control" id="round" name="round" onchange="this.form.submit()">
+        <% rounds.forEach(r => { %>
+          <option value="<%= r %>" <%= r === selectedRound ? 'selected' : '' %>>Round <%= r %></option>
+        <% }); %>
+      </select>
+    </div>
+  </form>
+</div>
+
+
+
 <% fixtures.forEach(fixture => { %>
   <section>
     <div class="row border py-2">
@@ -34,6 +48,7 @@
     </div>
   </section>
 <% }); %>
+</div>
 
 </div>
 <%- include('./partials/footer') %>

@@ -587,23 +587,39 @@ async function getUserGoals(userId) {
 }
 
 app.get('/', async (req, res) => {
+  const round = req.query.round || '1'; // Default to Round 1 if no round is specified
+
   try {
-    // Fetch fixtures with home and away team details
+    // Fetch fixtures for the specified round with home and away team details
     const { data: fixtures, error: fixturesError } = await supabase
       .from('fixtures')
       .select(`
         id,
+        round,
         kick_off_time,
         is_finished,
         home_team: home_team_id (id, name),
         away_team: away_team_id (id, name)
-      `);
+      `)
+      .eq('round', round);
 
     if (fixturesError) {
       throw fixturesError;
     }
 
-    res.render('home', { fixtures });
+    // Fetch all rounds for the dropdown selection
+    const { data: allFixtures, error: allFixturesError } = await supabase
+      .from('fixtures')
+      .select('round');
+
+    if (allFixturesError) {
+      throw allFixturesError;
+    }
+
+    // Extract unique rounds from all fixtures
+    const rounds = [...new Set(allFixtures.map(fixture => fixture.round))];
+
+    res.render('home', { fixtures, rounds, selectedRound: round });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
