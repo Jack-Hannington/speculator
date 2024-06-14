@@ -4,7 +4,7 @@
   <section>
     <div class="row">
       <div class="col-lg-6 col-12">
-        <h4><%= league.name %></h4>
+        <h3><%= league.name %></h3>
       </div>
       <div class="col-lg-6 col-12 d-flex justify-content-lg-end mt-lg-0 mt-2">
         <div class="input-group">
@@ -18,23 +18,49 @@
       </div>
     </div>
   </section>
-
-  <section class="mt-4">
+  <section>
+    <div class="row mt-3">
+        <div class="col-12">
+          <h4 class="mb-0">Members</h4>
+        </div>
+    </div>
+  </section>
+  <section class="">
     <div class="row">
       <div class="col-12">
-        <h4>Members</h4>
-        <ul class="list-group">
-          <% participants.forEach(participant => { %>
-            <li class="list-group-item"><%= participant.users.first_name %> <%= participant.users.last_name %></li>
-          <% }); %>
-        </ul>
+        <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Record</th>
+              <th>PTS</th>
+            </tr>
+          </thead>
+          <tbody>
+              <% participants.forEach(participant => { %>
+                  <tr>
+                      <td><%= participant.users.first_name %></td>
+                      <td>1W 2L</td>
+                      <td>00</td>
+                  </tr>
+              <% }); %>
+          </tbody>
+      </table>
+    </div>
+      
       </div>
     </div>
   </section>
-
-  <section class="mt-4 container">
+<section>
+  <div class="row mt-3">
+      <div class="col-12">
+        <h4 class="mb-0">Predictions</h4>
+      </div>
+  </div>
+</section>
+  <section class="container">
     <div class="row">
-    
         <div class="col-12 font-14">
           <% Object.keys(groupedPredictions).forEach(fixtureId => { %>
             <div class="row py-2 mb-2 fixture-row" style="background:#f6f6f6;border-radius: 6px;border:solid 1px #ededed;">
@@ -51,7 +77,7 @@
             </div>
             
               <% groupedPredictions[fixtureId].predictions.forEach(prediction => { %>
-                <div class="row mb-2 border py-2">
+                <div class="row mb-2 border rounded py-2">
                 <div class="col-12 text-center">
                   <p class="mb-0"><%= participants.find(p => p.user_id === prediction.user_id).users.first_name %></p>
                 </div>
@@ -76,7 +102,7 @@
     const inviteCode = inviteCodeInput.value;
     const url = window.location.href;
 
-    const textToCopy = `Join my league on Speculator.com. Link: ${url}/register, Invite Code: ${inviteCode}`;
+    const textToCopy = `Join my league on Speculator.com. Link: https://euros.up.railway.app/register, Invite Code: ${inviteCode}`;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
       alert('Invite link and access code copied to clipboard!');

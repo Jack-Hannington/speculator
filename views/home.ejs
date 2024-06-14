@@ -12,7 +12,7 @@
   <section class="mb-3">
     <div class="row">
       <div class="col-lg-6 col-12 d-flex align-items-center">
-        <h4 class="mb-0">Your predictions</h4>
+        <h3 class="mb-0">Your predictions</h3>
       </div>
       <div class="col-lg-6 col-12 d-flex justify-content-lg-end align-items-center mt-2">
         <div class="dropdown">
@@ -89,7 +89,7 @@
     <div class="mt-3 mb-2">
       <form method="get" action="/">
         <div class="form-group">
-          <select class="form-select text-center w-100" id="round" name="round" onchange="this.form.submit()" style="border-radius: 6px; border:solid 1px #ededed;">
+          <select class="form-select text-center w-100 font-14" id="round" name="round" onchange="this.form.submit()" style="border-radius: 6px; border:solid 1px #ededed;">
             <% rounds.forEach(r => { %>
               <option class="text-center" value="<%= r %>" <%= r == selectedRound ? 'selected' : '' %>>Round <%= r %></option>
             <% }); %>

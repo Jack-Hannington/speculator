@@ -52,10 +52,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 4000); // Display for 3000 ms before sliding out
     }
 
-    const navLinks = document.querySelectorAll('.sidebar-nav a ');
+    const navLinks = document.querySelectorAll('.sidebar-nav a');
 
     navLinks.forEach(link => {
         if (link.href === window.location.href) {
+            link.classList.add('active');
+        } else if (link.getAttribute('href') === '/' && window.location.pathname === '/') {
             link.classList.add('active');
         }
     });

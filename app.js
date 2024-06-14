@@ -236,7 +236,6 @@ app.post('/login', async (req, res, next) => {
         }
 
         req.session.role = user.role;
-        req.flash('success', 'Login successful');
         console.log('Login successful for non-admin user'); // Debugging line
         return res.redirect('/');
       });
