@@ -12,6 +12,29 @@
     </div>
   </section>
 
+<section>
+  <div class="row">
+    <div class="col">
+      <button class="btn btn-secondary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#joinLeagueCollapse" aria-expanded="false" aria-controls="joinLeagueCollapse">
+        Join a league
+      </button>
+      <div class="collapse mt-3" id="joinLeagueCollapse">
+        <form method="POST" action="/leagues/join">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" name="inviteCode" placeholder="League invite code" required>
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary h-100" style="border-top-left-radius: 0px; border-bottom-left-radius: 0px;" type="submit">
+                Join league
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+</section>
+
   <section class="mt-4">
     <div class="row">
       <div class="col-12">
@@ -21,6 +44,7 @@
               <tr>
                 <th>Name</th>
                 <th>Position</th>
+                <th>PTS</th>
               </tr>
             </thead>
             <tbody>
@@ -28,6 +52,7 @@
                 <tr>
                   <td class="fw-semibold"><a href="/leagues/<%= league.id %>"><%= league.name %></a></td>
                   <td><%= league.owner_name %></td>
+                  <td>00</td>
                 </tr>
               <% }) %>
             </tbody>
