@@ -2,7 +2,12 @@
   box-sizing: border-box;
 }
 
+html {
+  background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+  background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+  background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 
+}
 
 :root {
   --heading-color: #101828;
@@ -64,7 +69,11 @@ body {
   font-weight: 400;
   background-color: var(--default-background-color);
   font-size: var(--base-font-size);
-  border: 1px solid #ededed;
+  min-height: 98vh;
+  margin: 20px auto;
+  max-width: 540px;
+  position: relative;
+  border-radius: 10px;
 }
 
 h1,
@@ -172,9 +181,9 @@ img {
   margin: auto;
   position: fixed;
   left: 0;
-  bottom: 0;
+  bottom: 0px;
 
-  background-color: #fff;
+
   display: flex;
   flex-direction: row;
   font-weight: 500;
@@ -184,11 +193,12 @@ img {
 .sidebar-nav {
   flex-grow: 1;
   display: flex;
+  background-color: #fff;
   flex-direction: row;
   padding: 8px 16px;
   justify-content: space-between;
   max-width: 540px;
-  border: 1px solid #ededed;
+  border-top: 1px solid #ededed;
   border-bottom: 0px;
 }
 
@@ -216,7 +226,7 @@ nav>a {
 
 }
 
-@media (min-width:900px) {
+@media (max-width:900px) {
   .site-title {
     text-align: center;
   }
@@ -229,8 +239,12 @@ nav>a {
     border-radius: 8px;
   }
 
-  .sidebar-footer {
+  .sidebar {
     border-top: 1px solid #ededed;
+  }
+
+  .sidebar-nav {
+    border: none;
   }
 
 }
@@ -331,7 +345,7 @@ iconify-icon.custom-icon svg {
 
 .main-content {
   padding-top: 10px;
-  padding-bottom: 90px;
+  padding-bottom: 40px;
 }
 
 @media (min-width: 1400px) {
@@ -555,7 +569,6 @@ button,
   background-color: #fff;
   color: var(--brand-color);
   border-color: var(--brand-color);
-  ;
 }
 
 

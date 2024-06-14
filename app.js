@@ -219,7 +219,7 @@ app.post('/login', async (req, res, next) => {
           }
 
           req.session.role = user.role;
-          req.flash('success', 'Login successful');
+
           return res.redirect('/');
         });
       })(req, res, next);
@@ -664,6 +664,8 @@ app.get('/', ensureAuthenticated, async (req, res) => {
     // Check if the fixtures for the selected round have started
     const isLocked = await checkSubmissionTime(round);
     const messages = req.flash('success'); // Retrieve the flash message
+    console.log('Selected round:', round); // Debugging line
+
     res.render('home', { fixtures, rounds, selectedRound: round, predictionsMap, isLocked, message: messages[0] });
   } catch (error) {
     console.error(error);

@@ -3,12 +3,12 @@
 <div class="container-xxl">
   <section>
     <div class="row">
-      <div class="col-lg-8 col-12">
-        <h1><%= league.name %></h1>
+      <div class="col-lg-6 col-12">
+        <h4><%= league.name %></h4>
       </div>
-      <div class="col-lg-4 col-12 d-flex justify-content-lg-end mt-lg-0 mt-2">
+      <div class="col-lg-6 col-12 d-flex justify-content-lg-end mt-lg-0 mt-2">
         <div class="input-group">
-          <input type="text" class="form-control" id="inviteCode" value="<%= league.invite_code %>" readonly>
+          <input type="text" class="form-control font-14" id="inviteCode" value="<%= league.invite_code %>" readonly>
           <div class="input-group-append">
             <button class="btn btn-outline-secondary h-100" style="border-top-left-radius: 0px;border-bottom-left-radius: 0px;" type="button" id="copyInviteCodeButton">
               <iconify-icon inline icon="mdi:clipboard-outline"></iconify-icon> Copy invite
@@ -22,7 +22,7 @@
   <section class="mt-4">
     <div class="row">
       <div class="col-12">
-        <h2>Participants</h2>
+        <h4>Members</h4>
         <ul class="list-group">
           <% participants.forEach(participant => { %>
             <li class="list-group-item"><%= participant.users.first_name %> <%= participant.users.last_name %></li>
@@ -32,37 +32,40 @@
     </div>
   </section>
 
-  <section class="mt-4">
+  <section class="mt-4 container">
     <div class="row">
-      <div class="col-12">
-        <h2>Predictions</h2>
-        <div class="table-container">
-          <table class="">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Home Team</th>
-                <th>Away Team</th>
-                <th>Home Score</th>
-                <th>Away Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% predictions.forEach(prediction => { %>
-                <tr>
-                  <td><%= participants.find(p => p.user_id === prediction.user_id).users.first_name %> <%= participants.find(p => p.user_id === prediction.user_id).users.last_name %></td>
-                  <td><%= prediction.fixtures.home_team.name %></td>
-                  <td><%= prediction.fixtures.away_team.name %></td>
-                  <td><%= prediction.predicted_home_score %></td>
-                  <td><%= prediction.predicted_away_score %></td>
-                </tr>
-              <% }); %>
-            </tbody>
-          </table>
+    
+        <div class="col-12 font-14">
+          <% Object.keys(groupedPredictions).forEach(fixtureId => { %>
+            <div class="row py-2 mb-2 fixture-row" style="background:#f6f6f6;border-radius: 6px;border:solid 1px #ededed;">
+              <div class="col-12 text-center pb-2 fixture-date"><%= groupedPredictions[fixtureId].fixture.formatted_kick_off_time %></div>
+              <div class="col-12 d-flex justify-content-center align-items-center">
+                <span>
+                  <img src="<%= groupedPredictions[fixtureId].fixture.home_team.flag %>" class="fixture-row-flag me-2" style="width: 24px; height: 24px;"> 
+                  <%= groupedPredictions[fixtureId].fixture.home_team.name %> vs 
+                
+                  <%= groupedPredictions[fixtureId].fixture.away_team.name %>
+                  <img src="<%= groupedPredictions[fixtureId].fixture.away_team.flag %>" class="fixture-row-flag ms-2" style="width: 24px; height: 24px;">
+                </span>
+              </div>
+            </div>
+            
+              <% groupedPredictions[fixtureId].predictions.forEach(prediction => { %>
+                <div class="row mb-2 border py-2">
+                <div class="col-12 text-center">
+                  <p class="mb-0"><%= participants.find(p => p.user_id === prediction.user_id).users.first_name %></p>
+                </div>
+                <div class="col-12 text-center">
+                  <p class="mb-0"><%= prediction.predicted_home_score %> - <%= prediction.predicted_away_score %></p>
+                </div>
+              </div>
+            <% }); %>
+         
+          <% }); %>
         </div>
-      </div>
     </div>
   </section>
+  
 </div>
 
 <%- include('../partials/footer') %>

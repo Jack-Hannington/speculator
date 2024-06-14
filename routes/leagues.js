@@ -3,7 +3,7 @@ const router = express.Router();
 const supabase = require('../config/supabaseClient');
 const { v4: uuidv4 } = require('uuid');
 const { accessControl, ensureAuthenticated } = require('../middleware/middleware');
-
+const { format, parseISO } = require('date-fns');
 // View leagues 
 // Get leagues the user is involved in
 router.get('/', ensureAuthenticated, async (req, res) => {
@@ -275,27 +275,44 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
         predicted_home_score,
         predicted_away_score,
         fixtures (
+          id,
+          kick_off_time,
           home_team_id,
           away_team_id,
-          home_team:home_team_id (name),
-          away_team:away_team_id (name)
+          home_team:home_team_id (name, flag),
+          away_team:away_team_id (name, flag)
         )
       `)
-      .in('user_id', participantIds)
-      .eq('tournament_id', league.tournament_id);
+      .in('user_id', participantIds);
 
     if (predictionsError) {
       throw predictionsError;
     }
 
-    console.log('league participants', league, participants, predictions)
+    // Format the kick_off_time and group predictions by fixture_id
+    const groupedPredictions = predictions.reduce((acc, prediction) => {
+      const fixtureId = prediction.fixture_id;
+      if (!acc[fixtureId]) {
+        const fixture = prediction.fixtures;
+        fixture.formatted_kick_off_time = format(parseISO(fixture.kick_off_time), 'EEE do MMMM, HH:mm');
+        acc[fixtureId] = {
+          fixture,
+          predictions: []
+        };
+      }
+      acc[fixtureId].predictions.push(prediction);
+      return acc;
+    }, {});
 
-    res.render('leagues/view', { league, participants, predictions });
+    console.log('league participants', league, participants, groupedPredictions);
+
+    res.render('leagues/view', { league, participants, groupedPredictions });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 
