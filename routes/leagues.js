@@ -4,8 +4,54 @@ const supabase = require('../config/supabaseClient');
 const { v4: uuidv4 } = require('uuid');
 const { accessControl, ensureAuthenticated } = require('../middleware/middleware');
 
-// Create a new league
+// View leagues 
+// Get leagues the user is involved in
+router.get('/', ensureAuthenticated, async (req, res) => {
+  const userId = req.session.user_id;
 
+  try {
+    // Fetch leagues where the user is the owner
+    const { data: ownedLeagues, error: ownedLeaguesError } = await supabase
+      .from('user_leagues')
+      .select('id, name')
+      .eq('user_id', userId);
+
+    if (ownedLeaguesError) {
+      throw ownedLeaguesError;
+    }
+
+    // Fetch leagues where the user is a member
+    const { data: memberLeagues, error: memberLeaguesError } = await supabase
+      .from('user_league_members')
+      .select('league_id, user_leagues (id, name)')
+      .eq('user_id', userId);
+
+    if (memberLeaguesError) {
+      throw memberLeaguesError;
+    }
+
+    // Combine owned and member leagues
+    const leagues = [
+      ...ownedLeagues,
+      ...memberLeagues.map(member => member.user_leagues)
+    ];
+
+    // Remove duplicates if any
+    const uniqueLeagues = Array.from(new Set(leagues.map(league => league.id)))
+      .map(id => {
+        return leagues.find(league => league.id === id);
+      });
+
+    res.render('leagues', { leagues: uniqueLeagues });
+  } catch (error) {
+    console.error('Error fetching leagues:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
+// Create a new league
 router.get('/create', ensureAuthenticated, async (req, res) => {
   try {
     const { data: tournaments, error } = await supabase
@@ -24,34 +70,71 @@ router.get('/create', ensureAuthenticated, async (req, res) => {
   }
 });
 
-router.post('/create', ensureAuthenticated, async (req, res) => {
-  const userId = req.session.user_id;
-  const { tournament_id, name } = req.body;
-  const inviteCode = uuidv4();
+async function generateUniqueInviteCode() {
+  let inviteCode;
+  let isUnique = false;
 
-  try {
-    console.log('User ID:', userId); // Log to ensure userId is available
-    console.log('Request body:', req.body); // Log the request body
+  while (!isUnique) {
+    inviteCode = Math.floor(100000 + Math.random() * 9000).toString();
 
-    // Validate inputs
-    if (!userId || !tournament_id || !name) {
-      throw new Error('Missing required fields');
-    }
-
+    // Check if the generated invite code already exists in the user_leagues table
     const { data, error } = await supabase
       .from('user_leagues')
-      .insert([
-        { tournament_id, name, user_id: userId, invite_code: inviteCode }
-      ])
-      .select(); // Use select() to return the inserted row
+      .select('invite_code')
+      .eq('invite_code', inviteCode);
 
     if (error) {
       throw error;
     }
 
-    console.log('Inserted data:', data); // Log inserted data
+    // If no existing record with the same invite code is found, it's unique
+    if (data.length === 0) {
+      isUnique = true;
+    }
+  }
 
-    res.redirect(`/leagues/${data[0].id}`);
+  return inviteCode;
+}
+
+
+router.post('/create', ensureAuthenticated, async (req, res) => {
+  const userId = req.session.user_id;
+  const { tournament_id, name } = req.body;
+  const inviteCode = await generateUniqueInviteCode();
+
+  try {
+    console.log('User ID:', userId); // Log to ensure userId is available
+    console.log('Request body:', req.body); // Log the request body
+
+    // Create the league
+    const { data: league, error: leagueError } = await supabase
+      .from('user_leagues')
+      .insert([
+        { tournament_id, name, user_id: userId, invite_code: inviteCode }
+      ])
+      .select();
+
+    console.log(league)
+
+    if (leagueError) {
+      throw leagueError;
+    }
+
+    console.log('Inserted league:', league); // Log inserted league
+
+    // Add user to user_league_members
+    const { error: memberError } = await supabase
+      .from('user_league_members')
+      .insert([
+        { user_id: userId, league_id: league[0].id }
+      ]);
+
+    if (memberError) {
+      throw memberError;
+    }
+
+    req.flash('success', 'League created successfully!');
+    res.redirect(`/leagues`);
   } catch (error) {
     console.error('Error creating league:', error);
     res.status(500).send('Internal Server Error');
@@ -97,71 +180,74 @@ router.post('/leagues/:id/edit', ensureAuthenticated, async (req, res) => {
   }
 });
 
-// Invite to a league
-router.get('/leagues/:id/invite', ensureAuthenticated, async (req, res) => {
-  const leagueId = req.params.id;
 
-  try {
-    const { data: league, error: leagueError } = await supabase
-      .from('user_leagues')
-      .select('invite_code')
-      .eq('id', leagueId)
-      .single();
-
-    if (leagueError) {
-      throw leagueError;
-    }
-
-    res.send(`Invite code: ${league.invite_code}`);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
 
 // Join a league with an invite code
-router.post('/leagues/join', ensureAuthenticated, async (req, res) => {
-  const userId = req.session.userId;
+router.post('/join', ensureAuthenticated, async (req, res) => {
+  const userId = req.session.user_id;
   const { inviteCode } = req.body;
 
   try {
+    console.log(inviteCode);
     const { data: league, error: leagueError } = await supabase
       .from('user_leagues')
       .select('id')
-      .eq('invite_code', inviteCode)
-      .single();
+      .eq('invite_code', inviteCode);
 
     if (leagueError) {
       throw leagueError;
     }
 
-    // Add user to the league (assuming you have a user_league_members table)
-    const { error: memberError } = await supabase
-      .from('user_league_members')
-      .insert([
-        { user_id: userId, league_id: league.id }
-      ]);
-
-    if (memberError) {
-      throw memberError;
+    if (league.length === 0) {
+      throw new Error('Invalid invite code.');
     }
 
-    res.redirect(`/leagues/${league.id}`);
+    const leagueId = league[0].id;
+
+    // Check if the user is already a member of the league
+    const { data: member, error: memberCheckError } = await supabase
+      .from('user_league_members')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('league_id', leagueId);
+
+    if (memberCheckError) {
+      throw memberCheckError;
+    }
+
+    if (member.length > 0) {
+      // User is already a member, redirect to the league page
+      res.redirect(`/leagues/${leagueId}`);
+    } else {
+      // User is not a member, insert the membership
+      const { error: memberInsertError } = await supabase
+        .from('user_league_members')
+        .insert([
+          { user_id: userId, league_id: leagueId }
+        ]);
+
+      if (memberInsertError) {
+        throw memberInsertError;
+      }
+
+      res.redirect(`/leagues/${leagueId}`);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 });
 
+
 // View a league
-router.get('/leagues/:id', ensureAuthenticated, async (req, res) => {
+router.get('/:id', ensureAuthenticated, async (req, res) => {
   const leagueId = req.params.id;
 
   try {
     // Fetch league details
     const { data: league, error: leagueError } = await supabase
       .from('user_leagues')
-      .select('id, name, tournament_id')
+      .select('id, name, tournament_id, invite_code')
       .eq('id', leagueId)
       .single();
 
@@ -172,7 +258,7 @@ router.get('/leagues/:id', ensureAuthenticated, async (req, res) => {
     // Fetch league participants
     const { data: participants, error: participantsError } = await supabase
       .from('user_league_members')
-      .select('user_id, users (name)')
+      .select('user_id, users (first_name)')
       .eq('league_id', leagueId);
 
     if (participantsError) {
@@ -188,7 +274,12 @@ router.get('/leagues/:id', ensureAuthenticated, async (req, res) => {
         fixture_id,
         predicted_home_score,
         predicted_away_score,
-        fixtures (home_team_id, away_team_id, home_team (name), away_team (name))
+        fixtures (
+          home_team_id,
+          away_team_id,
+          home_team:home_team_id (name),
+          away_team:away_team_id (name)
+        )
       `)
       .in('user_id', participantIds)
       .eq('tournament_id', league.tournament_id);
@@ -197,7 +288,33 @@ router.get('/leagues/:id', ensureAuthenticated, async (req, res) => {
       throw predictionsError;
     }
 
-    res.render('league', { league, participants, predictions });
+    console.log('league participants', league, participants, predictions)
+
+    res.render('leagues/view', { league, participants, predictions });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
+// Invite to a league
+router.get('/:id/invite', ensureAuthenticated, async (req, res) => {
+  const leagueId = req.params.id;
+
+  try {
+    const { data: league, error: leagueError } = await supabase
+      .from('user_leagues')
+      .select('invite_code')
+      .eq('id', leagueId)
+      .single();
+
+    if (leagueError) {
+      throw leagueError;
+    }
+
+    res.send(`Invite code: ${league.invite_code}`);
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');

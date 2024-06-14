@@ -1,53 +1,41 @@
 <%- include('../partials/header') %>
 <%- include('../partials/nav') %>
+<div class="container-xxl">
+  <section>
+    <div class="row">
+      <div class="col-lg-9 col-12">
+        <h1>Your Leagues</h1>
+      </div>
+      <div class="col-lg-3 col-12 d-flex justify-content-lg-end mt-lg-0 mt-2 align-items-center">
+        <a class="btn btn-primary" href="/leagues/create">+ Create League</a>
+      </div>
+    </div>
+  </section>
 
-<% if (message && message.length > 0) { %>
-    <div class="flash-messages-container animate__animated">
-      <div class="flash-message">
-        <iconify-icon icon="solar:info-circle-outline" inline class="brand-orange"></iconify-icon><%= message %>
+  <section class="mt-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="table-container">
+          <table class="">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Position</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% leagues.forEach(league => { %>
+                <tr>
+                  <td class="fw-semibold"><a href="/leagues/<%= league.id %>"><%= league.name %></a></td>
+                  <td><%= league.owner_name %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  <% } %>
-  <div class="container-xxl px-xl-4 px-0">
-<section>
-  <div class="row">
-  <div class="col-lg-9 col-12">
-    <h1>Assessments</h1>
-  </div>
-  <div class="col-lg-3 col-12 d-flex justify-content-lg-end mt-lg-0 mt-2">
-    <a class="btn btn-primary" href="/assessments/create">+ Add assessment</a>
-  </div>
+  </section>
 </div>
-</section>
-<section class="mt-4">
-  <div class="row">
-    <div class="col-12">
-      <div class="table-container">
-        <table>
-        <thead>
-          <tr>
-            <th>Created on</th>
-            <th>Name</th>
-            <th>About</th>
-            <th>Questions</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% assessments.forEach(assessment => { %>
-            <tr>
-              <td><%= new Date(assessment.created_on).toLocaleDateString('en-gb') %></td>
-              <td class="fw-semibold"><%= assessment.name %></td>
-              <td><%= assessment.description %></td>
-              <td><%= assessment.assessment_questions.length %></td>
-              <td><a href="/assessments/edit/<%= assessment.id %>">Edit</a></td>
-            </tr>
-          <% }) %>
-        </tbody>
-      </table>
-      </div>
-    </div>
-  </div>
-</section>
-</div>
-  <%- include('../partials/footer') %>
+
+<%- include('../partials/footer') %>

@@ -8,58 +8,107 @@
     </div>
   </div>
 <% } %>
-<div class="container-xxl px-xl-4 p6-0" style="max-width: 500px;">
+<div class="container-xxl">
   <section>
-    <div class="row border py-2">
-        <div class="col-4 d-flex justify-content-end align-items-center">
-            <p class="mb-0">Germany</p>
-        </div>
-        <div class="col-4 d-flex justify-content-center align-items-center">
-            <input class="form-control d-inline-block text-center" style="width: 50px;" type="number" id="home_score" placeholder="0">
-            <span class="mx-2">-</span>
-            <input class="form-control d-inline-block text-center" style="width: 50px;" type="number" id="away_score" placeholder="0">
-        </div>
-        <div class="col-4 d-flex justify-content-start align-items-center">
-            <p class="mb-0">Scotland</p>
-        </div>
+    <div class="row">
+      <div class="col">
+       <h4>Your predictions</h4>
+        
+      </div>
     </div>
+  </section>
+<section>
+  <div class="row">
+    <div class="col">
+      <button class="btn btn-secondary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#joinLeagueCollapse" aria-expanded="false" aria-controls="joinLeagueCollapse">
+        Join League
+      </button>
+      <div class="collapse mt-3" id="joinLeagueCollapse">
+        <form method="POST" action="/leagues/join">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" name="inviteCode" placeholder="League code" required>
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary h-100" style="border-top-left-radius: 0px; border-bottom-left-radius: 0px;" type="submit">
+                Join a league
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
 </section>
-<div class="my-3">
+
+
+
+<section class="container font-14">
+  <div class="row py-3 px-2" style="background-color: #f6f6f6;border-radius:6px;border: solid 1px #ededed;">
+    <div class="col">
+      <div class="d-flex flex-column align-items-center mb-0 gap-1">
+        <iconify-icon icon="mdi:counter" inline></iconify-icon>
+        <span class="font-14">Scoreline</span>
+      </div>
+      <div class="fw-semibold text-center">3 points</div>
+    </div>
+    <div class="col">
+      
+      <div class="d-flex flex-column align-items-center mb-0 gap-1">
+        <iconify-icon icon="mdi:check-circle-outline" inline></iconify-icon>
+        <span class="font-14">Result </span>
+      </div>
+      <div class="fw-semibold text-center">1 point</div>
+    </div>
+ 
+    <div class="col">
+      <div class="d-flex flex-column align-items-center mb-0 gap-1">
+        <iconify-icon icon="mdi:soccer" inline></iconify-icon>
+        
+        <span class="font-14">Goals</span>
+      </div>
+      <div class="fw-semibold text-center">1 point</div>
+    </div>
+  </div>
+</section>
+
+<div class="mt-3 mb-2">
   <form method="get" action="/">
     <div class="form-group">
-      <select class="form-select" id="round" name="round" onchange="this.form.submit()" style="background:#f6f6f6;border-radius: 6px;border:solid 1px #ededed;">
+      <select class="form-select text-center w-100" id="round" name="round" onchange="this.form.submit()" style="border-radius: 6px;border:solid 1px #ededed;">
         <% rounds.forEach(r => { %>
-          <option value="<%= r %>" <%= r === selectedRound ? 'selected' : '' %>>Round <%= r %></option>
+          <option class="text-center" value="<%= r %>" <%= r === selectedRound ? 'selected' : '' %>>Round <%= r %></option>
         <% }); %>
       </select>
+      
     </div>
   </form>
 </div>
 
-
 <form id="predictions-form" method="post" action="/predictions/user-predictions">
+  <section class="container">
   <% fixtures.forEach(fixture => { %>
-    <section>
-      <div class="row py-2 fixture-row" style="background:#f6f6f6;border-radius: 6px;border:solid 1px #ededed;">
-        <div class="col-4 d-flex justify-content-end align-items-center">
+    
+      <div class="row py-2 mb-2 fixture-row" style="background:#f6f6f6;border-radius: 6px;border:solid 1px #ededed;">
+        <div class="col-12 text-center pb-2 fixture-date"><%= fixture.formatted_kick_off_time %></div>
+        <div class="col-4 d-flex justify-content-start flex-column align-items-end px-1">
           <img src="<%= fixture.home_team.flag %>" class="fixture-row-flag" style="margin-right:8px;">  <p class="mb-0"><%= fixture.home_team.name %></p>
         </div>
         <div class="col-4 d-flex justify-content-center align-items-center">
           <input type="hidden" name="fixture_id_<%= fixture.id %>" value="<%= fixture.id %>">
-          <input class="form-control d-inline-block text-center score-input" type="number" name="home_score_<%= fixture.id %>" placeholder="..." value="<%= predictionsMap[fixture.id]?.predicted_home_score || '' %>">
+          <input class="form-control d-inline-block text-center score-input" type="number" name="home_score_<%= fixture.id %>" placeholder="..." value="<%= predictionsMap[fixture.id] && predictionsMap[fixture.id].predicted_home_score !== null && predictionsMap[fixture.id].predicted_home_score !== undefined ? predictionsMap[fixture.id].predicted_home_score : '' %>">
           <span class="mx-2">-</span>
-          <input class="form-control d-inline-block text-center score-input" type="number" name="away_score_<%= fixture.id %>" placeholder="..." value="<%= predictionsMap[fixture.id]?.predicted_away_score || '' %>">
+          <input class="form-control d-inline-block text-center score-input" type="number" name="away_score_<%= fixture.id %>" placeholder="..." value="<%= predictionsMap[fixture.id] && predictionsMap[fixture.id].predicted_home_score !== null && predictionsMap[fixture.id].predicted_home_score !== undefined ? predictionsMap[fixture.id].predicted_home_score : '' %>">
         </div>
-        <div class="col-4 d-flex justify-content-start align-items-center">
-          <p class="mb-0"><%= fixture.away_team.name %></p><img class="fixture-row-flag"  src="<%= fixture.away_team.flag %>" style="margin-left:8px;"> 
+        <div class="col-4 d-flex justify-content-start flex-column align-items-start px-1">
+          <p class="mb-0 order-2" style="white-space: nowrap"><%= fixture.away_team.name %></p><img class="fixture-row-flag"  src="<%= fixture.away_team.flag %>" style="margin-left:8px;"> 
         </div>
       </div>
-    </section>
-  <% }); %>
 
+  <% }); %>
+</section>
   <% if (!isLocked) { %>
     <div class="mt-3">
-      <button type="submit" class="btn btn-primary">Save Predictions</button>
+      <button type="submit" class="btn btn-primary w-100">Save Predictions</button>
     </div>
   <% } %>
 </form>
@@ -85,14 +134,6 @@
       });
     });
   });
-
-  // const form = document.getElementById('predictions-form');
-  //     form.addEventListener('submit', (event) => {
-  //       const confirmed = confirm('Are you sure you want to save your predictions?');
-  //       if (!confirmed) {
-  //         event.preventDefault();
-  //       }
-  //     });
 
       document.addEventListener('DOMContentLoaded', () => {
     const scoreInputs = document.querySelectorAll('.score-input');

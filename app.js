@@ -15,6 +15,7 @@ const base_url = process.env.NODE_ENV === 'DEV' ? process.env.DEV_URL : process.
 const { resetPasswordEmail, sendPinReminderEmail } = require('./config/sendgrid');
 const responseTimeLogger = require('./utils/responseLogger');
 const generatePin = require('./utils/pinGenerator');
+const { format, parseISO } = require('date-fns');
 
 
 // Initialize Express app
@@ -612,11 +613,18 @@ app.get('/', ensureAuthenticated, async (req, res) => {
         home_team: home_team_id (id, name, flag),
         away_team: away_team_id (id, name, flag)
       `)
-      .eq('round', round);
+      .eq('round', round)
+      .order('kick_off_time', { ascending: true });
 
     if (fixturesError) {
       throw fixturesError;
     }
+
+    // Format the kick_off_time
+    fixtures.forEach(fixture => {
+      fixture.formatted_kick_off_time = format(parseISO(fixture.kick_off_time), 'EEE do MMMM, HH:mm');
+    });
+
 
     // Fetch user's predictions for the specified round
     const { data: userPredictions, error: predictionsError } = await supabase
@@ -651,6 +659,8 @@ app.get('/', ensureAuthenticated, async (req, res) => {
     // Extract unique rounds from all fixtures
     const rounds = [...new Set(allFixtures.map(fixture => fixture.round))];
 
+    console.log(rounds); // Debugging line to ensure rounds are populated correctly
+
     // Check if the fixtures for the selected round have started
     const isLocked = await checkSubmissionTime(round);
     const messages = req.flash('success'); // Retrieve the flash message
@@ -660,7 +670,6 @@ app.get('/', ensureAuthenticated, async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
 
 
 // Route to handle upserting predictions

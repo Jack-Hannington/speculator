@@ -1,121 +1,20 @@
 <div class="sidebar">
-    <div class="sidebar-header">
-      <div class="site-title">
-        <h2>Speculator</h2>
-      </div>
-      <div class="menu-toggle-container">
-        <div style="position:relative" id="navToggle">
-          <div id="nav-icon1">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </div>
-      </div>
-    </div>
-  
-    <nav class="sidebar-nav">
-      <!-- <div class="nav-search-container nav-item">
-        <input type="text" class="form-control" id="search-nav" style="height:34px!important;">
-      </div> -->
-      <a href="/leagues/create">
-        <div class="nav-item d-flex justify-content-between align-items-center">
-            <span>
-              <iconify-icon inline icon="solar:documents-broken"></iconify-icon>Leagues
-            </span>
-        </div>
-      </a>
-        <% if (user.role === 'admin') { %>
-          <a href="/">
-            <div class="nav-item">
-              <span>
-                <iconify-icon inline icon="solar:home-2-linear"></iconify-icon>Home
-              </span>
-            </div>
-          </a>
-
-        <a href="/content">
-          <div class="nav-item d-flex justify-content-between align-items-center">
-              <span>
-                <iconify-icon inline icon="solar:documents-broken"></iconify-icon>Content
-              </span>
-          </div>
-        </a>
-        <a href="/assessments">
-          <div class="nav-item d-flex justify-content-between align-items-center">
-              <span>
-                <iconify-icon inline icon="solar:folder-favourite-bookmark-outline"></iconify-icon>Assessments
-              </span>
-          </div>
-        </a>
-        <a href="/questions">
-          <div class="nav-item d-flex justify-content-between align-items-center">
-              <span>
-                  <iconify-icon inline icon="solar:clipboard-text-outline"></iconify-icon>Questions
-              </span>
-          </div>
-        </a>
-        <!-- <a href="#" aria-disabled="disabled">
-          <div class="nav-item d-flex justify-content-between align-items-center">
-              <span>
-                <iconify-icon icon="solar:buildings-3-linear" inline></iconify-icon>Businesses
-              </span>
-          </div>
-      </a> -->
-      <a href="/businesses">
-        <div class="nav-item d-flex justify-content-between align-items-center">
-            <span>
-              <iconify-icon inline icon="solar:buildings-3-linear"></iconify-icon>Businesses
-            </span>
-        </div>
-      </a>
-        <a href="/customers">
-            <div class="nav-item d-flex justify-content-between align-items-center">
-                <span>
-                    <iconify-icon inline icon="solar:users-group-two-rounded-broken"></iconify-icon>Clients
-                </span>
-            </div>
-        </a>
-      <% } %>
-      <% if (user.role === 'client') { %>
-      <a href="/">
-        <div class="nav-item">
-          <span>
-            <iconify-icon inline icon="solar:home-2-linear"></iconify-icon>Home
-          </span>
-        </div>
-      </a>
-      <a href="/assessments/view">
-        <div class="nav-item">
-          <span>
-            <iconify-icon inline icon="solar:folder-favourite-bookmark-outline"></iconify-icon>My assessments
-          </span>
-        </div>
-      </a>
-      <% } %>
-      <div class="sidebar-footer">
-        <div class="dropdown w-100">
-          <button class="border dropdown-toggle d-flex align-items-center w-100" type="button" id="profileDropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-            <div class="nav-profile-container d-flex align-items-start gap-2">
-              <% if (user.businessImage != null) { %>       
-              <img class="nav-business-logo" src="<%= user.businessImage %>">
-              <% } %>
-              <div class="font-14 ms-2 me-2 text-start">
-                <span><%= user.first_name %></span>
-                <% if (user.businessName != null) { %>                
-                  <span class="support-text font-12 d-block"><%= user.businessName %></span>
-                <% } %>
-              </div>
-            </div>
-          </button>
-          <ul class="dropdown-menu font-14 w-100 border" aria-labelledby="profileDropdownMenuButton">
-            <!-- <li><a class="dropdown-item" href="/profile">View Profile</a></li> -->
-            <li><a class="dropdown-item" href="/logout">Logout</a></li>
-          </ul>
-        </div>
-        
-      </div>
-    </nav>
+  <nav class="sidebar-nav">
+    <a href="/" class="nav-item d-flex align-items-center justify-content-center text-center">
+      <iconify-icon inline icon="mdi:soccer"></iconify-icon> Home
+  </a>
+    <a href="/leagues" class="nav-item d-flex align-items-center justify-content-center text-center">
+        <iconify-icon inline icon="mdi:trophy-outline"></iconify-icon> Leagues
+    </a>
+    <!-- <div class="nav-item dropdown d-flex align-items-center justify-content-center text-cente">
+      <span class="dropdown-toggle" id="logoutDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <iconify-icon inline icon="solar:user-broken"></iconify-icon> Profile
+      </span>
+      <ul class="dropdown-menu w-100" aria-labelledby="logoutDropdown">
+        <li><a class="dropdown-item" href="/logout">Logout</a></li>
+      </ul>
+    </div> -->
+  </nav>
   </div>
 
-  <div class="main-content container-fluid">
+  <div class="main-content">
