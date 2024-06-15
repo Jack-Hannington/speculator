@@ -16,7 +16,7 @@ const { resetPasswordEmail, sendPinReminderEmail } = require('./config/sendgrid'
 const responseTimeLogger = require('./utils/responseLogger');
 const generatePin = require('./utils/pinGenerator');
 const { format, parseISO } = require('date-fns');
-
+const { CronJob } = require('cron');
 
 // Initialize Express app
 const app = express();
@@ -555,49 +555,21 @@ app.post('/reset-password', async (req, res) => {
 
 
 
-async function getUserGoals(userId) {
-  const { data: goals, error } = await supabase
-    .from('user_goals')
-    .select('category_id')
-    .eq('user_id', userId);
+const checkFixtureStatus = (kickOffTime) => {
+  const now = new Date();
+  const kickOffDate = new Date(kickOffTime);
+  const lockTime = new Date(kickOffDate.getTime() - 2 * 60 * 1000); // 2 minutes before kick-off
 
-  if (error) throw error;
-  console.log(goals)
-  return goals.map(goal => goal.category_id);
-}
-
-const checkSubmissionTime = async (round) => {
-  try {
-    // Fetch the start time of the first fixture for the specified round
-    const { data: firstFixture, error } = await supabase
-      .from('fixtures')
-      .select('kick_off_time')
-      .eq('round', round)
-      .order('kick_off_time', { ascending: true })
-      .limit(1)
-      .single();
-
-    if (error) {
-      throw error;
-    }
-
-    if (firstFixture) {
-      const now = new Date();
-      const kickOffTime = new Date(firstFixture.kick_off_time);
-      const lockTime = new Date(kickOffTime.getTime() - 2 * 60 * 1000); // 2 minutes before kick-off
-
-      return now > lockTime;
-    }
-
-    return false;
-  } catch (error) {
-    console.error(error);
-    throw error;
+  if (now > kickOffDate) {
+    return 'finished';
+  } else if (now > lockTime) {
+    return 'in-progress';
+  } else {
+    return 'not-started';
   }
 };
-
 app.get('/', ensureAuthenticated, async (req, res) => {
-  const round = req.query.round || '1'; // Default to Round 1 if no round is specified
+  const round = req.query.round || '1';
   const userId = req.user.id;
 
   try {
@@ -608,9 +580,11 @@ app.get('/', ensureAuthenticated, async (req, res) => {
         id,
         round,
         kick_off_time,
-        is_finished,
         home_team: home_team_id (id, name, flag),
-        away_team: away_team_id (id, name, flag)
+        away_team: away_team_id (id, name, flag),
+        home_team_score,
+        away_team_score,
+        status
       `)
       .eq('round', round)
       .order('kick_off_time', { ascending: true });
@@ -619,19 +593,31 @@ app.get('/', ensureAuthenticated, async (req, res) => {
       throw fixturesError;
     }
 
-    // Format the kick_off_time
-    fixtures.forEach(fixture => {
-      fixture.formatted_kick_off_time = format(parseISO(fixture.kick_off_time), 'EEE do MMMM, HH:mm');
+    fixtures.forEach(async fixture => {
+      const status = checkFixtureStatus(fixture.kick_off_time);
+      if (fixture.status !== status) {
+        fixture.status = status;
+        await supabase
+          .from('fixtures')
+          .update({ status })
+          .eq('id', fixture.id);
+      }
+
+      if (fixture.status === 'in-progress' || fixture.status === 'finished') {
+        fixture.formatted_kick_off_time = `${fixture.home_team.name} ${fixture.home_team_score} - ${fixture.away_team_score} ${fixture.away_team.name}`;
+      } else {
+        fixture.formatted_kick_off_time = format(parseISO(fixture.kick_off_time), 'EEE do MMMM, HH:mm');
+      }
     });
 
-
-    // Fetch user's predictions for the specified round
+    // Fetch user's predictions for the specified round including points
     const { data: userPredictions, error: predictionsError } = await supabase
       .from('user_predictions')
       .select(`
         fixture_id,
         predicted_home_score,
-        predicted_away_score
+        predicted_away_score,
+        points
       `)
       .eq('user_id', userId)
       .in('fixture_id', fixtures.map(fixture => fixture.id));
@@ -640,13 +626,11 @@ app.get('/', ensureAuthenticated, async (req, res) => {
       throw predictionsError;
     }
 
-    // Map user's predictions to an object for easier access
     const predictionsMap = userPredictions.reduce((acc, prediction) => {
       acc[prediction.fixture_id] = prediction;
       return acc;
     }, {});
 
-    // Fetch all rounds for the dropdown selection
     const { data: allFixtures, error: allFixturesError } = await supabase
       .from('fixtures')
       .select('round');
@@ -655,17 +639,11 @@ app.get('/', ensureAuthenticated, async (req, res) => {
       throw allFixturesError;
     }
 
-    // Extract unique rounds from all fixtures
     const rounds = [...new Set(allFixtures.map(fixture => fixture.round))];
 
-    console.log(rounds); // Debugging line to ensure rounds are populated correctly
+    const messages = req.flash('success');
 
-    // Check if the fixtures for the selected round have started
-    const isLocked = await checkSubmissionTime(round);
-    const messages = req.flash('success'); // Retrieve the flash message
-    console.log('Selected round:', round); // Debugging line
-
-    res.render('home', { fixtures, rounds, selectedRound: round, predictionsMap, isLocked, message: messages[0] });
+    res.render('home', { fixtures, rounds, selectedRound: round, predictionsMap, message: messages[0] });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -673,13 +651,25 @@ app.get('/', ensureAuthenticated, async (req, res) => {
 });
 
 
-// Route to handle upserting predictions
+
 app.post('/predictions/user-predictions', async (req, res) => {
-  const userId = req.user.id; // Assume user ID is stored in session
-  const predictions = req.body; // All form data
+  const userId = req.user.id;
+  const predictions = req.body;
 
   try {
-    console.log('Request body:', predictions); // Log the request body
+    console.log('Request body:', predictions);
+
+    // Fetch all fixtures to determine the active round
+    const { data: allFixtures, error: allFixturesError } = await supabase
+      .from('fixtures')
+      .select('*')
+      .order('kick_off_time', { ascending: true });
+
+    if (allFixturesError) {
+      throw allFixturesError;
+    }
+
+    const updates = [];
 
     for (const key in predictions) {
       if (predictions.hasOwnProperty(key) && key.startsWith('fixture_id_')) {
@@ -687,32 +677,36 @@ app.post('/predictions/user-predictions', async (req, res) => {
         const homeScore = predictions[`home_score_${fixtureId}`];
         const awayScore = predictions[`away_score_${fixtureId}`];
 
-        if (homeScore === '' && awayScore === '') {
-          continue; // Skip if both scores are empty
-        }
+        const fixture = allFixtures.find(f => f.id === parseInt(fixtureId));
 
-        const predictionData = {
-          user_id: userId,
-          fixture_id: fixtureId,
-          prediction_time: new Date().toISOString()
-        };
+        // Only process fixtures that have not started
+        if (fixture && fixture.status === 'not-started') {
+          // Check if both scores are not null or empty
+          if (homeScore !== '' && homeScore !== null && awayScore !== '' && awayScore !== null) {
+            const predictionData = {
+              user_id: userId,
+              fixture_id: fixtureId,
+              predicted_home_score: parseInt(homeScore, 10),
+              predicted_away_score: parseInt(awayScore, 10),
+              prediction_time: new Date().toISOString()
+            };
 
-        if (homeScore !== '') predictionData.predicted_home_score = parseInt(homeScore, 10);
-        if (awayScore !== '') predictionData.predicted_away_score = parseInt(awayScore, 10);
-
-        // Upsert prediction
-        const { data, error } = await supabase
-          .from('user_predictions')
-          .upsert(
-            predictionData,
-            { onConflict: ['user_id', 'fixture_id'] } // Ensure uniqueness on user_id and fixture_id
-          );
-
-        if (error) {
-          throw error;
+            updates.push(predictionData);
+          }
         }
       }
     }
+
+    if (updates.length > 0) {
+      const { data, error } = await supabase
+        .from('user_predictions')
+        .upsert(updates, { onConflict: ['user_id', 'fixture_id'] });
+
+      if (error) {
+        throw error;
+      }
+    }
+
     req.flash('success', 'Scores saved');
     return res.redirect('/');
   } catch (error) {
@@ -728,27 +722,18 @@ const leagueRoutes = require('./routes/leagues');
 // Use routes
 app.use('/leagues', ensureAuthenticated, leagueRoutes);
 
+const executeCronJobs = async () => {
+  console.log('Running cron job to calculate prediction points');
+  const { error } = await supabase.rpc('calculate_prediction_points');
+  if (error) {
+    console.error('Error running calculate_prediction_points RPC:', error);
+  } else {
+    console.log('Successfully calculated prediction points');
+  }
+};
 
-// fs.readFile('public/washer.png', async (err, avatarFile) => {
-//   if (err) {
-//     console.error("Error reading file:", err);
-//     return;
-//   }
+const job = new CronJob('0 * * * *', executeCronJobs, null, true, 'UTC');  // Runs every hour
+job.start();
 
-//   // Upload the file to Supabase storage
-//   const { data, error } = await supabase
-//     .storage
-//     .from('flexiibook')
-//     .upload('tenant_profiles/washer.png', avatarFile, {
-//       cacheControl: '3600',
-//       upsert: false
-//     });
-
-//   if (error) {
-//     console.error("Upload error:", error);
-//   } else {
-//     console.log("Upload successful:", data);
-//   }
-// });
 
 module.exports = app;

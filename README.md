@@ -1,28 +1,55 @@
-Speculator App
+App Summary
+Overview:
+A football scores guessing game based on the Euros teams.
+Friends can guess result scores and compare their predictions.
+Technical Details
+Backend:
 
-Purpose: A football score guessing game based on the Euros tournament, where friends can guess match results and compete against each other.
+Framework: Express.js
+Database: Supabase (PostgreSQL)
+Authentication: Passport.js with Google OAuth
+Frontend:
 
-Main Features:
+Templating Engine: EJS (Embedded JavaScript)
+CSS Framework: Bootstrap
+Middleware
+Authentication:
+ensureAuthenticated middleware to protect routes and ensure only logged-in users can access certain pages.
+Submission Time Check:
+Middleware to ensure that predictions are submitted before the fixture starts.
+Uses UTC to handle time zone differences and ensures submissions are locked 2 minutes before the fixture starts.
+Scoring System
+Points Allocation:
+Correct Result: 1 point (correctly predicting win/loss/draw)
+Correct Scoreline: 3 points (correctly predicting the exact score)
+Key Features
+Leagues:
 
-Team Information:
+Users can create leagues and invite friends to join using a unique invite code.
+Users can join leagues by entering the invite code.
+Only league members can view and participate in the league.
+Predictions:
 
-Store team names, flags, and additional info.
-Match Results:
+Users can submit their predictions for each fixture.
+Predictions are grouped by fixture and displayed alongside other users' predictions for comparison.
+Routes
+Home:
 
-Record results for each fixture including home team, away team, and their scores.
-User Predictions:
+Displays a list of leagues and allows users to join a league.
+Leagues:
 
-Users submit their predicted scores for each fixture.
-Scoring System:
+Create League: Allows users to create a new league and generates a unique invite code.
+Join League: Users can join a league using an invite code.
+View League: Displays league details, participants, and their predictions, grouped by fixture.
+Predictions:
 
-Users earn up to 5 points per fixture:
-3 points for the correct score.
-1 point for the correct result.
-1 point for the correct total number of goals.
-User Rooms:
+Users can submit predictions for upcoming fixtures.
+EJS Templates
+Layout:
 
-Users create and join rooms to compete with friends.
-Each room has a unique URL for easy access.
-Leaderboards:
+Uses EJS templates for dynamic content rendering.
+Templates include partials for header, footer, and navigation for consistency.
+Fixtures and Predictions:
 
-Track and display user rankings within each room based on their scores.
+Fixtures are displayed with formatted kick-off times.
+User predictions are grouped by fixture and displayed below each fixture for clarity.

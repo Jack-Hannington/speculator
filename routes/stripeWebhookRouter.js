@@ -8,7 +8,7 @@ const sendgrid = require('../config/sendgrid');
 const generatePin = require('../utils/pinGenerator');
 const base_url = process.env.NODE_ENV === 'DEV' ? process.env.DEV_URL : process.env.PROD_URL;
 
-console.log(`this  sdfsdfd is ${base_url}`)
+console.log(`this is ${base_url}`)
 
 const { corporateRegistrationEmail } = require('../config/sendgrid');
 

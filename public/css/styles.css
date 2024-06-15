@@ -2,7 +2,8 @@
   box-sizing: border-box;
 }
 
-html {
+html,
+body {
   background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
   background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
   background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -69,11 +70,18 @@ body {
   font-weight: 400;
   background-color: var(--default-background-color);
   font-size: var(--base-font-size);
+  position: relative;
+
+}
+
+.main-content {
+  padding-top: 4px;
+  padding-bottom: 40px;
   min-height: 98vh;
+  border-radius: 10px;
   margin: 20px auto;
   max-width: 540px;
-  position: relative;
-  border-radius: 10px;
+  background-color: white;
 }
 
 h1,
@@ -343,10 +351,7 @@ iconify-icon.custom-icon svg {
 
 /* layout */
 
-.main-content {
-  padding-top: 4px;
-  padding-bottom: 40px;
-}
+
 
 @media (min-width: 1400px) {
   .container-xxl {
@@ -714,7 +719,7 @@ label {
 
 
 .active {
-  background-color: #f8f8f8;
+  background-color: #f2f2f2;
   transition: 0.3s;
   /* border-top:1px solid #ededed;
     border-bottom:1px solid #ededed; */

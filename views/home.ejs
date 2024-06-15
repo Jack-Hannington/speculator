@@ -11,10 +11,11 @@
 <div class="container-xxl">
   <section class="mb-3">
     <div class="row">
-      <div class="col-lg-6 col-12 d-flex align-items-center">
+      <div class="col-8 d-flex flex-column ">
         <h3 class="mb-0">Your predictions</h3>
+        <p class="font-14">Edit predictions up to 2 minutes before a match begins.</p>
       </div>
-      <div class="col-lg-6 col-12 d-flex justify-content-lg-end align-items-center mt-2">
+      <div class="col-4 d-flex justify-content-end align-items-start">
         <div class="dropdown">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="logoutDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             <iconify-icon inline icon="solar:user-broken"></iconify-icon><%= user.first_name %>
@@ -32,9 +33,6 @@
 
 <section class="container font-14">
   <div class="row py-3 px-2" style="background-color: #f6f6f6;border-radius:6px;border: solid 1px #ededed;">
-    <!-- <div class="col-12 text-center mb-3">
-      Score a max of 3 points per match for the correct scoreline. Get 1 point for getting the correct result. 
-    </div> -->
     <div class="col border py-2 rounded me-2 bg-white">
       <div class="d-flex flex-column align-items-center mb-0 gap-1">
         <iconify-icon icon="mdi:counter" inline></iconify-icon>
@@ -49,15 +47,6 @@
       </div>
       <div class="fw-semibold text-center">1 point</div>
     </div>
- 
-    <!-- <div class="col">
-      <div class="d-flex flex-column align-items-center mb-0 gap-1">
-        <iconify-icon icon="mdi:soccer" inline></iconify-icon>
-        
-        <span class="font-14">Goals</span>
-      </div>
-      <div class="fw-semibold text-center">1 point</div>
-    </div> -->
   </div>
 </section>
 
@@ -80,35 +69,52 @@
     
   </form>
 </div>
-
 <form id="predictions-form" method="post" action="/predictions/user-predictions">
   <section class="container">
-  <% fixtures.forEach(fixture => { %>
-    
+    <% fixtures.forEach(fixture => { %>
       <div class="row py-2 mb-2 fixture-row" style="background:#f6f6f6;border-radius: 6px;border:solid 1px #ededed;">
-        <div class="col-12 text-center pb-2 fixture-date"><%= fixture.formatted_kick_off_time %></div>
+        <div class="col-12 text-center pb-2 fixture-date">
+          <% if (fixture.status === 'not-started') { %>
+            <%= fixture.formatted_kick_off_time %>
+          <% } else { %>
+            Final result: <%= fixture.home_team.name %> <%= fixture.home_team_score %> - <%= fixture.away_team_score %> <%= fixture.away_team.name %>
+          <% } %>
+        </div>
         <div class="col-4 d-flex justify-content-start flex-column align-items-center px-1">
-          <img src="<%= fixture.home_team.flag %>" class="fixture-row-flag" style="">  <p class="mb-0"><%= fixture.home_team.name %></p>
+          <img src="<%= fixture.home_team.flag %>" class="fixture-row-flag" style="">
+          <p class="mb-0"><%= fixture.home_team.name %></p>
         </div>
         <div class="col-4 d-flex justify-content-center align-items-center">
           <input type="hidden" name="fixture_id_<%= fixture.id %>" value="<%= fixture.id %>">
-          <input class="form-control d-inline-block text-center score-input" type="number" name="home_score_<%= fixture.id %>" placeholder="..." value="<%= predictionsMap[fixture.id] && predictionsMap[fixture.id].predicted_home_score !== null && predictionsMap[fixture.id].predicted_home_score !== undefined ? predictionsMap[fixture.id].predicted_home_score : '' %>">
-          <span class="mx-2">-</span>
-          <input class="form-control d-inline-block text-center score-input" type="number" name="away_score_<%= fixture.id %>" placeholder="..." value="<%= predictionsMap[fixture.id] && predictionsMap[fixture.id].predicted_home_score !== null && predictionsMap[fixture.id].predicted_home_score !== undefined ? predictionsMap[fixture.id].predicted_home_score : '' %>">
+          <% if (fixture.status === 'not-started') { %>
+            <input class="form-control d-inline-block text-center score-input" type="number" name="home_score_<%= fixture.id %>" placeholder="..." value="<%= predictionsMap[fixture.id] && predictionsMap[fixture.id].predicted_home_score !== null && predictionsMap[fixture.id].predicted_home_score !== undefined ? predictionsMap[fixture.id].predicted_home_score : '' %>">
+            <span class="mx-2">-</span>
+            <input class="form-control d-inline-block text-center score-input" type="number" name="away_score_<%= fixture.id %>" placeholder="..." value="<%= predictionsMap[fixture.id] && predictionsMap[fixture.id].predicted_away_score !== null && predictionsMap[fixture.id].predicted_away_score !== undefined ? predictionsMap[fixture.id].predicted_away_score : '' %>">
+          <% } else { %>
+            <p class="mb-0"><%= predictionsMap[fixture.id] && predictionsMap[fixture.id].predicted_home_score !== null && predictionsMap[fixture.id].predicted_home_score !== undefined ? predictionsMap[fixture.id].predicted_home_score : '-' %> - <%= predictionsMap[fixture.id] && predictionsMap[fixture.id].predicted_away_score !== null && predictionsMap[fixture.id].predicted_away_score !== undefined ? predictionsMap[fixture.id].predicted_away_score : '-' %></p>
+          <% } %>
         </div>
         <div class="col-4 d-flex justify-content-start flex-column align-items-center px-1">
-          <p class="mb-0 order-2" style="white-space: nowrap"><%= fixture.away_team.name %></p><img class="fixture-row-flag"  src="<%= fixture.away_team.flag %>"> 
+          <p class="mb-0 order-2" style="white-space: nowrap"><%= fixture.away_team.name %></p>
+          <img class="fixture-row-flag" src="<%= fixture.away_team.flag %>">
         </div>
-      </div>
+        <% if (fixture.status === 'finished') { %>
+          <div class="col-12 text-center">
+            <p class="<%= predictionsMap[fixture.id] ? (predictionsMap[fixture.id].points === 3 ? 'text-success' : (predictionsMap[fixture.id].points === 1 ? 'text-warning' : 'text-danger')) : 'text-danger' %>">Points: <%= predictionsMap[fixture.id] ? predictionsMap[fixture.id].points : '0' %></p>
 
-  <% }); %>
-</section>
-  <% if (!isLocked) { %>
+          </div>
+        <% } %>
+      </div>
+    <% }); %>
+  </section>
+  
+  <% if (fixtures.some(fixture => fixture.status === 'not-started')) { %>
     <div class="mt-3">
       <button type="submit" class="btn btn-primary w-100">Save Predictions</button>
     </div>
   <% } %>
 </form>
+
 
 
 

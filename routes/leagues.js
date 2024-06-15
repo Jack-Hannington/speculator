@@ -41,7 +41,6 @@ router.get('/', ensureAuthenticated, async (req, res) => {
       .map(id => {
         return leagues.find(league => league.id === id);
       });
-
     res.render('leagues', { leagues: uniqueLeagues });
   } catch (error) {
     console.error('Error fetching leagues:', error);
