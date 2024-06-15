@@ -76,35 +76,6 @@ async function sendPinReminderEmail(recipientEmail, subject, pin) {
  * @param {string} name - The name of the recipient.
  * @param {string} registrationLink - The registration link for the user.
  */
-async function corporateRegistrationEmail(recipientEmail, subject, name, registrationLink) {
-    // Construct the HTML body using recipient details
-    const htmlBody = `
-        <img src="https://altiuswellness-production.up.railway.app/wellness_by_altius%20(1).png" alt="Altius wellness logo" style="width:80px">
-        <h1>Welcome to Altius Wellness</h1>
-        <p>Hi ${name},</p>
-        <p>Thank you for joining our corporate wellness program. Please use the following link to complete your registration:</p>
-        <a href="${registrationLink}">${registrationLink}</a>
-    `;
 
-    // Setup the message object
-    const msg = {
-        to: recipientEmail,
-        from: 'jack@hanningtondigital.com',  // This should be a verified sender email in your SendGrid account
-        subject: subject,
-        text: `Hi ${name}, Thank you for joining our corporate wellness program. Please use the following link to complete your registration: ${registrationLink}`,
-        html: htmlBody,
-    };
 
-    // Send the email
-    try {
-        await sgMail.send(msg);
-        console.log('Corporate registration email sent successfully');
-    } catch (error) {
-        console.error('Failed to send email:', error);
-        if (error.response) {
-            console.error(error.response.body);
-        }
-    }
-}
-
-module.exports = { resetPasswordEmail, corporateRegistrationEmail, sendPinReminderEmail };
+module.exports = { resetPasswordEmail, sendPinReminderEmail };

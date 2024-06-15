@@ -552,7 +552,7 @@ app.post('/reset-password', async (req, res) => {
 const checkFixtureStatus = (kickOffTime) => {
   const now = new Date();
   const kickOffDate = new Date(kickOffTime);
-  const lockTime = new Date(kickOffDate.getTime() - 2 * 60 * 1000); // 2 minutes before kick-off
+  const lockTime = new Date(kickOffDate.getTime() - 60 * 60 * 1000); // 2 minutes before kick-off
 
   if (now > kickOffDate) {
     return 'finished';

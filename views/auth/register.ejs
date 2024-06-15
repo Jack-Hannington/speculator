@@ -1,5 +1,5 @@
 <%- include('../partials/header') %>
-<section class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;max-width: 780px;">
+<section class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;max-width: 780px;padding:30px;">
     <div class="row">
  
         <div class="col-lg-6">
@@ -7,14 +7,14 @@
             <form action="/register" method="POST">
                 <div class="col-12 mb-4">
                     <h2>EasyLeagues </h2>
-                    <h4>Guess results and earn points</h4>
-                    <p class="font-14">Create a private or public leagues based on real competitions. Earn points for the correct result and scoreline. </p>                    
-                    <p class="font-14">Guess View overall and weekly leaderboards so there's something to play for every match.</p>
+                    <h4>Guess scores, earn points, rank higher</h4>
+                    <p class="font-14">Create or join private and public leagues based on real competitions. Earn points for the correct result and scoreline. View overall and weekly leaderboards giving you something to play for every week.</p>
                 </div>
                 <div class="row mb-3">
                     <div class="col-12">
-                        <h4>Register</h4>
-                        <label class="form-label" for="first_name">Name</label>
+                        <h4>Sign up here</h4>
+                        
+                        <label class="form-label" for="first_name">First name</label>
                         <input class="form-control" type="text" id="first_name" name="first_name" required>
                     </div>
                 </div>
@@ -35,6 +35,9 @@
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary w-100">Register</button>
                     </div>
+                    <div class="col-12 mt-3 d-flex justify-content-center">
+                        <a href="/login" class="font-14 brand no-styling fw-semibold">Back to login</a>
+                      </div>
                 </div>
             </form>
         </div>
