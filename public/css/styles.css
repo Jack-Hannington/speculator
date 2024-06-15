@@ -71,6 +71,7 @@ body {
   background-color: var(--default-background-color);
   font-size: var(--base-font-size);
   position: relative;
+  min-height: 100vh;
 
 }
 

@@ -24,75 +24,84 @@
           <h4 class="mb-0">Members</h4>
         </div>
     </div>
-  </section>
-  <section class="">
-    <div class="row">
-      <div class="col-12">
-        <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Record</th>
-              <th>PTS</th>
-            </tr>
-          </thead>
-          <tbody>
-              <% participants.forEach(participant => { %>
-                  <tr>
-                      <td><%= participant.users.first_name %></td>
-                      <td>1W 2L</td>
-                      <td>00</td>
-                  </tr>
-              <% }); %>
-          </tbody>
-      </table>
-    </div>
-      
-      </div>
-    </div>
-  </section>
-<section>
-  <div class="row mt-3">
-      <div class="col-12">
-        <h4 class="mb-0">Predictions</h4>
-      </div>
-  </div>
 </section>
-  <section class="container">
+<section class="">
     <div class="row">
-        <div class="col-12 font-14">
-          <% Object.keys(groupedPredictions).forEach(fixtureId => { %>
-            <div class="row py-2 mb-2 fixture-row" style="background:#f6f6f6;border-radius: 6px;border:solid 1px #ededed;">
-              <div class="col-12 text-center pb-2 fixture-date"><%= groupedPredictions[fixtureId].fixture.formatted_kick_off_time %></div>
-              <div class="col-12 d-flex justify-content-center align-items-center">
-                <span>
-                  <img src="<%= groupedPredictions[fixtureId].fixture.home_team.flag %>" class="fixture-row-flag me-2" style="width: 24px; height: 24px;"> 
-                  <%= groupedPredictions[fixtureId].fixture.home_team.name %> vs 
-                
-                  <%= groupedPredictions[fixtureId].fixture.away_team.name %>
-                  <img src="<%= groupedPredictions[fixtureId].fixture.away_team.flag %>" class="fixture-row-flag ms-2" style="width: 24px; height: 24px;">
-                </span>
-              </div>
+        <div class="col-12">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Record</th>
+                            <th>PTS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% participants.forEach(participant => { %>
+                            <tr>
+                                <td><%= participant.first_name %></td>
+                                <td><%= participant.total_correct_results %>W <%= participant.total_incorrect_results %>L</td>
+                                <td><%= participant.total_points %></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
             </div>
-            
-              <% groupedPredictions[fixtureId].predictions.forEach(prediction => { %>
-                <div class="row mb-2 border rounded py-2">
-                <div class="col-12 text-center">
-                  <p class="mb-0"><%= participants.find(p => p.user_id === prediction.user_id).users.first_name %></p>
-                </div>
-                <div class="col-12 text-center">
-                  <p class="mb-0"><%= prediction.predicted_home_score %> - <%= prediction.predicted_away_score %></p>
-                </div>
-              </div>
-            <% }); %>
-         
-          <% }); %>
         </div>
     </div>
-  </section>
-  
-</div>
+</section>
+
+<section>
+    <div class="row mt-3">
+        <div class="col-12">
+            <h4 class="mb-0">Predictions</h4>
+        </div>
+    </div>
+</section>
+
+<form method="get" action="/leagues/<%= league.id %>">
+    <div class="form-group">
+        <select class="form-select text-center w-100 font-14" id="round" name="round" onchange="this.form.submit()" style="border-radius: 6px; border:solid 1px #ededed;">
+            <% rounds.forEach(r => { %>
+                <option class="text-center" value="<%= r %>" <%= r == selectedRound ? 'selected' : '' %>>Round <%= r %></option>
+            <% }); %>
+        </select>
+    </div>
+</form>
+
+<section class="container">
+    <div class="row">
+        <div class="col-12 font-14">
+            <% Object.keys(groupedPredictions[selectedRound] || {}).forEach(fixtureId => { %>
+                <div class="row py-2 mb-2 fixture-row" style="background:#f6f6f6;border-radius: 6px;border:solid 1px #ededed;">
+                    <div class="col-12 text-center pb-2 fixture-date"><%= groupedPredictions[selectedRound][fixtureId].fixture.formatted_kick_off_time %></div>
+                    <div class="col-12 d-flex justify-content-center align-items-center">
+                        <span>
+                            <img src="<%= groupedPredictions[selectedRound][fixtureId].fixture.home_team.flag %>" class="fixture-row-flag me-2" style="width: 24px; height: 24px;">
+                            <%= groupedPredictions[selectedRound][fixtureId].fixture.home_team.name %> vs
+                            <%= groupedPredictions[selectedRound][fixtureId].fixture.away_team.name %>
+                            <img src="<%= groupedPredictions[selectedRound][fixtureId].fixture.away_team.flag %>" class="fixture-row-flag ms-2" style="width: 24px; height: 24px;">
+                        </span>
+                    </div>
+                </div>
+
+                <% groupedPredictions[selectedRound][fixtureId].predictions.forEach(prediction => { %>
+                    <div class="row mb-2 border rounded py-2">
+                        <div class="col-12 text-center">
+                            <p class="mb-0"><%= participants.find(p => p.user_id === prediction.user_id).first_name %></p>
+                        </div>
+                        <div class="col-12 text-center">
+                            <p class="mb-0"><%= prediction.predicted_home_score %> - <%= prediction.predicted_away_score %></p>
+                        </div>
+                    </div>
+                <% }); %>
+            <% }); %>
+        </div>
+    </div>
+</section>
+
+
 
 <%- include('../partials/footer') %>
 

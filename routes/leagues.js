@@ -237,10 +237,9 @@ router.post('/join', ensureAuthenticated, async (req, res) => {
   }
 });
 
-
-// View a league
 router.get('/:id', ensureAuthenticated, async (req, res) => {
   const leagueId = req.params.id;
+  const selectedRound = req.query.round || '1';
 
   try {
     // Fetch league details
@@ -254,10 +253,10 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
       throw leagueError;
     }
 
-    // Fetch league participants
+    // Fetch league participants with their total points and rankings
     const { data: participants, error: participantsError } = await supabase
-      .from('user_league_members')
-      .select('user_id, users (first_name)')
+      .from('league_user_points')
+      .select('user_id, first_name, total_points, ranking, total_correct_results, total_incorrect_results')
       .eq('league_id', leagueId);
 
     if (participantsError) {
@@ -273,13 +272,18 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
         fixture_id,
         predicted_home_score,
         predicted_away_score,
+        points,
         fixtures (
           id,
+          round,
           kick_off_time,
           home_team_id,
           away_team_id,
           home_team:home_team_id (name, flag),
-          away_team:away_team_id (name, flag)
+          away_team:away_team_id (name, flag),
+          home_team_score,
+          away_team_score,
+          status
         )
       `)
       .in('user_id', participantIds);
@@ -288,29 +292,43 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
       throw predictionsError;
     }
 
-    // Format the kick_off_time and group predictions by fixture_id
+    // Format the kick_off_time and group predictions by fixture_id and round
     const groupedPredictions = predictions.reduce((acc, prediction) => {
       const fixtureId = prediction.fixture_id;
-      if (!acc[fixtureId]) {
+      const round = prediction.fixtures.round;
+
+      if (!acc[round]) {
+        acc[round] = {};
+      }
+
+      if (!acc[round][fixtureId]) {
         const fixture = prediction.fixtures;
-        fixture.formatted_kick_off_time = format(parseISO(fixture.kick_off_time), 'EEE do MMMM, HH:mm');
-        acc[fixtureId] = {
+        if (fixture.status === 'in-progress' || fixture.status === 'finished') {
+          fixture.formatted_kick_off_time = `${fixture.home_team.name} ${fixture.home_team_score} - ${fixture.away_team_score} ${fixture.away_team.name}`;
+        } else {
+          fixture.formatted_kick_off_time = format(parseISO(fixture.kick_off_time), 'EEE do MMMM, HH:mm');
+        }
+        acc[round][fixtureId] = {
           fixture,
           predictions: []
         };
       }
-      acc[fixtureId].predictions.push(prediction);
+      acc[round][fixtureId].predictions.push(prediction);
       return acc;
     }, {});
 
-    console.log('league participants', league, participants, groupedPredictions);
+    // Extract unique rounds
+    const rounds = [...new Set(predictions.map(prediction => prediction.fixtures.round))];
 
-    res.render('leagues/view', { league, participants, groupedPredictions });
+    console.log('league participants', participants);
+
+    res.render('leagues/view', { league, participants, selectedRound, groupedPredictions, rounds });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 

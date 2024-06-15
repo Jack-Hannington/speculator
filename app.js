@@ -224,9 +224,6 @@ app.post('/login', async (req, res, next) => {
         });
       })(req, res, next);
     } else {
-      // Corporate user authentication using access pin
-      console.log('Non-admin user detected:', user); // Debugging line
-
 
       req.logIn(user, (err) => {
         if (err) {
@@ -236,7 +233,6 @@ app.post('/login', async (req, res, next) => {
         }
 
         req.session.role = user.role;
-        console.log('Login successful for non-admin user'); // Debugging line
         return res.redirect('/');
       });
     }
@@ -249,8 +245,6 @@ app.post('/login', async (req, res, next) => {
 
 // Log the user to ensure it's being set correctly
 app.use((req, res, next) => {
-  console.log('Current user:', req.user);
-  console.log('Session user ID:', req.session.user_id);
   next();
 });
 

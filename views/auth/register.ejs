@@ -1,54 +1,37 @@
 <%- include('../partials/header') %>
-<body>
-    <section class="container">
-        <div class="row">
-            <div class="col-12">
-                <form action="/register" method="POST">
-                    <!-- Name -->
-                    <div class="form-row row">
-                        <div class="col-lg-4 col-12">
-                            <label class="form-label" for="">Name</label>
-                        </div>
-                        <div class="col-lg-8 col-12">
-                            <input class="form-control" type="text" id="first_name" name="first_name" required>
-                        </div>
-                       
+<section id="login-layout" class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="row" style="width:400px; max-width:100%;">
+        <div class="col-12">
+            <form action="/register" method="POST">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <label class="form-label" for="first_name">Name</label>
+                        <input class="form-control" type="text" id="first_name" name="first_name" required>
                     </div>
-                
-                    <!-- Email -->
-                    <div class="form-row row">
-                        <div class="col-lg-4 col-12">
-                            <label class="form-label" for="email">Email</label>
-                        </div>
-                        <div class="col-lg-8 col-12">
-                            <input class="form-control" type="email" id="email" name="email" required>
-                        </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <label class="form-label" for="email">Email</label>
+                        <input class="form-control" type="email" id="email" name="email" required>
                     </div>
-                
-                    <!-- Password -->
-                    <div class="form-row row">
-                        <div class="col-lg-4 col-12">
-                            <label class="form-label" for="password">Password</label>
-                        </div>
-                        <div class="col-lg-8 col-12">
-                            <input class="form-control" type="password" id="password" name="password" required>
-                        </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <label class="form-label" for="password">Password</label>
+                        <input class="form-control" type="password" id="password" name="password" required>
                     </div>
-                
-                    <!-- Role (hidden) -->
-                    <input type="hidden" id="role" name="role" value="user">
-                
-                    <!-- Submit Button -->
-                    <div class="form-row row">
-                        <div class="col-12">
-                            <button type="submit" class="btn-primary">Register</button>
-                        </div>
+                </div>
+                <input type="hidden" id="role" name="role" value="user">
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
-    </section>
-    
-    
-</body>
-</html>
+        <!-- <div class="col-lg-6 col-md-8 col-12 text-center bg-dark">
+            <img style="max-width: 100%;width:600px;" src="../register_screenshot.png" alt="Registration Screenshot">
+        </div> -->
+    </div>
+</section>
+<%- include('../partials/footer') %>
