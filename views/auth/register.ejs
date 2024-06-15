@@ -1,10 +1,19 @@
 <%- include('../partials/header') %>
-<section id="login-layout" class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
-    <div class="row" style="width:400px; max-width:100%;">
-        <div class="col-12">
+<section class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;max-width: 780px;">
+    <div class="row">
+ 
+        <div class="col-lg-6">
+
             <form action="/register" method="POST">
+                <div class="col-12 mb-4">
+                    <h2>EasyLeagues </h2>
+                    <h4>Guess results and earn points</h4>
+                    <p class="font-14">Create a private or public leagues based on real competitions. Earn points for the correct result and scoreline. </p>                    
+                    <p class="font-14">Guess View overall and weekly leaderboards so there's something to play for every match.</p>
+                </div>
                 <div class="row mb-3">
                     <div class="col-12">
+                        <h4>Register</h4>
                         <label class="form-label" for="first_name">Name</label>
                         <input class="form-control" type="text" id="first_name" name="first_name" required>
                     </div>
@@ -29,9 +38,13 @@
                 </div>
             </form>
         </div>
-        <!-- <div class="col-lg-6 col-md-8 col-12 text-center bg-dark">
-            <img style="max-width: 100%;width:600px;" src="../register_screenshot.png" alt="Registration Screenshot">
-        </div> -->
+        <div class="col-lg-6 col-12 text-center align-items-center">
+           
+            <div class="shadow-lg" style="border: 4px solid #ecf0f6; padding: 5px;background-color: #ecf0f6;border-radius: 6px;">
+                <img style="max-width: 100%; width: 100%;" src="../predictions.png" alt="Registration Screenshot">
+            </div>
+            
+        </div>
     </div>
 </section>
 <%- include('../partials/footer') %>
