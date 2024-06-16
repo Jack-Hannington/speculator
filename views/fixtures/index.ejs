@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<section class="container mt-5">
+  <h2>All Fixtures</h2>
+  <div class="table-container" style="max-height: 550px;overflow: auto;">
+    <table class="">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Home Team</th>
+          <th>Away Team</th>
+          <th>Kick-off Time</th>
+          <th>Round</th>
+          <th>Home Score</th>
+          <th>Away Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% fixtures.forEach(fixture => { %>
+            <tr onclick="window.location.href='/fixtures/edit/<%= fixture.id %>'" style="cursor:pointer;">
+              <td><%= fixture.id %></td>
+              <td><%= fixture.home_team.name %></td>
+              <td><%= fixture.away_team.name %></td>
+              <td><%= new Date(fixture.kick_off_time).toLocaleString() %></td>
+              <td><%= fixture.round %></td>
+              <td><%= fixture.home_team_score %></td>
+              <td><%= fixture.away_team_score %></td>
+            </tr>
+          <% }) %>
+          
+      </tbody>
+    </table>
+  </div>
+  <a href="/fixtures/add" class="btn btn-success mt-3">Add New Fixture</a>
+</section>
+<%- include('../partials/footer') %>

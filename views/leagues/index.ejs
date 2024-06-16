@@ -36,33 +36,37 @@
   </div>
   
 </section>
-
-  <section class="mt-4">
-    <div class="row">
+<section class="mt-4">
+  <div class="row">
       <div class="col-12">
-        <div class="table-container">
-          <table class="">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>PTS</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% leagues.forEach(league => { %>
-                <tr>
-                  <td class="fw-semibold"><a href="/leagues/<%= league.id %>"><%= league.name %></a></td>
-                  <td><%= league.owner_name %></td>
-                  <td>00</td>
-                </tr>
-              <% }) %>
-            </tbody>
-          </table>
-        </div>
+          <div class="table-container">
+              <table class="">
+                  <thead>
+                      <tr>
+                          <th>Pos</th>
+                          <th>League</th>
+                          <th>Record (W-L)</th>
+                          <th>Points</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    <% leagues.forEach(league => { %>
+                      <tr onclick="window.location.href='/leagues/<%= league.id %>'" style="cursor:pointer;">
+                        <td><%= league.ranking %></td>
+                        <td class="fw-semibold"><a href="/leagues/<%= league.id %>" class="unstyled"><%= league.name %></a></td>
+                        <td><%= league.total_correct_results %>W - <%= league.total_incorrect_results %>L</td>
+                        <td><%= league.total_points %></td>
+                      </tr>
+                    <% }) %>
+                    
+                  </tbody>
+              </table>
+          </div>
       </div>
-    </div>
-  </section>
+  </div>
+</section>
+</div>
+
 </div>
 
 <%- include('../partials/footer') %>

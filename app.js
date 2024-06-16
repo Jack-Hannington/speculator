@@ -408,7 +408,7 @@ app.post('/request-reset', async (req, res) => {
   try {
     const { data: user, error: userError } = await supabase
       .from('users')
-      .select('id, email, role, access_pin')
+      .select('id, email')
       .eq('email', email)
       .single();
 
@@ -420,30 +420,24 @@ app.post('/request-reset', async (req, res) => {
 
     console.log(`This user requested a reset: ${user.email}`);
 
-    if (user.role === 'admin') {
-      const token = crypto.randomBytes(20).toString('hex'); // Generate a secure token
-      const expiration = new Date(Date.now() + 3600000).toISOString(); // Token expires in one hour
+    const token = crypto.randomBytes(20).toString('hex'); // Generate a secure token
+    const expiration = new Date(Date.now() + 3600000).toISOString(); // Token expires in one hour
 
-      const { data: updateData, error: updateError } = await supabase
-        .from('users')
-        .update({ reset_password_token: token, reset_password_expires: expiration })
-        .eq('id', user.id);
+    const { data: updateData, error: updateError } = await supabase
+      .from('users')
+      .update({ reset_password_token: token, reset_password_expires: expiration })
+      .eq('id', user.id);
 
-      if (updateError) {
-        console.error('Error updating user with reset token:', updateError);
-        req.flash('error', 'Failed to store reset token');
-        return res.redirect('/request-reset');
-      }
-
-      console.log(`Reset token set: ${token}`);
-
-      await resetPasswordEmail(user.email, 'Your password reset', `${base_url}/reset/${token}`);
-      req.flash('success', 'Password reset link sent');
-    } else {
-      // Non-admin users
-      await sendPinReminderEmail(user.email, 'Your access pin reminder', `Your access pin is ${user.access_pin}. <br/>Login: ${base_url}/login`);
-      req.flash('success', 'Access pin reminder sent');
+    if (updateError) {
+      console.error('Error updating user with reset token:', updateError);
+      req.flash('error', 'Failed to store reset token');
+      return res.redirect('/request-reset');
     }
+
+    console.log(`Reset token set: ${token}`);
+
+    await resetPasswordEmail(user.email, 'Your password reset', `${base_url}/reset/${token}`);
+    req.flash('success', 'Password reset link sent');
 
     res.redirect('/login');
   } catch (error) {
@@ -633,7 +627,7 @@ app.get('/', ensureAuthenticated, async (req, res) => {
       throw allFixturesError;
     }
 
-    const rounds = [...new Set(allFixtures.map(fixture => fixture.round))];
+    const rounds = [...new Set(allFixtures.map(fixture => fixture.round))].sort((a, b) => a - b);
 
     const messages = req.flash('success');
 
@@ -711,10 +705,12 @@ app.post('/predictions/user-predictions', async (req, res) => {
 
 
 // More routes and middleware as needed
+const fixtureRoutes = require('./routes/fixtures');
 const leagueRoutes = require('./routes/leagues');
 
 // Use routes
 app.use('/leagues', ensureAuthenticated, leagueRoutes);
+app.use('/fixtures', ensureAuthenticated, fixtureRoutes);
 
 const executeCronJobs = async () => {
   console.log('Running cron job to calculate prediction points');
@@ -726,7 +722,7 @@ const executeCronJobs = async () => {
   }
 };
 
-const job = new CronJob('0 * * * *', executeCronJobs, null, true, 'UTC');  // Runs every hour
+const job = new CronJob('*/30 * * * *', executeCronJobs, null, true, 'UTC');  // Runs every 30 minutes
 job.start();
 
 

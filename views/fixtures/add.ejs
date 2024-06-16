@@ -1,0 +1,33 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<section class="container mt-5">
+  <h2>Add Fixture</h2>
+  <form action="/fixtures/add" method="POST">
+    <div class="mb-3">
+      <label for="home_team_id" class="form-label">Home Team</label>
+      <select class="form-select" id="home_team_id" name="home_team_id" required>
+        <% teams.forEach(team => { %>
+          <option value="<%= team.id %>"><%= team.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="away_team_id" class="form-label">Away Team</label>
+      <select class="form-select" id="away_team_id" name="away_team_id" required>
+        <% teams.forEach(team => { %>
+          <option value="<%= team.id %>"><%= team.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="kick_off_time" class="form-label">Kick-off Time</label>
+      <input type="datetime-local" class="form-control" id="kick_off_time" name="kick_off_time" required>
+    </div>
+    <div class="mb-3">
+      <label for="round" class="form-label">Round</label>
+      <input type="number" class="form-control" id="round" name="round" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Fixture</button>
+  </form>
+</section>
+<%- include('../partials/footer') %>

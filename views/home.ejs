@@ -11,14 +11,14 @@
 <div class="container-xxl">
   <section class="mb-3">
     <div class="row">
-      <div class="col-8 d-flex flex-column ">
+      <div class="col-7 d-flex flex-column ">
         <h3 class="mb-0">Your predictions</h3>
         <p class="font-14">Edit predictions up to 2 minutes before a match begins.</p>
       </div>
-      <div class="col-4 d-flex justify-content-end align-items-start">
+      <div class="col-5 d-flex justify-content-end align-items-start">
         <div class="dropdown">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="logoutDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            <iconify-icon inline icon="solar:user-broken"></iconify-icon><%= user.first_name %>
+            <iconify-icon inline icon="solar:user-linear"></iconify-icon><%= user.first_name %>
           </button>
           <ul class="dropdown-menu" aria-labelledby="logoutDropdown">
             <li><a class="dropdown-item" href="/logout">Logout</a></li>
@@ -77,7 +77,7 @@
           <% if (fixture.status === 'not-started') { %>
             <%= fixture.formatted_kick_off_time %>
           <% } else { %>
-            Final result: <%= fixture.home_team.name %> <%= fixture.home_team_score %> - <%= fixture.away_team_score %> <%= fixture.away_team.name %>
+            Result: <span class="fw-semibold d-inline-block mb-1"><%= fixture.home_team.name %> <%= fixture.home_team_score %> - <%= fixture.away_team_score %> <%= fixture.away_team.name %></span>
           <% } %>
         </div>
         <div class="col-4 d-flex justify-content-start flex-column align-items-center px-1">
@@ -100,7 +100,7 @@
         </div>
         <% if (fixture.status === 'finished') { %>
           <div class="col-12 text-center">
-            <p class="<%= predictionsMap[fixture.id] ? (predictionsMap[fixture.id].points === 3 ? 'text-success' : (predictionsMap[fixture.id].points === 1 ? 'text-warning' : 'text-danger')) : 'text-danger' %>">Points: <%= predictionsMap[fixture.id] ? predictionsMap[fixture.id].points : '0' %></p>
+            <p class="font-14 <%= predictionsMap[fixture.id] ? (predictionsMap[fixture.id].points === 3 ? 'text-success' : (predictionsMap[fixture.id].points === 1 ? 'text-success' : 'text-danger')) : 'text-danger' %>">Points: <%= predictionsMap[fixture.id] ? predictionsMap[fixture.id].points : '0' %></p>
 
           </div>
         <% } %>

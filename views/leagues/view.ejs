@@ -32,16 +32,18 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Record</th>
+                            <th>Pos</th>
+                            <th>Player</th>
+                            <th>Record (W-L)</th>
                             <th>PTS</th>
                         </tr>
                     </thead>
                     <tbody>
                         <% participants.forEach(participant => { %>
                             <tr>
+                              <td><%= participant.ranking %></td>
                                 <td><%= participant.first_name %></td>
-                                <td><%= participant.total_correct_results %>W <%= participant.total_incorrect_results %>L</td>
+                                <td><%= participant.total_correct_results %>W - <%= participant.total_incorrect_results %>L</td>
                                 <td><%= participant.total_points %></td>
                             </tr>
                         <% }); %>
@@ -111,10 +113,10 @@
     const inviteCode = inviteCodeInput.value;
     const url = window.location.href;
 
-    const textToCopy = `Join my league on Speculator.com. Link: https://euros.up.railway.app/register, Invite Code: ${inviteCode}`;
+    const textToCopy = `Join my league on Easyleagues.co/register. Invite Code: ${inviteCode}`;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
-      alert('Invite link and access code copied to clipboard!');
+      alert('Invite link and league code copied to clipboard!');
     }).catch(err => {
       console.error('Failed to copy: ', err);
     });

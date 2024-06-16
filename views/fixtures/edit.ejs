@@ -1,0 +1,46 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<section class="container mt-5">
+    <h2>Edit Fixture</h2>
+    <form action="/fixtures/edit/<%= fixture.id %>" method="POST">
+      <div class="mb-3">
+        <label for="home_team_id" class="form-label">Home Team</label>
+        <select class="form-select" id="home_team_id" name="home_team_id" disabled>
+          <% teams.forEach(team => { %>
+            <option value="<%= team.id %>" <%= fixture.home_team_id === team.id ? 'selected' : '' %>><%= team.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="away_team_id" class="form-label">Away Team</label>
+        <select class="form-select" id="away_team_id" name="away_team_id" disabled>
+          <% teams.forEach(team => { %>
+            <option value="<%= team.id %>" <%= fixture.away_team_id === team.id ? 'selected' : '' %>><%= team.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="kick_off_time" class="form-label">Kick-off Time</label>
+        <input type="datetime-local" class="form-control" id="kick_off_time" name="kick_off_time" value="<%= new Date(fixture.kick_off_time).toISOString().slice(0, 16) %>" disabled>
+      </div>
+      <div class="mb-3">
+        <label for="home_team_score" class="form-label">Home Team Score</label>
+        <input type="number" class="form-control" id="home_team_score" name="home_team_score" value="<%= fixture.home_team_score %>">
+      </div>
+      <div class="mb-3">
+        <label for="away_team_score" class="form-label">Away Team Score</label>
+        <input type="number" class="form-control" id="away_team_score" name="away_team_score" value="<%= fixture.away_team_score %>">
+      </div>
+      <div class="mb-3">
+        <label for="round" class="form-label">Round</label>
+        <input type="number" class="form-control" id="round" name="round" value="<%= fixture.round %>">
+      </div>
+      <button type="submit" class="btn btn-primary">Update Fixture</button>
+    </form>
+    <form action="/fixtures/delete/<%= fixture.id %>" method="POST" onsubmit="return confirm('Are you sure you want to delete this fixture? This action cannot be undone.');">
+      <button type="submit" class="btn btn-danger mt-3">Delete Fixture</button>
+    </form>
+    <a href="/fixtures" class="btn btn-secondary mt-3">Back to Fixtures</a>
+  </section>
+  
+<%- include('../partials/footer') %>

@@ -19,7 +19,7 @@ async function resetPasswordEmail(recipientEmail, subject, link) {
     // Setup the message object
     const msg = {
         to: recipientEmail,
-        from: 'jack@hanningtondigital.com',  // This should be a verified sender email in your SendGrid account
+        from: 'noreply@easyleagues.co',
         subject: subject,
         text: `Your password reset link will expire in 1 hour ${link}`,
         html: htmlBody,

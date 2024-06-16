@@ -41,12 +41,36 @@ router.get('/', ensureAuthenticated, async (req, res) => {
       .map(id => {
         return leagues.find(league => league.id === id);
       });
-    res.render('leagues', { leagues: uniqueLeagues });
+
+    // Fetch user points, ranking, and win/loss record for each league
+    const { data: userPointsData, error: userPointsError } = await supabase
+      .from('league_user_points')
+      .select('league_id, total_points, ranking, total_correct_results, total_incorrect_results')
+      .eq('user_id', userId);
+
+    if (userPointsError) {
+      throw userPointsError;
+    }
+
+    // Map user points data to leagues
+    const leaguesWithStats = uniqueLeagues.map(league => {
+      const userStats = userPointsData.find(stats => stats.league_id === league.id) || {};
+      return {
+        ...league,
+        total_points: userStats.total_points || 0,
+        ranking: userStats.ranking || 'N/A',
+        total_correct_results: userStats.total_correct_results || 0,
+        total_incorrect_results: userStats.total_incorrect_results || 0
+      };
+    });
+
+    res.render('leagues', { leagues: leaguesWithStats });
   } catch (error) {
     console.error('Error fetching leagues:', error);
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 
@@ -318,7 +342,7 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
     }, {});
 
     // Extract unique rounds
-    const rounds = [...new Set(predictions.map(prediction => prediction.fixtures.round))];
+    const rounds = [...new Set(predictions.map(prediction => prediction.fixtures.round))].sort((a, b) => a - b);;
 
     console.log('league participants', participants);
 

@@ -6,14 +6,12 @@
     <a href="/leagues" class="nav-item d-flex align-items-center justify-content-center text-center">
         <iconify-icon inline icon="mdi:trophy-outline"></iconify-icon> Leagues
     </a>
-    <!-- <div class="nav-item dropdown d-flex align-items-center justify-content-center text-cente">
-      <span class="dropdown-toggle" id="logoutDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        <iconify-icon inline icon="solar:user-broken"></iconify-icon> Profile
-      </span>
-      <ul class="dropdown-menu w-100" aria-labelledby="logoutDropdown">
-        <li><a class="dropdown-item" href="/logout">Logout</a></li>
-      </ul>
-    </div> -->
+    <% if (user.role == "admin" ) { %>
+    <a href="/fixtures" class="nav-item d-flex align-items-center justify-content-center text-center">
+      <iconify-icon inline icon="mdi:calendar"></iconify-icon> Games
+    </a>
+   <% } %>
+ 
   </nav>
   </div>
 
