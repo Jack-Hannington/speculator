@@ -106,12 +106,12 @@ router.get('/edit/:id', ensureAuthenticated, async (req, res) => {
 // Edit a fixture
 router.post('/edit/:id', ensureAuthenticated, async (req, res) => {
     const fixtureId = req.params.id;
-    const { home_team_score, away_team_score, round } = req.body;
+    const { home_team_score, away_team_score, round, kick_off_time } = req.body;
 
     try {
         const { data, error } = await supabase
             .from('fixtures')
-            .update({ home_team_score, away_team_score, round })
+            .update({ home_team_score, away_team_score, round, kick_off_time })
             .eq('id', fixtureId);
 
         if (error) {
@@ -124,6 +124,7 @@ router.post('/edit/:id', ensureAuthenticated, async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
 
 // Delete a fixture
 router.post('/delete/:id', ensureAuthenticated, async (req, res) => {
